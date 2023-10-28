@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.10"
 basemodel = "^20190604.1625"
 pydantic = "^2.4.2"
+requests = "^2.31.0"
 
 
 [build-system]

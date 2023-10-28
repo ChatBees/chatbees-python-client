@@ -2,7 +2,8 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
-from models.index import ColumnType, QueryWithEmbedding, QueryResult, Vector
+from server_models.index import (ColumnType, QueryWithEmbedding, QueryResult,
+                               Vector)
 
 
 class CreateCollectionRequest(BaseModel):

@@ -1,41 +1,64 @@
-from client.collection_config import CollectionConfig
+import os
+import sys
+from typing import List
+
+from client_models.collection import Collection
+from client_models.vector import Vector
+from utils.config import Config
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from client_models.collection_config import CollectionConfig
+from server_models.api import (
+    CreateCollectionRequest,
+    ListCollectionsResponse,
+    DeleteCollectionRequest,
+)
 
 
 class NautilusDB:
-    DEMO_ACCOUNT: str = "b487hc1om1"
-    api_key: str = None
-    account_name: str = DEMO_ACCOUNT
-
     @classmethod
-    def validate_setup(cls):
-        if cls.account_name is None:
-            raise ValueError("Account is not set up, please run "
-                             "`nautilus.init(account_name=<account_name>)`")
-
-    @classmethod
-    def get_base_url(cls):
-        cls.validate_setup()
-        return f"https://{cls.account_name}.execute-api.us-west-2.amazonaws.com/alpha"
-
-    @classmethod
-    def init(cls, api_key: str = None, account_name: str = DEMO_ACCOUNT):
-        cls.api_key = api_key
-        cls.account_name = account_name
+    def init(cls, api_key: str = None, account_name: str = Config.DEMO_ACCOUNT):
+        Config.api_key = api_key
+        Config.account_name = account_name
 
     @classmethod
     def create_collection(
             cls,
             collection_name: str,
-            config: CollectionConfig = CollectionConfig.file_upload()):
+            config: CollectionConfig = CollectionConfig.file_upload()) -> Collection:
         config.validate()
-        url = cls.get_base_url() + '/collections/create'
-
-
+        url = Config.get_base_url() + '/collections/create'
+        req = CreateCollectionRequest(name=collection_name,
+                                      dimension=config.dimension,
+                                      description=config.description,
+                                      metas=config.metadata_columns)
+        Config.post(url=url, data=req.model_dump_json())
+        return Collection(collection_name)
 
     @classmethod
-    def list_collections(cls):
-        pass
+    def collection(cls, collection_name: str) -> Collection:
+        return Collection(collection_name)
 
     @classmethod
-    def delete_collection(cls):
-        pass
+    def list_collections(cls) -> List[Collection]:
+        url = Config.get_base_url() + '/collections/list'
+        resp = Config.post(url=url)
+        return [Collection(name) for name in
+                ListCollectionsResponse.model_validate_json(resp.json()).names]
+
+    @classmethod
+    def delete_collection(cls, collection_name: str):
+        req = DeleteCollectionRequest(name=collection_name)
+        url = Config.get_base_url() + '/collections/list'
+        Config.post(url=url, data=req.model_dump_json())
+
+
+if __name__ == '__main__':
+    col = Collection('a')
+    col.upsert_vector([Vector(id='abc', embedding=[1.0, 2.0, 3.0])])
+    col = NautilusDB.create_collection("rkang-test-ut")
+    col.upsert_vector([Vector(id='abc', embedding=[1.0, 2.0, 3.0])])
+    NautilusDB.list_collections()
+    NautilusDB.delete_collection("rkang-test-ut-dne")
+    NautilusDB.delete_collection("rkang-test-ut-ut")

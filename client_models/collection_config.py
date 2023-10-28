@@ -1,17 +1,26 @@
 from enum import Enum
 from typing import Dict
 
-from models.index import ColumnType
+from server_models.index import ColumnType
 
 
 class CollectionConfig:
     dimension: int
     description: str
     metadata_columns: Dict[str, ColumnType]
+
     def __init__(self):
-        pass
+        self.dimension = 0
+        self.description = None
+        self.metadata_columns = dict()
+
     @classmethod
     def openai_ada_002(cls):
+        """
+        Canned collection config
+
+        :return:
+        """
         return CollectionConfig().set_dimension(1536)
 
     @classmethod
@@ -22,12 +31,12 @@ class CollectionConfig:
         :return:
         """
         return (CollectionConfig()
-        .set_dimension(1536)
-        .set_description('This is a demo collection. '
-                         'Embeddings are generated using OpenAI ada_002 models')
-        .add_metadata_column('text', ColumnType.String)
-        .add_metadata_column('tokens', ColumnType.Int)
-        .add_metadata_column('filename', ColumnType.Int))
+                .set_dimension(1536)
+                .set_description('This is a demo collection. Embeddings are '
+                                 'generated using OpenAI ada_002 server_models')
+                .add_metadata_column('text', ColumnType.String)
+                .add_metadata_column('tokens', ColumnType.Int)
+                .add_metadata_column('filename', ColumnType.Int))
 
     def set_dimension(self, dimension: int):
         self.dimension = dimension
@@ -47,3 +56,7 @@ class CollectionConfig:
         if self.dimension is None or self.dimension <= 0:
             raise ValueError("Collection must have dimension > 0")
         return self
+
+
+if __name__ == '__main__':
+    a = CollectionConfig.file_upload()
