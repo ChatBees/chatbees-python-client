@@ -12,9 +12,6 @@ class Collection:
     """
     name: str
 
-    class VectorUpsertResponse:
-        upsert_count: int
-
     def __init__(self, name):
         self.name = name
 
