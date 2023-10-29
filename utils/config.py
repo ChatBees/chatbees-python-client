@@ -27,5 +27,11 @@ class Config:
 
 
     @classmethod
+    def get(cls, url, data=None):
+        resp = requests.get(url, data=data, headers=cls._construct_header())
+        raise_for_error(resp)
+        return resp
+
+    @classmethod
     def _construct_header(cls):
         return None if cls.api_key is None else {'api_key': cls.api_key}

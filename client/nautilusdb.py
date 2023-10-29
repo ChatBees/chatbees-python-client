@@ -3,8 +3,8 @@ import sys
 from typing import List
 
 from client_models.collection import Collection
-from client_models.vector import Vector
 from utils.config import Config
+from utils.exceptions import CollectionNotFound
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -43,22 +43,23 @@ class NautilusDB:
     @classmethod
     def list_collections(cls) -> List[Collection]:
         url = Config.get_base_url() + '/collections/list'
-        resp = Config.post(url=url)
+        resp = Config.get(url=url)
         return [Collection(name) for name in
-                ListCollectionsResponse.model_validate_json(resp.json()).names]
+                ListCollectionsResponse.model_validate(resp.json()).names]
 
     @classmethod
     def delete_collection(cls, collection_name: str):
         req = DeleteCollectionRequest(name=collection_name)
-        url = Config.get_base_url() + '/collections/list'
+        url = Config.get_base_url() + '/collections/delete'
         Config.post(url=url, data=req.model_dump_json())
 
 
 if __name__ == '__main__':
-    col = Collection('a')
-    col.upsert_vector([Vector(id='abc', embedding=[1.0, 2.0, 3.0])])
-    col = NautilusDB.create_collection("rkang-test-ut")
-    col.upsert_vector([Vector(id='abc', embedding=[1.0, 2.0, 3.0])])
+    NautilusDB.create_collection("rkang-test-ut")
     NautilusDB.list_collections()
-    NautilusDB.delete_collection("rkang-test-ut-dne")
-    NautilusDB.delete_collection("rkang-test-ut-ut")
+    try:
+        NautilusDB.delete_collection("rkang-test-ut-dne")
+    except CollectionNotFound:
+        pass
+
+    NautilusDB.delete_collection("rkang-test-ut")

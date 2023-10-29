@@ -42,6 +42,8 @@ def raise_for_error(response: requests.Response):
         case HTTPStatus.OK:
             return
         case HTTPStatus.CONFLICT:
+            raise CollectionAlreadyExists(response.reason)
+        case HTTPStatus.NOT_FOUND:
             raise CollectionNotFound(response.reason)
         case HTTPStatus.PAYMENT_REQUIRED:
             raise LimitExceeded(response.reason)
@@ -49,4 +51,5 @@ def raise_for_error(response: requests.Response):
             raise ServerError(response.reason)
         case _:
             if response.status_code >= 300:
-                raise APIError(f"{response.status_code}: {response.reason}")
+                raise APIError(f"{response.status_code}: {response.reason} "
+                               f"from {response.request.url}")
