@@ -8,7 +8,7 @@ from utils.exceptions import CollectionNotFound
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from client_models.collection_config import CollectionConfig
+from client_models.collection_builder import CollectionBuilder
 from server_models.api import (
     CreateCollectionRequest,
     ListCollectionsResponse,
@@ -23,18 +23,13 @@ class NautilusDB:
         Config.account_name = account_name
 
     @classmethod
-    def create_collection(
-            cls,
-            collection_name: str,
-            config: CollectionConfig = CollectionConfig.file_upload()) -> Collection:
-        config.validate()
+    def create_collection(cls, collection: Collection):
         url = Config.get_base_url() + '/collections/create'
-        req = CreateCollectionRequest(name=collection_name,
-                                      dimension=config.dimension,
-                                      description=config.description,
-                                      metas=config.metadata_columns)
+        req = CreateCollectionRequest(name=collection.name,
+                                      dimension=collection.dimension,
+                                      description=collection.description,
+                                      metas=collection.metadata_columns)
         Config.post(url=url, data=req.model_dump_json())
-        return Collection(collection_name)
 
     @classmethod
     def collection(cls, collection_name: str) -> Collection:
