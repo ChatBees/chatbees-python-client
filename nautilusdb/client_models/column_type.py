@@ -1,6 +1,8 @@
 from enum import Enum
 
 
+__all__ = ["ColumnType"]
+
 class ColumnType(str, Enum):
     """
     Metadata column data types supported by NautilusDB (avro primitive types).

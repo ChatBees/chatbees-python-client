@@ -1,10 +1,10 @@
 import os
-from typing import List, Dict, Optional
+from typing import List, Dict
 from urllib import request
 
 from nautilusdb.client_models.column_type import ColumnType
-from nautilusdb.client_models.ecosystem import AnswerReference
-from nautilusdb.server_models.ecosystem_api import AddDocRequest, AskRequest, AskResponse
+from nautilusdb.client_models.app import AnswerReference
+from nautilusdb.server_models.app_api import AddDocRequest, AskRequest, AskResponse
 from nautilusdb.utils.config import Config
 from nautilusdb.utils.exceptions import Unimplemented
 from nautilusdb.client_models.vector import Vector
@@ -15,6 +15,7 @@ from nautilusdb.utils.file_upload import (
     validate_url_file,
 )
 
+__all__ = ["Collection"]
 
 class Collection:
     """

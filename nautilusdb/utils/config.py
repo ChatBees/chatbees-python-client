@@ -1,6 +1,6 @@
 import requests
 
-from utils.exceptions import raise_for_error
+from .exceptions import raise_for_error
 
 
 class Config:

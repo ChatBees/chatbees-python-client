@@ -2,6 +2,16 @@ from http import HTTPStatus
 
 import requests
 
+__all__ = [
+    "CollectionNotFound",
+    "CollectionAlreadyExists",
+    "NotAuthorized",
+    "LimitExceeded",
+    "ServerError",
+    "APIError",
+    "Unimplemented",
+]
+
 
 class CollectionNotFound(Exception):
     pass
@@ -51,5 +61,6 @@ def raise_for_error(response: requests.Response):
             raise ServerError(response.reason)
         case _:
             if response.status_code >= 300:
-                raise APIError(f"{response.status_code}: {response.reason} "
-                               f"from {response.request.url}")
+                raise APIError(
+                    f"{response.status_code}: {response.reason} "
+                    f"from {response.request.url}")

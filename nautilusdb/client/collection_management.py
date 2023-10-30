@@ -1,8 +1,4 @@
-import os
-import sys
 from typing import List
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from nautilusdb.client_models.collection import Collection
 from nautilusdb.utils.config import Config
@@ -12,6 +8,13 @@ from nautilusdb.server_models.api import (
     ListCollectionsResponse,
     DeleteCollectionRequest,
 )
+
+__all__ = [
+    "create_collection",
+    "collection",
+    "list_collections",
+    "delete_collection",
+]
 
 
 def create_collection(col: Collection) -> Collection:

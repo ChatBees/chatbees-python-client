@@ -2,6 +2,8 @@ from typing import Optional, Dict, Any, List
 
 from nautilusdb.server_models.index import Vector as ServerVector
 
+__all__ = ["Vector"]
+
 
 class Vector:
     """
@@ -16,7 +18,7 @@ class Vector:
     def __init__(
         self, vid: str,
         embedding: Optional[List[float]] = None,
-        metadata:Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None
     ):
         """
         Initializes a vector

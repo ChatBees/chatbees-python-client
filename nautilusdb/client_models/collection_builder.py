@@ -1,9 +1,10 @@
-from enum import Enum
 from typing import Dict
 
 from nautilusdb.client_models.collection import Collection
 from nautilusdb.client_models.column_type import ColumnType
 
+
+__all__ = ["CollectionBuilder"]
 
 class CollectionBuilder:
     name: str
@@ -59,7 +60,7 @@ class CollectionBuilder:
                             column_name: str,
                             column_type: ColumnType) -> "CollectionBuilder":
         if self.metadata_columns is None:
-            self.metadata_columns = dict()
+            self.metadata_columns = {}
         self.metadata_columns[column_name] = column_type
         return self
 
