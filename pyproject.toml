@@ -1,13 +1,12 @@
 [tool.poetry]
 name = "nautilusdb-python-client"
 version = "0.1.0"
-description = ""
+description = "Python client for NautilusDB"
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-basemodel = "^20190604.1625"
 pydantic = "^2.4.2"
 requests = "^2.31.0"
 

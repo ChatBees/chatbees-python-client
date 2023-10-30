@@ -3,11 +3,6 @@ from typing import Any, Dict, List, Optional, Tuple
 from pydantic import BaseModel
 
 
-"""
-A vector has 4 attributes: a unique id, embedding, a vector id and metadatas.
-"""
-
-
 class Vector(BaseModel):
     id: str
     embedding: Optional[List[float]] = None

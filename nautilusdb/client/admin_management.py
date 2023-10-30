@@ -3,8 +3,8 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from server_models.api import CreateApiKeyRequest, CreateApiKeyResponse
-from utils.config import Config
+from nautilusdb.server_models.api import CreateApiKeyRequest, CreateApiKeyResponse
+from nautilusdb.utils.config import Config
 
 
 def init(

@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Dict
 
-from client_models.collection import Collection
-from client_models.column_type import ColumnType
+from nautilusdb.client_models.collection import Collection
+from nautilusdb.client_models.column_type import ColumnType
 
 
 class CollectionBuilder:
@@ -15,25 +15,27 @@ class CollectionBuilder:
         self.name = ""
         self.dimension = 0
         self.description = ""
-        self.metadata_columns = dict()
+        self.metadata_columns = {}
 
     @classmethod
-    def openai_ada_002(cls) -> "CollectionBuilder":
+    def openai_ada_002(cls, name: str = "") -> "CollectionBuilder":
         """
-        Canned collection config
+        Canned collection config for embeddings generated with OpenAI's
+        text-embedding-ada-002 model.
 
         :return:
         """
-        return CollectionBuilder().set_dimension(1536)
+        return CollectionBuilder().set_dimension(1536).set_name(name)
 
     @classmethod
-    def file_upload(cls) -> "CollectionBuilder":
+    def file_upload(cls, name: str = "") -> "CollectionBuilder":
         """
-        Canned collection config that supports file upload
+        Canned collection config that is compatible with file_upload API.
 
         :return:
         """
         return (CollectionBuilder()
+                .set_name(name)
                 .set_dimension(1536)
                 .set_description('This is a demo collection. Embeddings are '
                                  'generated using OpenAI ada_002 server_models')
@@ -70,7 +72,3 @@ class CollectionBuilder:
                           self.dimension,
                           self.description,
                           self.metadata_columns)
-
-
-if __name__ == '__main__':
-    collection = CollectionBuilder.file_upload().set_name("My file").build()

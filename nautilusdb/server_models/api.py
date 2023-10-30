@@ -2,8 +2,8 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
-from client_models.column_type import ColumnType
-from server_models.index import (
+from nautilusdb.client_models.column_type import ColumnType
+from nautilusdb.server_models.index import (
     QueryWithEmbedding,
     QueryResult,
     Vector,

@@ -4,22 +4,24 @@ from typing import List
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from client_models.collection import Collection
-from utils.config import Config
+from nautilusdb.client_models.collection import Collection
+from nautilusdb.utils.config import Config
 
-from server_models.api import (
+from nautilusdb.server_models.api import (
     CreateCollectionRequest,
     ListCollectionsResponse,
     DeleteCollectionRequest,
 )
 
 
-def create_collection(col: Collection):
+def create_collection(col: Collection) -> Collection:
     """
     Create a new collection in NautilusDB.
 
     Args:
         col (Collection): The collection to create.
+    Returns:
+        The created collection
 
     """
     url = f'{Config.get_base_url()}/collections/create'
@@ -29,11 +31,12 @@ def create_collection(col: Collection):
         description=col.description,
         metas=col.metadata_columns)
     Config.post(url=url, data=req.model_dump_json())
+    return col
 
 
 def collection(collection_name: str) -> Collection:
     """
-    Get a collection by name.
+    Initializes a collection by name.
 
     Args:
         collection_name (str): The name of the collection.
