@@ -7,23 +7,3 @@ class Vector(BaseModel):
     id: str
     embedding: Optional[List[float]] = None
     metas: Optional[Dict[str, Any]] = None
-
-
-class VectorWithScore(Vector):
-    score: float
-
-
-class Query(BaseModel):
-    # where supports SQL =, <, >, <=, >=, !=, and, or, etc.
-    where: Optional[str] = None
-    return_metas: Optional[List[str]] = None
-    return_embedding: Optional[bool] = False
-    top_k: Optional[int] = 3
-
-
-class QueryWithEmbedding(Query):
-    embedding: List[float]
-
-
-class QueryResult(BaseModel):
-    vectors: List[VectorWithScore]

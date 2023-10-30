@@ -4,8 +4,6 @@ from pydantic import BaseModel
 
 from nautilusdb.client_models.column_type import ColumnType
 from nautilusdb.server_models.index import (
-    QueryWithEmbedding,
-    QueryResult,
     Vector,
 )
 
@@ -32,16 +30,6 @@ class UpsertRequest(BaseModel):
 
 class UpsertResponse(BaseModel):
     upsert_count: int
-
-
-class QueryRequest(BaseModel):
-    collection_name: str
-    queries: List[QueryWithEmbedding]
-
-
-class QueryResponse(BaseModel):
-    # The results are sorted by the score in the descending order
-    results: List[QueryResult]
 
 
 class CreateApiKeyRequest(BaseModel):
