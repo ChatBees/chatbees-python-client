@@ -47,7 +47,7 @@ def collection(collection_name: str) -> Collection:
     Returns:
         Collection: The collection object.
     """
-    return Collection(collection_name)
+    return Collection(name=collection_name)
 
 
 def list_collections() -> List[Collection]:
@@ -59,7 +59,7 @@ def list_collections() -> List[Collection]:
     """
     url = f'{Config.get_base_url()}/collections/list'
     resp = Config.get(url=url)
-    return [Collection(name) for name in
+    return [Collection(name=name) for name in
             ListCollectionsResponse.model_validate(resp.json()).names]
 
 

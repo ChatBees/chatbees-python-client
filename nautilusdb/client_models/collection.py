@@ -2,6 +2,8 @@ import os
 from typing import List, Dict
 from urllib import request
 
+from pydantic import BaseModel
+
 from nautilusdb.client_models.column_type import ColumnType
 from nautilusdb.client_models.app import AnswerReference
 from nautilusdb.server_models.app_api import AddDocRequest, AskRequest, AskResponse
@@ -18,7 +20,7 @@ from nautilusdb.utils.file_upload import (
 __all__ = ["Collection"]
 
 
-class Collection:
+class Collection(BaseModel):
     """
     A Collection is a named vector search index with a fixed embedding dimension.
 
@@ -26,34 +28,19 @@ class Collection:
         import nautilusdb as ndb
         collection =  ndb.create_collection(ndb.
     """
+    #  Name of the collection
     name: str
-    dimension: int
-    description: str
-    metadata_columns: Dict[str, ColumnType]
 
-    def __init__(
-        self,
-        name: str,
-        dimension: int = 0,
-        description: str = "",
-        metadata_columns: Dict[str, ColumnType] = None
-        ):
-        """
-        Creates a Collection object
+    # Dimension of the vectors in this collection
+    dimension: int = 0
 
-        :param name: Name of the collection
-        :param dimension: Dimension of the vectors in this Collection. ALl
-                          vectors in a Collection have the same dimension.
-        :param description: Description of the collection
-        :param metadata_columns: A set of metadata columns associated with
-                                 vectors in this collection.
-                                     Key: Column name
-                                     Value: Column type (avro primitive type)
-        """
-        self.name = name
-        self.dimension = dimension
-        self.description = description
-        self.metadata_columns = metadata_columns
+    # Description of the collection
+    description: str = ""
+
+    # A set of metadata columns associated with vectors in this collection.
+    #       Key: Column name
+    #       Value: Column type(avro primitive type)
+    metadata_columns: Dict[str, ColumnType] = {}
 
     def upsert_vector(self, vectors: List[Vector]) -> int:
         """

@@ -1,7 +1,7 @@
 from enum import Enum
 
-
 __all__ = ["ColumnType"]
+
 
 class ColumnType(str, Enum):
     """
@@ -17,4 +17,3 @@ class ColumnType(str, Enum):
     Double = "double"
     String = "string"
     Bytes = "bytes"
-

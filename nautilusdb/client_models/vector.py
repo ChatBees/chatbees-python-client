@@ -1,37 +1,29 @@
 from typing import Optional, Dict, Any, List
 
+from pydantic import BaseModel
+
 from nautilusdb.server_models.index import Vector as ServerVector
 
 __all__ = ["Vector"]
 
 
-class Vector:
+class Vector(BaseModel):
     """
     A Vector is a document with embeddings and an optional set of key-value
     properties (metadata).
     """
 
+    # ID of the vector
     vid: str
-    embedding: Optional[List[float]]
-    metadata: Optional[Dict[str, Any]]
 
-    def __init__(
-        self, vid: str,
-        embedding: Optional[List[float]] = None,
-        metadata: Optional[Dict[str, Any]] = None
-    ):
-        """
-        Initializes a vector
+    # Embedding of the vector.
+    #
+    # Embedding dimension must be identical to the embedding dimension
+    # configured for its collection.
+    embedding: List[float] = None
 
-        :param vid: ID of the vector
-        :param embedding: Embedding of the vector. Embedding dimension must be
-                          identical to the embedding dimension configured for
-                          its collection.
-        :param metadata: Metadata associated with this vector.
-        """
-        self.vid = vid
-        self.embedding = embedding
-        self.metadata = metadata
+    # Metadata associated with this vector.
+    metadata: Dict[str, Any] = None
 
     def to_api_vector(self) -> ServerVector:
         if self.vid is None or self.vid == "":

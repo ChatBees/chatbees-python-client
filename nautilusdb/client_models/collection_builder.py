@@ -3,8 +3,8 @@ from typing import Dict
 from nautilusdb.client_models.collection import Collection
 from nautilusdb.client_models.column_type import ColumnType
 
-
 __all__ = ["CollectionBuilder"]
+
 
 class CollectionBuilder:
     name: str
@@ -38,8 +38,9 @@ class CollectionBuilder:
         return (CollectionBuilder()
                 .set_name(name)
                 .set_dimension(1536)
-                .set_description('This is a demo collection. Embeddings are '
-                                 'generated using OpenAI ada_002 server_models')
+                .set_description(
+            'This is a demo collection. Embeddings are '
+            'generated using OpenAI ada_002 server_models')
                 .add_metadata_column('text', ColumnType.String)
                 .add_metadata_column('tokens', ColumnType.Int)
                 .add_metadata_column('filename', ColumnType.Int))
@@ -56,9 +57,11 @@ class CollectionBuilder:
         self.description = description
         return self
 
-    def add_metadata_column(self,
-                            column_name: str,
-                            column_type: ColumnType) -> "CollectionBuilder":
+    def add_metadata_column(
+        self,
+        column_name: str,
+        column_type: ColumnType
+        ) -> "CollectionBuilder":
         if self.metadata_columns is None:
             self.metadata_columns = {}
         self.metadata_columns[column_name] = column_type
@@ -69,7 +72,8 @@ class CollectionBuilder:
             raise ValueError("Collection must have a name")
         if self.dimension is None or self.dimension <= 0:
             raise ValueError("Collection must have dimension > 0")
-        return Collection(self.name,
-                          self.dimension,
-                          self.description,
-                          self.metadata_columns)
+        return Collection(
+            name=self.name,
+            dimension=self.dimension,
+            description=self.description,
+            metadata_columns=self.metadata_columns)
