@@ -31,7 +31,7 @@ class CollectionBuilder:
     @classmethod
     def question_answer(cls, name: str = "") -> "CollectionBuilder":
         """
-        Canned collection config that is compatible with file_upload API.
+        Canned collection config that is compatible with Q/A API.
 
         :return:
         """
