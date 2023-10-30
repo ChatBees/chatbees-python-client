@@ -38,9 +38,8 @@ class CollectionBuilder:
         return (CollectionBuilder()
                 .set_name(name)
                 .set_dimension(1536)
-                .set_description(
-            'This is a demo collection. Embeddings are '
-            'generated using OpenAI ada_002 server_models')
+                .set_description('This is a demo collection. Embeddings are '
+                                 'generated using OpenAI ada_002 server_models')
                 .add_metadata_column('text', ColumnType.String)
                 .add_metadata_column('tokens', ColumnType.Int)
                 .add_metadata_column('filename', ColumnType.Int))
