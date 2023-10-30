@@ -18,8 +18,9 @@ class Config:
         return f"https://{cls.account_name}.us-west-2.aws.nautilusdb.com"
 
     @classmethod
-    def post(cls, url, data=None):
-        resp = requests.post(url, data=data, headers=cls._construct_header())
+    def post(cls, url, data=None, files=None):
+        resp = requests.post(
+            url, data=data, files=files, headers=cls._construct_header())
         raise_for_error(resp)
         return resp
 
