@@ -17,6 +17,7 @@ from nautilusdb.utils.file_upload import (
 
 __all__ = ["Collection"]
 
+
 class Collection:
     """
     A Collection is a named vector search index with a fixed embedding dimension.
@@ -30,11 +31,13 @@ class Collection:
     description: str
     metadata_columns: Dict[str, ColumnType]
 
-    def __init__(self,
-                 name: str,
-                 dimension: int = 0,
-                 description: str = "",
-                 metadata_columns: Dict[str, ColumnType] = None):
+    def __init__(
+        self,
+        name: str,
+        dimension: int = 0,
+        description: str = "",
+        metadata_columns: Dict[str, ColumnType] = None
+        ):
         """
         Creates a Collection object
 
@@ -66,8 +69,9 @@ class Collection:
         :return: The number of vectors created or updated
         """
         url = f'{Config.get_base_url()}/vectors/upsert'
-        req = UpsertRequest(collection_name=self.name,
-                            vectors=[v.to_api_vector() for v in vectors])
+        req = UpsertRequest(
+            collection_name=self.name,
+            vectors=[v.to_api_vector() for v in vectors])
         resp = Config.post(url=url, data=req.model_dump_json())
         resp = UpsertResponse.model_validate(resp.json())
         return resp.upsert_count
@@ -96,14 +100,16 @@ class Collection:
             validate_url_file(path_or_url)
             with request.urlopen(path_or_url) as f:
                 fname = os.path.basename(path_or_url)
-                Config.post(url=url, files={'file': (fname, f)},
-                            data={'request': req.model_dump_json()})
+                Config.post(
+                    url=url, files={'file': (fname, f)},
+                    data={'request': req.model_dump_json()})
         else:
             validate_file(path_or_url)
             with open(path_or_url, 'rb') as f:
                 fname = os.path.basename(path_or_url)
-                Config.post(url=url, files={'file': (fname, f)},
-                            data={'request': req.model_dump_json()})
+                Config.post(
+                    url=url, files={'file': (fname, f)},
+                    data={'request': req.model_dump_json()})
 
     def ask(
         self,
@@ -124,4 +130,9 @@ class Collection:
         resp = Config.post(url=url, data=req.model_dump_json())
         resp = AskResponse.model_validate(resp.json())
 
-        return resp.answer, resp.refs
+        unique_doc_names = {ref.doc_name for ref in resp.refs}
+
+        return (
+            resp.answer,
+            [AnswerReference(doc_name=name) for name in unique_doc_names]
+        )
