@@ -18,5 +18,7 @@ class Vector:
         self.metadata = metadata
 
     def to_api_vector(self) -> ServerVector:
-        return ServerVector(id=self.id, embedding=self.embedding,
-                         metas=self.metadata)
+        return ServerVector(
+            id=self.id,
+            embedding=self.embedding,
+            metas=self.metadata)

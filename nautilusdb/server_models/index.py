@@ -1,18 +1,6 @@
-import uuid
-from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel
-
-
-class ColumnType(str, Enum):
-    Boolean = "boolean"
-    Int = "int"
-    Long = "long"
-    Float = "float"
-    Double = "double"
-    String = "string"
-    Bytes = "bytes"
 
 
 """

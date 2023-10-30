@@ -2,8 +2,12 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
-from server_models.index import (ColumnType, QueryWithEmbedding, QueryResult,
-                               Vector)
+from client_models.column_type import ColumnType
+from server_models.index import (
+    QueryWithEmbedding,
+    QueryResult,
+    Vector,
+)
 
 
 class CreateCollectionRequest(BaseModel):
@@ -38,3 +42,11 @@ class QueryRequest(BaseModel):
 class QueryResponse(BaseModel):
     # The results are sorted by the score in the descending order
     results: List[QueryResult]
+
+
+class CreateApiKeyRequest(BaseModel):
+    pass
+
+
+class CreateApiKeyResponse(BaseModel):
+    api_key: str

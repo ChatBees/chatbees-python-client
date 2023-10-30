@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Dict
 
 from client_models.collection import Collection
-from server_models.index import ColumnType
+from client_models.column_type import ColumnType
 
 
 class CollectionBuilder:

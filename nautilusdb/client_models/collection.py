@@ -1,6 +1,6 @@
 from typing import List, Dict
 
-from server_models.index import ColumnType
+from client_models.column_type import ColumnType
 from utils.config import Config
 from utils.exceptions import Unimplemented
 from client_models.vector import Vector
@@ -27,7 +27,7 @@ class Collection:
         self.metadata_columns = metadata_columns
 
     def upsert_vector(self, vectors: List[Vector]) -> int:
-        url = Config.get_base_url() + '/vectors/upsert'
+        url = f'{Config.get_base_url()}/vectors/upsert'
         req = UpsertRequest(collection_name=self.name,
                             vectors=[v.to_api_vector() for v in vectors])
         resp = Config.post(url=url, data=req.model_dump_json())

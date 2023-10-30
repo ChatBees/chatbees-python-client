@@ -4,19 +4,17 @@ from utils.exceptions import raise_for_error
 
 
 class Config:
-    DEMO_ACCOUNT: str = "public"
+    PUBLIC_ACCOUNT: str = "public"
     api_key: str = None
-    account_name: str = DEMO_ACCOUNT
+    account_name: str = PUBLIC_ACCOUNT
 
     @classmethod
     def validate_setup(cls):
-        if cls.account_name is None:
-            raise ValueError("Account is not set up, please run "
-                             "`nautilus.init(account_name=<account_name>)`")
+        if cls.account_name is None or cls.account_name != cls.PUBLIC_ACCOUNT:
+            raise ValueError("Only public account ('public') is supported.")
 
     @classmethod
     def get_base_url(cls):
-        Config.validate_setup()
         return f"https://{cls.account_name}.us-west-2.aws.nautilusdb.com"
 
     @classmethod
@@ -24,7 +22,6 @@ class Config:
         resp = requests.post(url, data=data, headers=cls._construct_header())
         raise_for_error(resp)
         return resp
-
 
     @classmethod
     def get(cls, url, data=None):
