@@ -13,7 +13,7 @@ Please take a moment to fill out this [feedback form](https://docs.google.com/fo
 You can try out NautilusDB in just a few lines of code. We have 
 prepared a special public collection ```openai-web``` that can answer 
 questions about the contents of ```www.openai.com``` 
-``` python
+```python
 import nautilusdb as ndb
 
 answer, _ = ndb.collection('openai-web').ask('what is red team?')
@@ -21,9 +21,10 @@ print(answer)
 """
 Sample answer:
 
-Red teaming is a process of adversarial testing and evaluation of
-possibly harmful capabilities in new systems, performed by a cohort
-of external experts in collaboration with OpenAI.
+Red team refers to the group of external experts who work with OpenAI to
+identify and evaluate potential risks and harmful capabilities in new systems.
+The red team's role is to help develop taxonomies of risk and provide input
+throughout the model and product development lifecycle.
 """
 
 ```
@@ -99,7 +100,7 @@ ndb.init(api_key="<my_api_key>")
 # Create a collection called c1. c1 is configured to be compatible with 
 # Q/A APIs. It has vector embeddings dimension of 1536, contains three metadata
 # columns: text (string), tokens (int), filename (string). 
-collection = ndb.CollectionBuilder.question_answer('c1').build()
+collection = ndb.CollectionBuilder.question_answer('llm_research').build()
 ndb.create_collection(collection)
 ```
 
@@ -121,8 +122,8 @@ ndb.init(api_key="<my_api_key>")
 
 # Local file and URLs are both supported.
 # URL must contain the full scheme prefix (http:// or https://)
-ndb.collection('my_collection').upload_document('/path/to/file.pdf')
-ndb.collection('my_collection').upload_document('https://path/to/file.pdf')
+ndb.collection('llm_research').upload_document('/path/to/file.pdf')
+ndb.collection('llm_research').upload_document('https://path/to/file.pdf')
 
 ```
 
@@ -144,5 +145,5 @@ ndb.init(api_key="<my_api_key>")
 answer, refs = ndb.collection('openai-web').ask('what is red team?')
 
 
-answer, refs = ndb.collection('<your_collection>').ask('<your_question>')
+answer, refs = ndb.collection('llm_research').ask('what is a transformer?')
 ```
