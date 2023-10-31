@@ -8,7 +8,7 @@ from .client_models.column_type import *
 from .utils.exceptions import (
     CollectionNotFound,
     CollectionAlreadyExists,
-    NotAuthorized,
+    UnAuthorized,
     LimitExceeded,
     ServerError,
     APIError,

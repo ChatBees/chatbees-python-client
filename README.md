@@ -4,7 +4,7 @@ cloud-native vector search service.
 
 NautilusDB is currently in <ins>**public alpha**</ins>. We're actively improving 
 the product and releasing new features and we'd love to hear your feedback! 
-Please take a moment to fill out this [feedback form](https://docs.google.com/forms/d/e/1FAIpQLSdAB6FLU91oUBJVRcPtpEK3WpgL9cVWethFHx0gAkKhg7LjrQ/viewform) to help us understand your use-case better.
+Please take a moment to fill out this [feedback form](https://forms.gle/pif6Vx2LqPjW5v4w5) to help us understand your use-case better.
 
 By default, all collections are subject to permanent deletion after 2 weeks. 
 Please let us know if you need to keep it for longer via the feedback form.

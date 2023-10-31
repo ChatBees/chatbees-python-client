@@ -6,7 +6,7 @@ import requests
 __all__ = [
     "CollectionNotFound",
     "CollectionAlreadyExists",
-    "NotAuthorized",
+    "UnAuthorized",
     "LimitExceeded",
     "ServerError",
     "APIError",
@@ -22,7 +22,7 @@ class CollectionAlreadyExists(Exception):
     pass
 
 
-class NotAuthorized(Exception):
+class UnAuthorized(Exception):
     pass
 
 
@@ -69,6 +69,8 @@ def raise_for_error(response: requests.Response):
             raise LimitExceeded(_get_reason(response))
         case HTTPStatus.INTERNAL_SERVER_ERROR:
             raise ServerError(_get_reason(response))
+        case HTTPStatus.UNAUTHORIZED:
+            raise UnAuthorized(_get_reason(response))
         case _:
             if response.status_code >= 400:
                 raise APIError(
