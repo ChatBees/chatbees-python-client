@@ -10,11 +10,11 @@ from nautilusdb.server_models.api import (
 from nautilusdb.server_models.app_api import AskResponse, AnswerReference
 
 
-class E2E(unittest.TestCase):
+class APISurfaceTest(unittest.TestCase):
     API_KEY = 'fakeapikey'
 
     def setUp(self):
-        ndb.init(api_key=E2E.API_KEY)
+        ndb.init(api_key=APISurfaceTest.API_KEY)
 
     @requests_mock.mock()
     def test_create_api_key(self, mock):
