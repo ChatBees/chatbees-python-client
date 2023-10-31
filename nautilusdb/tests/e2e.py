@@ -4,7 +4,6 @@ import requests_mock
 import nautilusdb as ndb
 from nautilusdb import CollectionBuilder, Vector
 from nautilusdb.server_models.api import (
-    CreateCollectionRequest,
     ListCollectionsResponse,
     UpsertResponse,
 )
@@ -41,10 +40,29 @@ class E2E(unittest.TestCase):
             additional_matcher=match_request_text,
         )
 
-        assert ndb.create_collection(CollectionBuilder()
+        assert ndb.create_collection(
+            CollectionBuilder()
             .set_name('fakename')
             .set_dimension(10)
             .set_description('descr').build())
+
+    @requests_mock.mock()
+    def test_create_qa_collection(self, mock):
+        def match_request_text(request):
+            return request.text == (
+                '{"name":"fakename","dimension":1536,'
+                '"description":"This is a demo collection. '
+                'Embeddings are generated using OpenAI ada_002 server_models",'
+                '"metas":{"text":"string","tokens":"int","filename":"string"}}')
+
+        mock.register_uri(
+            'POST',
+            'https://public.us-west-2.aws.nautilusdb.com/collections/create',
+            request_headers={'api_key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+        )
+
+        assert ndb.create_collection(CollectionBuilder.question_answer("fakename").build())
 
     @requests_mock.mock()
     def test_list_collections(self, mock):

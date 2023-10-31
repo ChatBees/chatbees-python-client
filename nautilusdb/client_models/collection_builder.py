@@ -42,7 +42,7 @@ class CollectionBuilder:
                                  'generated using OpenAI ada_002 server_models')
                 .add_metadata_column('text', ColumnType.String)
                 .add_metadata_column('tokens', ColumnType.Int)
-                .add_metadata_column('filename', ColumnType.Int))
+                .add_metadata_column('filename', ColumnType.String))
 
     def set_dimension(self, dimension: int) -> "CollectionBuilder":
         self.dimension = dimension
