@@ -33,4 +33,4 @@ class Config:
 
     @classmethod
     def _construct_header(cls):
-        return None if cls.api_key is None else {'api_key': cls.api_key}
+        return None if cls.api_key is None else {'api-key': cls.api_key}

@@ -1,3 +1,4 @@
+import json
 from http import HTTPStatus
 
 import requests
@@ -41,6 +42,15 @@ class Unimplemented(Exception):
     pass
 
 
+def _get_reason(response: requests.Response):
+    try:
+        reason = json.loads(response.content)
+        return reason.get('detail')
+    except Exception as e:
+        pass
+    return response.reason
+
+
 def raise_for_error(response: requests.Response):
     """
     Converts and raises http errors into appropriate client-side exception
@@ -52,15 +62,15 @@ def raise_for_error(response: requests.Response):
         case HTTPStatus.OK:
             return
         case HTTPStatus.CONFLICT:
-            raise CollectionAlreadyExists(response.reason)
+            raise CollectionAlreadyExists(_get_reason(response))
         case HTTPStatus.NOT_FOUND:
-            raise CollectionNotFound(response.reason)
+            raise CollectionNotFound(_get_reason(response))
         case HTTPStatus.PAYMENT_REQUIRED:
-            raise LimitExceeded(response.reason)
+            raise LimitExceeded(_get_reason(response))
         case HTTPStatus.INTERNAL_SERVER_ERROR:
-            raise ServerError(response.reason)
+            raise ServerError(_get_reason(response))
         case _:
-            if response.status_code >= 300:
+            if response.status_code >= 400:
                 raise APIError(
-                    f"{response.status_code}: {response.reason} "
+                    f"{response.status_code}: {_get_reason(response)} "
                     f"from {response.request.url}")
