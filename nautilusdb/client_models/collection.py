@@ -91,6 +91,8 @@ class Collection(BaseModel):
                     url=url, files={'file': (fname, f)},
                     data={'request': req.model_dump_json()})
         else:
+            # Handle tilde "~/blah"
+            path_or_url = os.path.expanduser(path_or_url)
             validate_file(path_or_url)
             with open(path_or_url, 'rb') as f:
                 fname = os.path.basename(path_or_url)
