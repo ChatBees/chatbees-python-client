@@ -2,11 +2,12 @@
 Python client for [NautilusDB](http://nautilusdb.com), a fully-managed, 
 cloud-native vector search service.
 
-NautilusDB is currently in <ins>**public alpha**</ins>. We're actively 
-improving 
-the 
-product and releasing new features and we'd love to hear your feedback! 
+NautilusDB is currently in <ins>**public alpha**</ins>. We're actively improving 
+the product and releasing new features and we'd love to hear your feedback! 
 Please take a moment to fill out this [feedback form](https://docs.google.com/forms/d/e/1FAIpQLSdAB6FLU91oUBJVRcPtpEK3WpgL9cVWethFHx0gAkKhg7LjrQ/viewform) to help us understand your use-case better.
+
+By default, all collections are subject to permanent deletion after 2 weeks. 
+Please let us know if you need to keep it for longer via the feedback form.
 
 ## Quick start
 
@@ -146,4 +147,17 @@ answer, refs = ndb.collection('openai-web').ask('what is red team?')
 
 
 answer, refs = ndb.collection('llm_research').ask('what is a transformer?')
+```
+
+## Deleting a collection
+You can delete a public collection or a private collection using the same 
+API key that was used to create it.
+
+```python
+import nautilusdb as ndb
+
+# Optional API key to access private collections
+ndb.init(api_key="<my_api_key>")
+
+ndb.delete_collection('llm_research')
 ```
