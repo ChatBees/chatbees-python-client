@@ -36,7 +36,7 @@ class APISurfaceTest(unittest.TestCase):
         mock.register_uri(
             'POST',
             'https://public.us-west-2.aws.nautilusdb.com/collections/create',
-            request_headers={'api_key': 'fakeapikey'},
+            request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
         )
 
@@ -58,7 +58,7 @@ class APISurfaceTest(unittest.TestCase):
         mock.register_uri(
             'POST',
             'https://public.us-west-2.aws.nautilusdb.com/collections/create',
-            request_headers={'api_key': 'fakeapikey'},
+            request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
         )
 
@@ -70,7 +70,7 @@ class APISurfaceTest(unittest.TestCase):
         mock.register_uri(
             'GET',
             'https://public.us-west-2.aws.nautilusdb.com/collections/list',
-            request_headers={'api_key': 'fakeapikey'},
+            request_headers={'api-key': 'fakeapikey'},
             text=resp.model_dump_json(),
         )
 
@@ -85,7 +85,7 @@ class APISurfaceTest(unittest.TestCase):
         mock.register_uri(
             'POST',
             'https://public.us-west-2.aws.nautilusdb.com/collections/delete',
-            request_headers={'api_key': 'fakeapikey'},
+            request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
         )
 
@@ -101,7 +101,7 @@ class APISurfaceTest(unittest.TestCase):
         mock.register_uri(
             'POST',
             'https://public.us-west-2.aws.nautilusdb.com/vectors/upsert',
-            request_headers={'api_key': 'fakeapikey'},
+            request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
             text=UpsertResponse(upsert_count=1).model_dump_json(),
         )
@@ -119,7 +119,7 @@ class APISurfaceTest(unittest.TestCase):
         mock.register_uri(
             'POST',
             'https://public.us-west-2.aws.nautilusdb.com/qadocs/ask',
-            request_headers={'api_key': 'fakeapikey'},
+            request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
             text=AskResponse(
                 answer='42',

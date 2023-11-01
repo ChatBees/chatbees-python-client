@@ -15,7 +15,6 @@ class Config:
 
     @classmethod
     def get_base_url(cls):
-        # For local testing, use http://localhost:8080
         return f"https://{cls.account_name}.us-west-2.aws.nautilusdb.com"
 
     @classmethod
