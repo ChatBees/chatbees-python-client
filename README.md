@@ -130,7 +130,9 @@ ndb.collection('llm_research').upload_document('https://path/to/file.pdf')
 
 ## Asking a question
 You can ask questions within a collection. API key is required for private
-collections only.
+collections only. ```ask()``` method returns a plain-text answer to 
+your question as well as a list of most relevance references used to derive 
+the answer. 
 
 **Available public collections**
 - ```openai-web```: Contains contents of ```www.openai.com```

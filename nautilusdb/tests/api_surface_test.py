@@ -12,6 +12,7 @@ from nautilusdb.server_models.app_api import AskResponse, AnswerReference
 
 class APISurfaceTest(unittest.TestCase):
     API_KEY = 'fakeapikey'
+    API_ENDPOINT = 'https://public.us-west-2.aws.nautilusdb.com'
 
     def setUp(self):
         ndb.init(api_key=APISurfaceTest.API_KEY)
@@ -20,7 +21,7 @@ class APISurfaceTest(unittest.TestCase):
     def test_create_api_key(self, mock):
         mock.register_uri(
             'POST',
-            'https://public.us-west-2.aws.nautilusdb.com/apikey/create',
+            f'{APISurfaceTest.API_ENDPOINT}/apikey/create',
             text='{"api_key": "anotherfakeapikey"}',
         )
 
@@ -35,7 +36,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            'https://public.us-west-2.aws.nautilusdb.com/collections/create',
+            f'{APISurfaceTest.API_ENDPOINT}/collections/create',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
         )
@@ -57,7 +58,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            'https://public.us-west-2.aws.nautilusdb.com/collections/create',
+            f'{APISurfaceTest.API_ENDPOINT}/collections/create',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
         )
@@ -69,7 +70,7 @@ class APISurfaceTest(unittest.TestCase):
         resp = ListCollectionsResponse(names=['a', 'b', 'c'])
         mock.register_uri(
             'GET',
-            'https://public.us-west-2.aws.nautilusdb.com/collections/list',
+            f'{APISurfaceTest.API_ENDPOINT}/collections/list',
             request_headers={'api-key': 'fakeapikey'},
             text=resp.model_dump_json(),
         )
@@ -84,7 +85,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            'https://public.us-west-2.aws.nautilusdb.com/collections/delete',
+            f'{APISurfaceTest.API_ENDPOINT}/collections/delete',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
         )
@@ -100,7 +101,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            'https://public.us-west-2.aws.nautilusdb.com/vectors/upsert',
+            f'{APISurfaceTest.API_ENDPOINT}/vectors/upsert',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
             text=UpsertResponse(upsert_count=1).model_dump_json(),
@@ -118,7 +119,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            'https://public.us-west-2.aws.nautilusdb.com/qadocs/ask',
+            f'{APISurfaceTest.API_ENDPOINT}/qadocs/ask',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
             text=AskResponse(
