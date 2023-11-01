@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "nautilusdb"
+version = "0.5.0"
+description = "Python client for NautilusDB"
+authors = ["NautilusDB <contact@nautilusdb.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = "^2.4.2"
+requests = "^2.31.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+requests-mock =	"^1.11.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
