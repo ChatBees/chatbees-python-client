@@ -105,6 +105,18 @@ collection = ndb.CollectionBuilder.question_answer('llm_research').build()
 ndb.create_collection(collection)
 ```
 
+## Listing collection
+You can see list of collections you have access to. For example, this list 
+will include all public collections, as well as all collections that were 
+created using the currently configured API key.
+
+```python
+import nautilusdb as ndb
+
+collections = [col.name for col in ndb.list_collections()]
+```
+
+
 ## Uploading a document
 You can upload a local file or a file from a web URL and index it into a 
 collection.
@@ -131,7 +143,7 @@ ndb.collection('llm_research').upload_document('https://path/to/file.pdf')
 ## Asking a question
 You can ask questions within a collection. API key is required for private
 collections only. ```ask()``` method returns a plain-text answer to 
-your question as well as a list of most relevance references used to derive 
+your question, as well as a list of most relevance references used to derive 
 the answer. 
 
 **Available public collections**
