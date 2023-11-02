@@ -27,6 +27,7 @@ class QueryRequest(BaseModel):
     - Comparison Operators: =, <, >, <=, >=, !=
     - Boolean Operators: and, or, not
     - Grouping Operators: ()
+    - Null Check: is null, is not null
     
     Note about filter syntax:
     - Do not enclose metadata field names
