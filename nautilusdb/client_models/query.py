@@ -17,7 +17,7 @@ class QueryRequest(BaseModel):
     embedding: List[float]
 
     """
-    Metadata filter. Filter operations can be performed on any metadata field
+    Metadata filter. Filter operations can be performed on any metadata column
     declared in the collection of supported data type.
     
     Supported data types: Boolean, Int, Long , Float, Double, String
@@ -30,13 +30,13 @@ class QueryRequest(BaseModel):
     - Null Check: is null, is not null
     
     Note about filter syntax:
-    - Do not enclose metadata field names
+    - Do not enclose metadata column names
     - Do not enclose Int, Long, Float or Double values.
     - Enclose String values with single quote
    
     Examples:
-    1. A Collection contains 'published_on (int)' metadata field that contains
-       the epoch timestamp of when a vector is published. 'tag (string)' field 
+    1. A Collection contains 'published_on (int)' metadata column that contains
+       the epoch timestamp of when a vector is published. 'tag (string)' column 
        that contains a tag for the vector. The following filter can be used to
        restricts query results to only important vectors published after 
        1/1/2022 GMT.
@@ -56,7 +56,7 @@ class QueryRequest(BaseModel):
     """
     metadata_filter: Optional[str] = None
 
-    # A list of metadata fields to return with the vector embedding
+    # A list of metadata columns to return with the vector embedding
     include_metadata: Optional[List[str]] = None
 
     # Whether embeddings are returned

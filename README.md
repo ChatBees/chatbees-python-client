@@ -3,13 +3,19 @@ Python client for [NautilusDB](http://nautilusdb.com), a fully-managed,
 cloud-native vector search service.
 
 NautilusDB is currently in <ins>**public alpha**</ins>. We're actively improving 
-the product and releasing new features and we'd love to hear your feedback! 
+the product and releasing new features, and we'd love to hear your feedback! 
 Please take a moment to fill out this [feedback form](https://forms.gle/pif6Vx2LqPjW5v4w5) to help us understand your use-case better.
 
-By default, all collections are subject to permanent deletion after 2 weeks. 
-Please let us know if you need to keep it for longer via the feedback form.
+> By default, all collections are subject to permanent deletion after 2 weeks. Please let us know if you need to keep it for longer via the feedback form.
 
-## Quick start
+NautilusDB python client supports both high-level APIs where you can 
+directly upload files and ask questions, as well as a set of low-level APIs 
+to use it as a vector database to directly manipulate vectors.
+
+**Continue reading, or [Click here](#creating-a-collection) to see high-level API guide.** \
+**[Click here](#using-nautilusdb-as-a-vector-database) to see vector database API guide**
+
+## Quickstart
 
 You can try out NautilusDB in just a few lines of code. We have 
 prepared a special public collection ```openai-web``` that can answer 
@@ -174,4 +180,82 @@ import nautilusdb as ndb
 ndb.init(api_key="<my_api_key>")
 
 ndb.delete_collection('llm_research')
+```
+
+
+## Using NautilusDB as a vector database
+NautilusDB is a vector database at its core. You can directly manipulate 
+vectors in the database.
+
+### Creating a custom collection 
+Create a collection with a defined dimension of ```2``` and two metadata 
+columns, ```int_col``` of type ```Int``` and ```str_col``` of type ```String```.
+
+```python
+import nautilusdb as ndb
+
+ndb.init(api_key='<my_api_key>')
+
+# Create a collection with two metadata columns
+col = (ndb.CollectionBuilder() 
+      .set_name('custom_collection')
+      .set_dimension(2)
+      .add_metadata_column('int_col', ndb. ColumnType.Int)
+      .add_metadata_column('str_col', ndb.ColumnType.String).build())
+
+ndb.create_collection(col)
+```
+
+### Inserting vectors into the collection
+You can now upsert vectors into the collection. Metadata columns have 
+default value of ```null```. You can overwrite this default by setting
+```metadata``` field of the vector.
+
+```python
+import nautilusdb as ndb
+
+ndb.init(api_key='<my_api_key>')
+
+# Upsert 6 vectors. Some with one metadata column, others with two
+col = ndb.collection('custom_collection')
+col.upsert_vector([
+    ndb.Vector(vid='1', embedding=[1.0, 1.0], metadata={'int_col': 1, 'str_col': 'vector at 1.0, 1.0'}),
+    ndb.Vector(vid='2', embedding=[2.0, 2.0], metadata={'int_col': 2, 'str_col': 'vector at 2.0, 2.0'}),
+    ndb.Vector(vid='3', embedding=[3.0, 3.0], metadata={'int_col': 3, 'str_col': 'vector at 3.0, 3.0'}),
+    ndb.Vector(vid='100', embedding=[100.0, 100.0], metadata={'int_col': 100}),
+    ndb.Vector(vid='200', embedding=[200.0, 200.0], metadata={'int_col': 200}),
+    ndb.Vector(vid='300', embedding=[300.0, 300.0], metadata={'int_col': 300}),
+])
+```
+
+### Querying a collection
+You can query a collection with a set of vector, as well as a set of optional 
+metadata column filters. A wide range of operators are supported, including
+- Arithmetic Operators: ```+``` , ```-``` , ```*``` , ```/``` , ```%```
+- Comparison Operators: ```=```, ```<```, ```>```, ```<=```, ```>=```, ```!=```
+- Boolean Operators: ```and```, ```or```, ```not```
+- Grouping Operators: ```()```
+- Null Check:  ```is null```, ```is not null```
+
+```python
+import nautilusdb as ndb
+
+ndb.init(api_key='<my_api_key>')
+
+col = ndb.collection('custom_collection')
+
+# Query 
+col.query([
+    # Closest vectors are 1, 2, 3
+    ndb.QueryRequest(embedding=[0.0, 0.0]),
+    
+    # Closest vectors are 2, 3, 100 (1 is filered out)
+    ndb.QueryRequest(embedding=[0.0, 0.0], metadata_filter='int_col != 1'),
+
+    # Closest vectors is 1 (2, 3, ...) are filtered out
+    ndb.QueryRequest(embedding=[0.0, 0.0], metadata_filter='int_col = 1'),
+    
+    # Closest vectors is 100, 200, 300
+    ndb.QueryRequest(embedding=[0.0, 0.0], metadata_filter='str_col is null'),
+])
 ```
