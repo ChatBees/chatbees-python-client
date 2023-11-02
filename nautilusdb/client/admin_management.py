@@ -1,4 +1,4 @@
-from nautilusdb.server_models.api import CreateApiKeyRequest, CreateApiKeyResponse
+from nautilusdb.server_models.admin_api import CreateApiKeyRequest, CreateApiKeyResponse
 from nautilusdb.utils.config import Config
 
 __all__ = ["init", "create_api_key"]

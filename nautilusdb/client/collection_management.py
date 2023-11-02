@@ -3,7 +3,7 @@ from typing import List
 from nautilusdb.client_models.collection import Collection
 from nautilusdb.utils.config import Config
 
-from nautilusdb.server_models.api import (
+from nautilusdb.server_models.collection_api import (
     CreateCollectionRequest,
     ListCollectionsResponse,
     DeleteCollectionRequest,

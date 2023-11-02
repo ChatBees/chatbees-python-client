@@ -1,10 +1,8 @@
-from typing import Optional, Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from pydantic import BaseModel
 
-from nautilusdb.server_models.index import Vector as ServerVector
-
-__all__ = ["Vector"]
+__all__ = ["Vector", "VectorResult"]
 
 
 class Vector(BaseModel):
@@ -20,17 +18,18 @@ class Vector(BaseModel):
     #
     # Embedding dimension must be identical to the embedding dimension
     # configured for its collection.
-    embedding: List[float] = None
+    embedding: Optional[List[float]] = None
 
     # Metadata associated with this vector.
-    metadata: Dict[str, Any] = None
+    metadata: Optional[Dict[str, Any]] = None
 
-    def to_api_vector(self) -> ServerVector:
-        if self.vid is None or self.vid == "":
-            raise ValueError("Cannot create vector without a name")
-        if self.embedding is None:
-            raise ValueError("Cannot create vector without embeddings")
-        return ServerVector(
-            id=self.vid,
-            embedding=self.embedding,
-            metas=self.metadata)
+
+class VectorResult(Vector):
+    """
+    Vector with a numeric relevance score.
+    """
+
+    # A numeric score to denote the relative relevance of this vector to the
+    # given query.
+    score: float
+
