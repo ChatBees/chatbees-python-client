@@ -67,7 +67,7 @@ Install a released NautilusDB python client from pip.
 python3 version ```>= 3.10``` is required
 
 ```shell
-pip3 install nautilusdb
+pip3 install nautilusdb-client
 ```
 
 ## Creating an API key
@@ -119,7 +119,7 @@ created using the currently configured API key.
 ```python
 import nautilusdb as ndb
 
-collections = [col.name for col in ndb.list_collections()]
+collections = ndb.list_collections()
 ```
 
 
@@ -228,8 +228,8 @@ col.upsert_vector([
 ])
 ```
 
-### Querying a collection
-You can query a collection with a set of vectors, as well as a set of optional 
+### Searching a collection
+You can search a collection with a set of vectors, as well as a set of optional 
 metadata column filters. Metadata filter is SQL-compatible and supports a wide 
 range of operators, including:
 - Arithmetic Operators: ```+``` , ```-``` , ```*``` , ```/``` , ```%```
@@ -246,17 +246,19 @@ ndb.init(api_key='<my_api_key>')
 col = ndb.collection('custom_collection')
 
 # Query 
-col.query([
-    # Closest vectors are 1, 2, 3
-    ndb.QueryRequest(embedding=[0.0, 0.0]),
-    
-    # Closest vectors are 2, 3, 100 (1 is filered out)
-    ndb.QueryRequest(embedding=[0.0, 0.0], metadata_filter='int_col != 1'),
+col.search(
+    [
+        # Closest vectors are 1, 2, 3
+        ndb.SearchRequest(embedding=[0.1, 0.1]),
 
-    # Closest vectors is 1 (2, 3, ...) are filtered out
-    ndb.QueryRequest(embedding=[0.0, 0.0], metadata_filter='int_col = 1'),
-    
-    # Closest vectors is 100, 200, 300
-    ndb.QueryRequest(embedding=[0.0, 0.0], metadata_filter='str_col is null'),
-])
+        # Closest vectors are 2, 3, 100 (1 is filered out)
+        ndb.SearchRequest(embedding=[0.1, 0.1], metadata_filter='int_col != 1'),
+
+        # Closest vectors is 1 (2, 3, ...) are filtered out
+        ndb.SearchRequest(embedding=[0.1, 0.1], metadata_filter='int_col = 1'),
+
+        # Closest vectors is 100, 200, 300
+        ndb.searchrequest(
+            embedding=[0.1, 0.1], metadata_filter='str_col is null'),
+    ])
 ```

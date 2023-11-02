@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from nautilusdb.client_models.column_type import ColumnType
 from nautilusdb.client_models.app import AnswerReference
-from nautilusdb.client_models.query import QueryRequest, QueryResponse
+from nautilusdb.client_models.search import SearchRequest, SearchResponse
 from nautilusdb.server_models.app_api import AddDocRequest, AskRequest, AskResponse
 from nautilusdb.server_models.query_api import (
     QueryWithEmbedding,
@@ -136,9 +136,9 @@ class Collection(BaseModel):
             [AnswerReference(doc_name=name) for name in unique_doc_names]
         )
 
-    def query(self, queries: List[QueryRequest]) -> List[QueryResponse]:
+    def search(self, queries: List[SearchRequest]) -> List[SearchResponse]:
         """
-        Queries the collection
+        Searches the collection
         """
 
         req = ServerQueryRequest(

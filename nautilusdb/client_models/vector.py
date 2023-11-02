@@ -30,6 +30,8 @@ class VectorResult(Vector):
     """
 
     # A numeric score to denote the relative relevance of this vector to the
-    # given query.
+    # given query. Higher score indicates more relevant vector.
+    # Score is currently set to 1/(1 + l2_dist) between the vector and query
+    # vector.
     score: float
 

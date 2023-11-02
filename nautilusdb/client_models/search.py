@@ -5,10 +5,10 @@ from pydantic import BaseModel
 from nautilusdb.client_models.vector import VectorResult
 
 
-__all__ = ["QueryRequest", "QueryResponse"]
+__all__ = ["SearchRequest", "SearchResponse"]
 
 
-class QueryRequest(BaseModel):
+class SearchRequest(BaseModel):
     """
     A query against a collection.
     """
@@ -66,7 +66,7 @@ class QueryRequest(BaseModel):
     top_k: Optional[int] = 3
 
 
-class QueryResponse(BaseModel):
+class SearchResponse(BaseModel):
     """
     Result of a query
     """

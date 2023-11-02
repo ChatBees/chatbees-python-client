@@ -6,7 +6,7 @@ import requests_mock
 
 import nautilusdb as ndb
 from nautilusdb import CollectionBuilder, Vector
-from nautilusdb.client_models.query import QueryRequest, QueryResponse
+from nautilusdb.client_models.search import SearchRequest, SearchResponse
 from nautilusdb.server_models.collection_api import (
     ListCollectionsResponse,
 )
@@ -87,8 +87,7 @@ class APISurfaceTest(unittest.TestCase):
             text=resp.model_dump_json(),
         )
 
-        collections = ndb.list_collections()
-        assert {col.name for col in collections} == {'a', 'b', 'c'}
+        assert set(ndb.list_collections()) == {'a', 'b', 'c'}
 
     @requests_mock.mock()
     def test_delete_collection(self, mock):
@@ -168,8 +167,8 @@ class APISurfaceTest(unittest.TestCase):
             ).model_dump_json(),
         )
 
-        result: List[QueryResponse] = ndb.collection('fakename').query(
-            [QueryRequest(embedding=[1.1, 2.2], metadata_filter='where clause')])
+        result: List[SearchResponse] = ndb.collection('fakename').search(
+            [SearchRequest(embedding=[1.1, 2.2], metadata_filter='where clause')])
         assert len(result) == 1
         assert len(result[0].vectors) == 1
         assert math.isclose(result[0].vectors[0].score, 1.0)

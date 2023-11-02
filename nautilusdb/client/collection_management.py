@@ -50,7 +50,7 @@ def collection(collection_name: str) -> Collection:
     return Collection(name=collection_name)
 
 
-def list_collections() -> List[Collection]:
+def list_collections() -> List[str]:
     """
     List all collections in NautilusDB.
 
@@ -59,8 +59,7 @@ def list_collections() -> List[Collection]:
     """
     url = f'{Config.get_base_url()}/collections/list'
     resp = Config.get(url=url)
-    return [Collection(name=name) for name in
-            ListCollectionsResponse.model_validate(resp.json()).names]
+    return ListCollectionsResponse.model_validate(resp.json()).names
 
 
 def delete_collection(collection_name: str):
