@@ -229,7 +229,7 @@ col.upsert_vector([
 ```
 
 ### Querying a collection
-You can query a collection with a set of vector, as well as a set of optional 
+You can query a collection with a set of vectors, as well as a set of optional 
 metadata column filters. A wide range of operators are supported, including
 - Arithmetic Operators: ```+``` , ```-``` , ```*``` , ```/``` , ```%```
 - Comparison Operators: ```=```, ```<```, ```>```, ```<=```, ```>=```, ```!=```
