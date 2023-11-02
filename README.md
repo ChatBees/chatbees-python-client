@@ -206,7 +206,7 @@ col = (ndb.CollectionBuilder()
 ndb.create_collection(col)
 ```
 
-### Inserting vectors into the collection
+### Upserting vectors into the collection
 You can now upsert vectors into the collection. Metadata columns have 
 default value of ```null```. You can overwrite this default by setting
 ```metadata``` field of the vector.
