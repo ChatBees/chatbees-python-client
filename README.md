@@ -219,12 +219,12 @@ ndb.init(api_key='<my_api_key>')
 # Upsert 6 vectors. Some with one metadata column, others with two
 col = ndb.collection('custom_collection')
 col.upsert_vector([
-    ndb.Vector(vid='1', embedding=[1.0, 1.0], metadata={'int_col': 1, 'str_col': 'vector at 1.0, 1.0'}),
-    ndb.Vector(vid='2', embedding=[2.0, 2.0], metadata={'int_col': 2, 'str_col': 'vector at 2.0, 2.0'}),
-    ndb.Vector(vid='3', embedding=[3.0, 3.0], metadata={'int_col': 3, 'str_col': 'vector at 3.0, 3.0'}),
-    ndb.Vector(vid='100', embedding=[100.0, 100.0], metadata={'int_col': 100}),
-    ndb.Vector(vid='200', embedding=[200.0, 200.0], metadata={'int_col': 200}),
-    ndb.Vector(vid='300', embedding=[300.0, 300.0], metadata={'int_col': 300}),
+    ndb.Vector(vid='1', embedding=[0.1, 0.1], metadata={'int_col': 1, 'str_col': 'vector at 0.1, 0.1'}),
+    ndb.Vector(vid='2', embedding=[0.2, 0.2], metadata={'int_col': 2, 'str_col': 'vector at 0.2, 0.2'}),
+    ndb.Vector(vid='3', embedding=[0.3, 0.3], metadata={'int_col': 3, 'str_col': 'vector at 0.3, 0.3'}),
+    ndb.Vector(vid='100', embedding=[0.4, 0.4], metadata={'int_col': 100}),
+    ndb.Vector(vid='200', embedding=[0.5, 0.5], metadata={'int_col': 200}),
+    ndb.Vector(vid='300', embedding=[0.6, 0.6], metadata={'int_col': 300}),
 ])
 ```
 
@@ -232,7 +232,6 @@ col.upsert_vector([
 You can search a collection with a set of vectors, as well as a set of optional 
 metadata column filters. Metadata filter is SQL-compatible and supports a wide 
 range of operators, including:
-- Arithmetic Operators: ```+``` , ```-``` , ```*``` , ```/``` , ```%```
 - Comparison Operators: ```=```, ```<```, ```>```, ```<=```, ```>=```, ```!=```
 - Boolean Operators: ```and```, ```or```, ```not```
 - Grouping Operators: ```()```
