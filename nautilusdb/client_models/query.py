@@ -17,12 +17,12 @@ class QueryRequest(BaseModel):
     embedding: List[float]
 
     """
-    Metadata filter. Filter operations can be performed on any metadata column
-    declared in the collection of supported data type.
+    SQL-compatible Metadata filter. Filter operations can be performed on any
+    metadata column declared in the collection of supported data type.
     
     Supported data types: Boolean, Int, Long , Float, Double, String
     
-    Supported filter operators
+    Supported filter operators (a subset of SQL:1999 standard)
     - Arithmetic Operators: + , - , * , / , %
     - Comparison Operators: =, <, >, <=, >=, !=
     - Boolean Operators: and, or, not
@@ -43,12 +43,12 @@ class QueryRequest(BaseModel):
     
        published_on > 1641024000 and tag = 'important'
        
-    2. A Collection contains reddit comments with metadata columns 'score (int)'
+    2. A Collection contains reddit comments with metadata columns 'karma (int)'
        . 'published_on (int)', 'char_count (int)'. The following could be a 
        reasonable filter to restrict results to only recent, popular and 
        informative comments.
        
-       score >= 50 and published_on > 1641024000  and char_count > 100
+       karma >= 50 and published_on > 1641024000  and char_count > 100
        
     3. Other examples of valid filters
        (foo_int > 10 or bar_string = 'front_page') and baz_string != 'draft'

@@ -230,7 +230,8 @@ col.upsert_vector([
 
 ### Querying a collection
 You can query a collection with a set of vectors, as well as a set of optional 
-metadata column filters. A wide range of operators are supported, including
+metadata column filters. Metadata filter is SQL-compatible and supports a wide 
+range of operators, including:
 - Arithmetic Operators: ```+``` , ```-``` , ```*``` , ```/``` , ```%```
 - Comparison Operators: ```=```, ```<```, ```>```, ```<=```, ```>=```, ```!=```
 - Boolean Operators: ```and```, ```or```, ```not```
