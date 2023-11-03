@@ -6,11 +6,21 @@ from pydantic import BaseModel
 
 from nautilusdb.client_models.column_type import ColumnType
 from nautilusdb.client_models.app import AnswerReference
+from nautilusdb.client_models.search import SearchRequest, SearchResponse
 from nautilusdb.server_models.app_api import AddDocRequest, AskRequest, AskResponse
+from nautilusdb.server_models.query_api import (
+    QueryWithEmbedding,
+    QueryRequest as ServerQueryRequest,
+    QueryResponse as ServerQueryResponse,
+)
 from nautilusdb.utils.config import Config
 from nautilusdb.utils.exceptions import Unimplemented
 from nautilusdb.client_models.vector import Vector
-from nautilusdb.server_models.api import UpsertRequest, UpsertResponse
+from nautilusdb.server_models.vector_api import (
+    Vector as ServerVector,
+    UpsertRequest,
+    UpsertResponse,
+)
 from nautilusdb.utils.file_upload import (
     is_url,
     validate_file,
@@ -58,7 +68,7 @@ class Collection(BaseModel):
         url = f'{Config.get_base_url()}/vectors/upsert'
         req = UpsertRequest(
             collection_name=self.name,
-            vectors=[v.to_api_vector() for v in vectors])
+            vectors=[ServerVector.from_client_vector(v) for v in vectors])
         resp = Config.post(url=url, data=req.model_dump_json())
         resp = UpsertResponse.model_validate(resp.json())
         return resp.upsert_count
@@ -125,3 +135,18 @@ class Collection(BaseModel):
             resp.answer,
             [AnswerReference(doc_name=name) for name in unique_doc_names]
         )
+
+    def search(self, queries: List[SearchRequest]) -> List[SearchResponse]:
+        """
+        Searches the collection
+        """
+
+        req = ServerQueryRequest(
+            collection_name=self.name, queries=[
+                QueryWithEmbedding.from_client_request(q) for q in queries])
+
+        url = f'{Config.get_base_url()}/vectors/query'
+
+        resp = Config.post(url=url, data=req.model_dump_json())
+        resp = ServerQueryResponse.model_validate(resp.json())
+        return [r.to_client_response() for r in resp.results]

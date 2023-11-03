@@ -1,13 +1,25 @@
+import math
 import unittest
+from typing import List
+
 import requests_mock
 
 import nautilusdb as ndb
 from nautilusdb import CollectionBuilder, Vector
-from nautilusdb.server_models.api import (
+from nautilusdb.client_models.search import SearchRequest, SearchResponse
+from nautilusdb.server_models.collection_api import (
     ListCollectionsResponse,
+)
+from nautilusdb.server_models.vector_api import (
     UpsertResponse,
+    VectorWithScore as ServerVectorWithScore,
 )
 from nautilusdb.server_models.app_api import AskResponse, AnswerReference
+from nautilusdb.server_models.query_api import (
+    QueryRequest as ServerQueryRequest,
+    QueryResponse as ServerQueryResponse,
+    QueryResult as ServerQueryResult,
+)
 
 
 class APISurfaceTest(unittest.TestCase):
@@ -75,8 +87,7 @@ class APISurfaceTest(unittest.TestCase):
             text=resp.model_dump_json(),
         )
 
-        collections = ndb.list_collections()
-        assert {col.name for col in collections} == {'a', 'b', 'c'}
+        assert set(ndb.list_collections()) == {'a', 'b', 'c'}
 
     @requests_mock.mock()
     def test_delete_collection(self, mock):
@@ -131,3 +142,34 @@ class APISurfaceTest(unittest.TestCase):
         answer, _ = ndb.collection('fakename').ask(
             "what is the meaning of life?")
         assert answer == '42'
+
+    @requests_mock.mock()
+    def test_query(self, mock):
+        def match_request_text(request):
+            req = ServerQueryRequest.model_validate_json(request.text)
+            return (req.collection_name == 'fakename'
+                    and len(req.queries) == 1
+                    and req.queries[ 0].where == 'where clause')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/vectors/query',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+            text=ServerQueryResponse(
+                results=[
+                    ServerQueryResult(
+                        vectors=[
+                            ServerVectorWithScore(score=1.0, id='vec')
+                        ]
+                    )
+                ]
+            ).model_dump_json(),
+        )
+
+        result: List[SearchResponse] = ndb.collection('fakename').search(
+            [SearchRequest(embedding=[1.1, 2.2], metadata_filter='where clause')])
+        assert len(result) == 1
+        assert len(result[0].vectors) == 1
+        assert math.isclose(result[0].vectors[0].score, 1.0)
+        assert result[0].vectors[0].vid == 'vec'
