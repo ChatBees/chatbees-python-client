@@ -139,11 +139,12 @@ import nautilusdb as ndb
 # Optional API key to access private collections
 ndb.init(api_key="<my_api_key>")
 
+collection = ndb.collection('llm_research')
+
 # Local file and URLs are both supported.
 # URL must contain the full scheme prefix (http:// or https://)
-ndb.collection('llm_research').upload_document('/path/to/file.pdf')
-ndb.collection('llm_research').upload_document('https://path/to/file.pdf')
-
+collection.upload_document('/path/to/file.pdf')
+collection.upload_document('https://path/to/file.pdf')
 ```
 
 ## Asking a question
