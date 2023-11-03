@@ -189,8 +189,10 @@ NautilusDB is a vector database at its core. You can directly manipulate
 vectors in the database.
 
 ### Creating a custom collection 
-Create a collection with a defined dimension of ```2``` and two metadata 
-columns, ```int_col``` of type ```Int``` and ```str_col``` of type ```String```.
+Create a collection where vectors have embedding dimension of ```2``` and two 
+metadata columns, ```int_col``` of type ```Int``` and ```str_col``` of type ```String```.
+Currently, we use ```L2``` as the vector distance metric. Support for other 
+distance metrics will be available soon.
 
 ```python
 import nautilusdb as ndb
