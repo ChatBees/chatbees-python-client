@@ -256,10 +256,10 @@ col.search(
         # Closest vectors are 2, 3, 100 (1 is filered out)
         ndb.SearchRequest(embedding=[0.1, 0.1], metadata_filter='int_col != 1'),
 
-        # Closest vectors is 1 (2, 3, ...) are filtered out
+        # Closest vectors is 1 (2, 3, etc are filtered out)
         ndb.SearchRequest(embedding=[0.1, 0.1], metadata_filter='int_col = 1'),
 
-        # Closest vectors is 100, 200, 300
+        # Closest vectors are 100, 200, 300
         ndb.searchrequest(
             embedding=[0.1, 0.1], metadata_filter='str_col is null'),
     ])
