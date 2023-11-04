@@ -8,10 +8,10 @@ from nautilusdb.client_models.column_type import ColumnType
 from nautilusdb.client_models.app import AnswerReference
 from nautilusdb.client_models.search import SearchRequest, SearchResponse
 from nautilusdb.server_models.app_api import AddDocRequest, AskRequest, AskResponse
-from nautilusdb.server_models.query_api import (
-    QueryWithEmbedding,
-    QueryRequest as ServerQueryRequest,
-    QueryResponse as ServerQueryResponse,
+from nautilusdb.server_models.search_api import (
+    SearchWithEmbedding,
+    SearchRequest as ServerQueryRequest,
+    SearchResponse as ServerQueryResponse,
 )
 from nautilusdb.utils.config import Config
 from nautilusdb.utils.exceptions import Unimplemented
@@ -143,9 +143,9 @@ class Collection(BaseModel):
 
         req = ServerQueryRequest(
             collection_name=self.name, queries=[
-                QueryWithEmbedding.from_client_request(q) for q in queries])
+                SearchWithEmbedding.from_client_request(q) for q in queries])
 
-        url = f'{Config.get_base_url()}/vectors/query'
+        url = f'{Config.get_base_url()}/vectors/search'
 
         resp = Config.post(url=url, data=req.model_dump_json())
         resp = ServerQueryResponse.model_validate(resp.json())

@@ -3,21 +3,21 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from nautilusdb.client_models.search import (
-    SearchRequest as ClientQueryRequest,
-    SearchResponse as ClientQueryResponse,
+    SearchRequest as ClientSearchRequest,
+    SearchResponse as ClientSearchResponse,
 )
 from nautilusdb.server_models.vector_api import VectorWithScore
 
 
-class QueryResult(BaseModel):
+class SearchResult(BaseModel):
     vectors: List[VectorWithScore]
 
-    def to_client_response(self) -> ClientQueryResponse:
-        return ClientQueryResponse(
+    def to_client_response(self) -> ClientSearchResponse:
+        return ClientSearchResponse(
             vectors=[v.to_client_vector_resut() for v in self.vectors])
 
 
-class Query(BaseModel):
+class Search(BaseModel):
     # where supports SQL =, <, >, <=, >=, !=, and, or, etc.
     where: Optional[str] = None
     return_metas: Optional[List[str]] = None
@@ -25,15 +25,15 @@ class Query(BaseModel):
     top_k: Optional[int] = 3
 
 
-class QueryWithEmbedding(Query):
+class SearchWithEmbedding(Search):
     embedding: List[float]
 
     @classmethod
     def from_client_request(
         cls,
-        req: ClientQueryRequest
-    ) -> "QueryWithEmbedding":
-        return QueryWithEmbedding(
+        req: ClientSearchRequest
+    ) -> "SearchWithEmbedding":
+        return SearchWithEmbedding(
             embedding=req.embedding,
             where=req.metadata_filter,
             return_metas=req.include_metadata,
@@ -42,11 +42,11 @@ class QueryWithEmbedding(Query):
         )
 
 
-class QueryRequest(BaseModel):
+class SearchRequest(BaseModel):
     collection_name: str
-    queries: List[QueryWithEmbedding]
+    queries: List[SearchWithEmbedding]
 
 
-class QueryResponse(BaseModel):
+class SearchResponse(BaseModel):
     # The results are sorted by the score in the descending order
-    results: List[QueryResult]
+    results: List[SearchResult]
