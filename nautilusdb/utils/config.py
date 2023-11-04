@@ -20,22 +20,18 @@ class Config:
 
     @classmethod
     def post(cls, url, data: str = None, files=None):
+        if data is not None:
+            data = data.encode('utf-8')
         resp = requests.post(
-            url,
-            data=data.encode('utf-8'),
-            files=files,
-            headers=cls._construct_header()
-        )
+            url, data=data, files=files, headers=cls._construct_header())
         raise_for_error(resp)
         return resp
 
     @classmethod
     def get(cls, url: str, data: str = None):
-        resp = requests.get(
-            url,
-            data=data.encode('utf-8'),
-            headers=cls._construct_header()
-        )
+        if data is not None:
+            data = data.encode('utf-8')
+        resp = requests.get(url, data=data, headers=cls._construct_header())
         raise_for_error(resp)
         return resp
 
