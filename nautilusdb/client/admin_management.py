@@ -16,7 +16,7 @@ def init(
                                  Defaults to None. You can still access
                                  public collections without an API key.
         account_name (str, optional): The name of the account. Defaults to
-                                      Config.DEMO_ACCOUNT
+                                      "public"
     Raises:
         ValueError: If the provided config is invalid
     """

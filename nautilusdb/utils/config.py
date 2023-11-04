@@ -15,19 +15,27 @@ class Config:
 
     @classmethod
     def get_base_url(cls):
-        #return "http://localhost:8080"
+        # return "http://localhost:8080"
         return f"https://{cls.account_name}.us-west-2.aws.nautilusdb.com"
 
     @classmethod
-    def post(cls, url, data=None, files=None):
+    def post(cls, url, data: str = None, files=None):
         resp = requests.post(
-            url, data=data, files=files, headers=cls._construct_header())
+            url,
+            data=data.encode('utf-8'),
+            files=files,
+            headers=cls._construct_header()
+        )
         raise_for_error(resp)
         return resp
 
     @classmethod
-    def get(cls, url, data=None):
-        resp = requests.get(url, data=data, headers=cls._construct_header())
+    def get(cls, url: str, data: str = None):
+        resp = requests.get(
+            url,
+            data=data.encode('utf-8'),
+            headers=cls._construct_header()
+        )
         raise_for_error(resp)
         return resp
 
