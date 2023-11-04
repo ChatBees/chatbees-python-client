@@ -3,7 +3,7 @@ name = "nautilusdb-client"
 packages = [
     { include="nautilusdb", from="." },
 ]
-version = "0.5.0"
+version = "0.5.1"
 description = "Python client for NautilusDB"
 authors = ["NautilusDB <contact@nautilusdb.com>"]
 readme = "README.md"
