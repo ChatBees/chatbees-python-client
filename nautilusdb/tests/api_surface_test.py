@@ -15,10 +15,10 @@ from nautilusdb.server_models.vector_api import (
     VectorWithScore as ServerVectorWithScore,
 )
 from nautilusdb.server_models.app_api import AskResponse, AnswerReference
-from nautilusdb.server_models.query_api import (
-    QueryRequest as ServerQueryRequest,
-    QueryResponse as ServerQueryResponse,
-    QueryResult as ServerQueryResult,
+from nautilusdb.server_models.search_api import (
+    SearchRequest as ServerQueryRequest,
+    SearchResponse as ServerQueryResponse,
+    SearchResult as ServerQueryResult,
 )
 
 
@@ -144,7 +144,7 @@ class APISurfaceTest(unittest.TestCase):
         assert answer == '42'
 
     @requests_mock.mock()
-    def test_query(self, mock):
+    def test_search(self, mock):
         def match_request_text(request):
             req = ServerQueryRequest.model_validate_json(request.text)
             return (req.collection_name == 'fakename'
@@ -153,7 +153,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            f'{APISurfaceTest.API_ENDPOINT}/vectors/query',
+            f'{APISurfaceTest.API_ENDPOINT}/vectors/search',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
             text=ServerQueryResponse(
