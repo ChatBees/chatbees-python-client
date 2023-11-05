@@ -260,7 +260,7 @@ col.search(
         ndb.SearchRequest(embedding=[0.1, 0.1], metadata_filter='int_col = 1'),
 
         # Closest vectors are 100, 200, 300
-        ndb.searchrequest(
+        ndb.SearchRequest(
             embedding=[0.1, 0.1], metadata_filter='str_col is null'),
     ])
 ```
