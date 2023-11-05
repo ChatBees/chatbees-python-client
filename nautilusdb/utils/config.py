@@ -22,14 +22,18 @@ class Config:
         return f"https://{cls.account_name}.us-west-2.aws.nautilusdb.com"
 
     @classmethod
-    def post(cls, url, data=None, files=None):
+    def post(cls, url, data: str = None, files=None):
+        if data is not None:
+            data = data.encode('utf-8')
         resp = requests.post(
             url, data=data, files=files, headers=cls._construct_header())
         raise_for_error(resp)
         return resp
 
     @classmethod
-    def get(cls, url, data=None):
+    def get(cls, url: str, data: str = None):
+        if data is not None:
+            data = data.encode('utf-8')
         resp = requests.get(url, data=data, headers=cls._construct_header())
         raise_for_error(resp)
         return resp
