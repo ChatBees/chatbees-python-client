@@ -1,7 +1,9 @@
 import requests
+import os
 
 from .exceptions import raise_for_error
 
+ENV_TEST_BASE_URL = os.environ.get("ENV_TEST_BASE_URL", "")
 
 class Config:
     PUBLIC_ACCOUNT: str = "public"
@@ -15,7 +17,8 @@ class Config:
 
     @classmethod
     def get_base_url(cls):
-        # return "http://localhost:8080"
+        if ENV_TEST_BASE_URL != "":
+            return ENV_TEST_BASE_URL
         return f"https://{cls.account_name}.us-west-2.aws.nautilusdb.com"
 
     @classmethod

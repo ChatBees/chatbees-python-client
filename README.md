@@ -247,7 +247,7 @@ ndb.init(api_key='<my_api_key>')
 
 col = ndb.collection('custom_collection')
 
-# Query 
+# Search
 col.search(
     [
         # Closest vectors are 1, 2, 3
@@ -260,7 +260,7 @@ col.search(
         ndb.SearchRequest(embedding=[0.1, 0.1], metadata_filter='int_col = 1'),
 
         # Closest vectors are 100, 200, 300
-        ndb.searchrequest(
+        ndb.SearchRequest(
             embedding=[0.1, 0.1], metadata_filter='str_col is null'),
     ])
 ```
