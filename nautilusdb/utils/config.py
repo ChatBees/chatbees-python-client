@@ -22,8 +22,9 @@ class Config:
         return f"https://{cls.account_name}.us-west-2.aws.nautilusdb.com"
 
     @classmethod
-    def post(cls, url, data: str = None, files=None):
-        if data is not None:
+    def post(cls, url, data=None, files=None):
+        # Encode data if it is a string
+        if data is not None and isinstance(data, str):
             data = data.encode('utf-8')
         resp = requests.post(
             url, data=data, files=files, headers=cls._construct_header())
@@ -31,8 +32,9 @@ class Config:
         return resp
 
     @classmethod
-    def get(cls, url: str, data: str = None):
-        if data is not None:
+    def get(cls, url: str, data=None):
+        # Encode data if it is a string
+        if data is not None and isinstance(data, str):
             data = data.encode('utf-8')
         resp = requests.get(url, data=data, headers=cls._construct_header())
         raise_for_error(resp)
