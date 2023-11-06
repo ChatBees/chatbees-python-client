@@ -1,0 +1,23 @@
+this is a test file. It contains a list of random characters for testing
+purposes.
+
+UTF8 chars:
+р􆿹&ˣ쁀󮡏쩫6򧩚࠴
+^󴩥˒ۆI񠰠칣Jۉθ
+?㍝˩⽥Vʧİˍҕλ
+聀!r䲃ﺮ+ӑ}ü񗞒
+鋲茻挻؍􆸉殱U󻡳󍖖ύ
+쩻Ƌ󺯆隑󠰿Ѡ𮽷:হ
+򆲐tĶ靠夔􁙭�𸀓ݚN
++⪠񤁶򕧝>𾑎ī긟靥
+ڕ䙜񌙾a|֒󨹓೘֓A
+塻 􋋣䏛픤ɭ·"󙖎񛄣
+
+
+UTF8
+暨南大學
+\xe6\x9a\xa8\xe5\x8d\x97\xe5\xa4\xa7\xe5\xad\xb8
+
+Unicode characters
+\u1234
+\u002E

@@ -1,3 +1,5 @@
+import io
+import os
 import unittest
 import uuid
 
@@ -234,4 +236,27 @@ class SmokeTest(unittest.TestCase):
 
         finally:
             # Delete is idempotent
+            ndb.delete_collection(col.name)
+
+    def test_file_upload_and_ask(self):
+        owner = self.apikey1
+        ndb.init(owner)
+        unique_col = uuid.uuid4().hex
+
+        # Create a collection with a few different metadata columns
+        col = ndb.CollectionBuilder.question_answer(unique_col).build()
+        ndb.create_collection(col)
+
+        files = [
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt',
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/española.txt',
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/française.txt',
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/中文.txt',
+        ]
+
+        try:
+            for file in files:
+                col.upload_document(file)
+            col.ask('question?')
+        finally:
             ndb.delete_collection(col.name)
