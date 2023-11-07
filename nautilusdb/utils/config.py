@@ -14,10 +14,6 @@ class Config:
     account_name: str = PUBLIC_ACCOUNT
 
     @classmethod
-    def validate_and_set_api_key(cls, api_key: str):
-        Config.api_key = api_key
-
-    @classmethod
     def validate_setup(cls):
         if cls.account_name is None or cls.account_name != cls.PUBLIC_ACCOUNT:
             raise ValueError("Only public account ('public') is supported.")
