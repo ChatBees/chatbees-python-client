@@ -1,4 +1,5 @@
 import math
+import os
 import unittest
 from typing import List
 
@@ -173,3 +174,37 @@ class APISurfaceTest(unittest.TestCase):
         assert len(result[0].vectors) == 1
         assert math.isclose(result[0].vectors[0].score, 1.0)
         assert result[0].vectors[0].vid == 'vec'
+
+    @requests_mock.mock()
+    def test_api_key_required(self, mock):
+        # require API key for all APIs
+        ndb.init(api_key=None)
+        collection = ndb.collection('foo')
+        self.assertRaises(ValueError, ndb.list_collections)
+        self.assertRaises(ValueError, ndb.delete_collection, 'foo')
+        self.assertRaises(ValueError, ndb.create_collection, ndb.collection('foo'))
+        self.assertRaises(ValueError, collection.upsert_vector, [])
+        self.assertRaises(ValueError, collection.ask, "question")
+        fname = f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt'
+        self.assertRaises(ValueError, collection.upload_document, fname)
+
+        # The only exception is ask() API for openai-web collection
+        def match_request_text(request):
+            return request.text == (
+                '{"collection_name":"openai-web",'
+                '"question":"what is the meaning of life?"}')
+
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/qadocs/ask',
+            additional_matcher=match_request_text,
+            text=AskResponse(
+                answer='42',
+                refs=[AnswerReference(doc_name="doc")]
+            ).model_dump_json(),
+        )
+
+        answer, _ = ndb.collection('openai-web').ask(
+            "what is the meaning of life?")
+        assert answer == '42'

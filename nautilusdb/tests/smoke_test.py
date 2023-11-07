@@ -30,13 +30,8 @@ class SmokeTest(unittest.TestCase):
 
     def test_collection_apis(self):
         # Clear API key from config
-        ndb.init(api_key=None)
-
         apikey1 = self.apikey1
         apikey2 = self.apikey2
-
-        # Create a public collection
-        public_col = self.create_collection()
 
         # Create private collections, one for each created key
         ndb.init(api_key=apikey1)
@@ -46,19 +41,11 @@ class SmokeTest(unittest.TestCase):
         private_col_key2 = self.create_collection()
 
         try:
-            # List collections without API key
-            ndb.init(api_key=None)
-            collections_visible_to_public = set(ndb.list_collections())
-            assert private_col_key1.name not in collections_visible_to_public
-            assert private_col_key2.name not in collections_visible_to_public
-            assert public_col.name in collections_visible_to_public
-
             # List collections using API key1
             ndb.init(api_key=apikey1)
             collections_visible_to_key1 = set(ndb.list_collections())
             assert private_col_key2.name not in collections_visible_to_key1
             assert private_col_key1.name in collections_visible_to_key1
-            assert public_col.name in collections_visible_to_key1
             # Key1 is not authorized to delete a collection created by key2
             self.assertRaises(ndb.UnAuthorized, ndb.delete_collection, private_col_key2.name)
 
@@ -67,7 +54,6 @@ class SmokeTest(unittest.TestCase):
             collections_visible_to_key2 = set(ndb.list_collections())
             assert private_col_key1.name not in collections_visible_to_key2
             assert private_col_key2.name in collections_visible_to_key2
-            assert public_col.name in collections_visible_to_key2
             # Key2 is not authorized to delete a collection created by key1
             self.assertRaises(ndb.UnAuthorized, ndb.delete_collection, private_col_key1.name)
 
@@ -75,7 +61,6 @@ class SmokeTest(unittest.TestCase):
             # key1 is authorized to delete its own collections as well as public
             # collections
             ndb.init(api_key=apikey1)
-            ndb.delete_collection(public_col.name)
             ndb.delete_collection(private_col_key1.name)
 
             ndb.init(api_key=apikey2)
