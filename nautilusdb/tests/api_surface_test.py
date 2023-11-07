@@ -24,7 +24,7 @@ from nautilusdb.utils.config import Config
 
 
 class APISurfaceTest(unittest.TestCase):
-    API_KEY = 'ZmYtOTIzZjllZWMtNTg1My00OGViLWFhM2YtYjQ2OWExOWZjYmM2'
+    API_KEY = 'fakeapikey'
     API_ENDPOINT = 'https://public.us-west-2.aws.nautilusdb.com'
 
     def setUp(self):
@@ -174,29 +174,3 @@ class APISurfaceTest(unittest.TestCase):
         assert len(result[0].vectors) == 1
         assert math.isclose(result[0].vectors[0].score, 1.0)
         assert result[0].vectors[0].vid == 'vec'
-
-
-    def test_config(self):
-        self.assertRaises(ValueError, Config.validate_and_set_api_key, "abc")
-
-        invalid_keys = [
-            # fff-923f9eec-5853-48eb-aa3f-b469a19fcbc6
-            "ZmZmLTkyM2Y5ZWVjLTU4NTMtNDhlYi1hYTNmLWI0NjlhMTlmY2JjNg",
-            "ZmZmLTkyM2Y5ZWVjLTU4NTMtNDhlYi1hYTNmLWI0NjlhMTlmY2JjNg==",
-
-            # zz-923f9eec-5853-48eb-aa3f-b469a19fcbc6
-            "enotOTIzZjllZWMtNTg1My00OGViLWFhM2YtYjQ2OWExOWZjYmM2",
-            "enotOTIzZjllZWMtNTg1My00OGViLWFhM2YtYjQ2OWExOWZjYmM2==",
-
-            # ff-923f9eec-5853-48eb-aa3f-b469a19fcbc6-1
-            "ZmYtOTIzZjllZWMtNTg1My00OGViLWFhM2YtYjQ2OWExOWZjYmM2LTE",
-
-            # ff-923f9eec-5853-48eb-aa3f-b469a19fcbc
-            "ZmYtOTIzZjllZWMtNTg1My00OGViLWFhM2YtYjQ2OWExOWZjYmM",
-
-            # invalid-key
-            "aW52YWxpZC1rZXk",
-        ]
-
-        for key in invalid_keys:
-            self.assertRaises(ValueError, Config.validate_and_set_api_key, key)

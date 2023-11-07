@@ -15,31 +15,7 @@ class Config:
 
     @classmethod
     def validate_and_set_api_key(cls, api_key: str):
-        if api_key is None or api_key == "" or api_key.endswith('='):
-            raise ValueError(f"Invalid API key {api_key}")
-
-        raw_key_parts = []
-        try:
-            raw_key_parts = base64.urlsafe_b64decode(api_key).decode(
-                'ascii').split('-', 1)
-        except Exception:
-            raise ValueError(f"Invalid API key {api_key}")
-
-        # version-id must contain only digits
-        if len(raw_key_parts) != 2:
-            raise ValueError(f"Invalid API key {api_key}")
-
-        try:
-            # version-id must be a valid hex
-            int(raw_key_parts[0], 16)
-
-            # uuid must be valid
-            uuid.UUID(raw_key_parts[1], version=4)
-        except ValueError:
-            raise ValueError(f"Invalid API key {api_key}")
         Config.api_key = api_key
-
-
 
     @classmethod
     def validate_setup(cls):
