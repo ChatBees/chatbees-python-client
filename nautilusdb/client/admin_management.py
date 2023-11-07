@@ -20,7 +20,7 @@ def init(
     Raises:
         ValueError: If the provided config is invalid
     """
-    Config.api_key = api_key
+    Config.validate_and_set_api_key(api_key)
     Config.account_name = account_name
     Config.validate_setup()
 
