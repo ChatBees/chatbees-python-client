@@ -22,7 +22,10 @@ class Config:
         return f"https://{cls.account_name}.us-west-2.aws.nautilusdb.com"
 
     @classmethod
-    def post(cls, url, data=None, files=None):
+    def post(cls, url, data=None, files=None, enforce_api_key=True):
+        if enforce_api_key and cls.api_key is None or cls.api_key == "":
+            raise ValueError("API key is required for using NautilusDB")
+
         # Encode data if it is a string
         if data is not None and isinstance(data, str):
             data = data.encode('utf-8')
@@ -33,6 +36,9 @@ class Config:
 
     @classmethod
     def get(cls, url: str, data=None):
+        if cls.api_key is None or cls.api_key == "":
+            raise ValueError("API key is required for using NautilusDB")
+
         # Encode data if it is a string
         if data is not None and isinstance(data, str):
             data = data.encode('utf-8')

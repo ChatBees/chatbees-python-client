@@ -71,9 +71,10 @@ pip3 install nautilusdb-client
 ```
 
 ## Creating an API key
-You can create an API key and use it to create or access your own collections.  
-In public preview, all collections are created inside a shared, public 
-account. Private accounts and related functionalities will be released soon.
+You need an API key to create, update, delete own collections. A collection 
+can only be accessed by the API key that created it.
+
+Account management and related functionalities will be released soon.
 
 ```python
 import nautilusdb as ndb
@@ -94,14 +95,11 @@ ndb.init(api_key=my_api_key)
 ## Creating a Collection
 See [this page](https://www.nautilusdb.com/developers.html) for a brief overview of NautilusDB data model 
 
-You can create a public collection that is accessible to everyone, or a 
-private collection only accessible with a specific API key.
+You can create a collection that is only accessible with a specific API key.
 
 ```python
 import nautilusdb as ndb
 
-# Set an API key to create a private collection
-# Set API key to None to create a public collection
 ndb.init(api_key="<my_api_key>")
 
 # Create a collection called c1. c1 is configured to be compatible with 
@@ -113,11 +111,13 @@ ndb.create_collection(collection)
 
 ## Listing collection
 You can see list of collections you have access to. For example, this list 
-will include all public collections, as well as all collections that were 
-created using the currently configured API key.
+will include all collections that were created using the currently configured 
+API key.
 
 ```python
 import nautilusdb as ndb
+
+ndb.init(api_key="<my_api_key>")
 
 collections = ndb.list_collections()
 ```
@@ -136,9 +136,9 @@ collection.
 ```python
 import nautilusdb as ndb
 
-# Optional API key to access private collections
 ndb.init(api_key="<my_api_key>")
 
+# llm_research collection was created in the previous step
 collection = ndb.collection('llm_research')
 
 # Local file and URLs are both supported.
@@ -153,31 +153,26 @@ collections only. ```ask()``` method returns a plain-text answer to
 your question, as well as a list of most relevance references used to derive 
 the answer. 
 
-**Available public collections**
+**Available public collections that do not require an API key to access**
 - ```openai-web```: Contains contents of ```www.openai.com```
 
 ```python
 import nautilusdb as ndb
 
-# Optional API key to access private collections
-ndb.init(api_key="<my_api_key>")
-
 # Get a plain text answer, as well as a list of references from the collection
 # that are the most relevant to the question.
 answer, refs = ndb.collection('openai-web').ask('what is red team?')
 
-
+ndb.init(api_key="<my_api_key>")
 answer, refs = ndb.collection('llm_research').ask('what is a transformer?')
 ```
 
 ## Deleting a collection
-You can delete a public collection or a private collection using the same 
-API key that was used to create it.
+You can delete a collection using the same API key that was used to create it.
 
 ```python
 import nautilusdb as ndb
 
-# Optional API key to access private collections
 ndb.init(api_key="<my_api_key>")
 
 ndb.delete_collection('llm_research')
