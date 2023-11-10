@@ -35,5 +35,9 @@ def create_api_key() -> str:
     """
     url = f'{Config.get_base_url()}/apikey/create'
     req = CreateApiKeyRequest()
-    resp = Config.post(url=url, data=req.model_dump_json())
+    resp = Config.post(
+        url=url,
+        data=req.model_dump_json(),
+        enforce_api_key=False,
+    )
     return CreateApiKeyResponse.model_validate(resp.json()).api_key
