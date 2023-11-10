@@ -19,6 +19,7 @@ __all__ = [
     "collection",
     "list_collections",
     "delete_collection",
+    "describe_collection",
 ]
 
 
@@ -89,8 +90,8 @@ def describe_collection(collection_name: str) -> CollectionWithStats:
         CollectionWithStats: A collection with collection statistics
     """
 
-    req = DescribeCollectionRequest(name=collection_name)
+    req = DescribeCollectionRequest(collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/describe'
     resp = DescribeCollectionResponse.model_validate(
-        Config.post(url=url, data=req.model_dump_json()))
+        Config.get(url=url, data=req.model_dump_json()).json())
     return describe_response_to_collection(resp)

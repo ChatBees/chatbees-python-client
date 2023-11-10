@@ -243,7 +243,7 @@ def describe_response_to_collection(
     resp: DescribeCollectionResponse
 ) -> CollectionWithStats:
     return CollectionWithStats(
-        collection_name=resp.collection_name,
+        name=resp.collection_name,
         dimension=resp.dimension,
         metadata_columns=resp.metas,
         collection_stats=CollectionStats(vector_count=resp.vector_count),
