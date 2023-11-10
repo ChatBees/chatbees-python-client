@@ -14,7 +14,7 @@ class SearchResult(BaseModel):
 
     def to_client_response(self) -> ClientSearchResponse:
         return ClientSearchResponse(
-            vectors=[v.to_client_vector_resut() for v in self.vectors])
+            vectors=[v.to_client_vector_request() for v in self.vectors])
 
 
 class Search(BaseModel):

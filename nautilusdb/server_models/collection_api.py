@@ -20,3 +20,28 @@ class ListCollectionsResponse(BaseModel):
     names: List[str]
 
 
+class DescribeCollectionRequest(BaseModel):
+    collection_name: str
+
+
+class DescribeCollectionResponse(BaseModel):
+    collection_name: str
+    dimension: int
+    vector_count: int
+    metric: str = 'l2'
+    metas: Optional[Dict[str, ColumnType]] = None
+
+
+class DeleteVectorsRequest(BaseModel):
+    """
+    Delete vectors in a collection by ids, all or by where clause. Exactly one
+    of these three fields can be specified.
+    """
+    collection_name: str
+    vector_ids: List[str] = None
+    delete_all: bool = False
+    where: str = None
+
+
+class DeleteVectorsResponse(BaseModel):
+    pass
