@@ -93,5 +93,5 @@ def describe_collection(collection_name: str) -> CollectionWithStats:
     req = DescribeCollectionRequest(collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/describe'
     resp = DescribeCollectionResponse.model_validate(
-        Config.get(url=url, data=req.model_dump_json()).json())
+        Config.post(url=url, data=req.model_dump_json()).json())
     return describe_response_to_collection(resp)

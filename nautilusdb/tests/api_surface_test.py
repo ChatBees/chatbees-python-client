@@ -217,7 +217,7 @@ class APISurfaceTest(unittest.TestCase):
             return request.text == '{"collection_name":"fakename"}'
 
         mock.register_uri(
-            'GET',
+            'POST',
             f'{APISurfaceTest.API_ENDPOINT}/collections/describe',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
