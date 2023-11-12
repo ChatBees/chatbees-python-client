@@ -17,10 +17,10 @@ class SmokeTest(unittest.TestCase):
     def setUp(self):
         # TODO: Replace hard-coded API key with dynamically created keys when
         # TODO: we have the ability to delete API keys
-        #self.apikey1 = ndb.create_api_key()
-        #self.apikey2 = ndb.create_api_key()
-        self.apikey1 = 'MS1hOTJmZDE1Ni1lNTg1LTcyM2ItMzZiNy0yYjEyYzdjZDQ3ZWE='
-        self.apikey2 = 'MS1iMjA0ZDc1Yi03MTc5LTZlMTgtMjBmMC02OWQzODZiOTExZDM='
+        self.apikey1 = ndb.create_api_key()
+        self.apikey2 = ndb.create_api_key()
+        #self.apikey1 = 'MS1hOTJmZDE1Ni1lNTg1LTcyM2ItMzZiNy0yYjEyYzdjZDQ3ZWE='
+        #self.apikey2 = 'MS1iMjA0ZDc1Yi03MTc5LTZlMTgtMjBmMC02OWQzODZiOTExZDM='
 
     def test_invalid_api_key(self):
         ndb.init(api_key='invalid')
@@ -67,7 +67,7 @@ class SmokeTest(unittest.TestCase):
             ndb.delete_collection(private_col_key2.name)
 
     def create_collection(self) -> ndb.Collection:
-        unique_col = uuid.uuid4().hex
+        unique_col = 'cl-' + uuid.uuid4().hex
         col = (
             ndb.CollectionBuilder.question_answer(unique_col).build())
         return ndb.create_collection(col)
@@ -75,7 +75,7 @@ class SmokeTest(unittest.TestCase):
     def test_vector_apis(self):
         owner = self.apikey1
         ndb.init(owner)
-        unique_col = uuid.uuid4().hex
+        unique_col = 'cl-' + uuid.uuid4().hex
         col = ndb.CollectionBuilder().set_name(unique_col).set_dimension(2).build()
         ndb.create_collection(col)
 
@@ -207,7 +207,20 @@ class SmokeTest(unittest.TestCase):
                 "boolean_column = true": {'1', '2', '3'},
             }
 
+            # Search requests
             requests = [ndb.SearchRequest(embedding=[0.1, 0.1], metadata_filter=ftr) for ftr
+                        in filter_and_expectations.keys()]
+            results = col.search(requests)
+            actual_ids = [{vector.vid for vector in result.vectors} for result in results]
+            assert len(actual_ids) == len(filter_and_expectations)
+
+            for i in range(len(actual_ids)):
+                ftr = requests[i].metadata_filter
+                expectation = filter_and_expectations[ftr]
+                assert actual_ids[i] == expectation, (f"Expected {expectation}, got "
+                                                      f"{actual_ids[i]} for filter {ftr}")
+            # Query requests
+            requests = [ndb.Qu(embedding=[0.1, 0.1], metadata_filter=ftr) for ftr
                         in filter_and_expectations.keys()]
             results = col.search(requests)
             actual_ids = [{vector.vid for vector in result.vectors} for result in results]
@@ -226,7 +239,7 @@ class SmokeTest(unittest.TestCase):
     def test_file_upload_and_ask(self):
         owner = self.apikey1
         ndb.init(owner)
-        unique_col = uuid.uuid4().hex
+        unique_col = 'cl-' + uuid.uuid4().hex
 
         # Create a collection with a few different metadata columns
         col = ndb.CollectionBuilder.question_answer(unique_col).build()

@@ -38,9 +38,9 @@ class DeleteVectorsRequest(BaseModel):
     of these three fields can be specified.
     """
     collection_name: str
-    vector_ids: List[str] = None
+    vector_ids: Optional[List[str]] = None
     delete_all: bool = False
-    where: str = None
+    where: Optional[str] = None
 
 
 class DeleteVectorsResponse(BaseModel):

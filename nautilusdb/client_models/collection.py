@@ -1,18 +1,31 @@
 import os
-from typing import List, Dict
+from typing import List, Dict, Optional
 from urllib import request
 
 from pydantic import BaseModel
 
 from nautilusdb.client_models.column_type import ColumnType
 from nautilusdb.client_models.app import AnswerReference
-from nautilusdb.client_models.search import SearchRequest, SearchResponse
-from nautilusdb.server_models.app_api import AddDocRequest, AskRequest, AskResponse
-from nautilusdb.server_models.collection_api import DeleteVectorsRequest, DescribeCollectionResponse
+from nautilusdb.client_models.query import QueryRequest, VectorResponse
+from nautilusdb.client_models.search import SearchRequest
+from nautilusdb.server_models.app_api import (
+    AddDocRequest,
+    AskRequest,
+    AskResponse,
+)
+from nautilusdb.server_models.collection_api import (
+    DeleteVectorsRequest,
+    DescribeCollectionResponse,
+)
 from nautilusdb.server_models.search_api import (
     SearchWithEmbedding,
-    SearchRequest as ServerQueryRequest,
-    SearchResponse as ServerQueryResponse,
+    Query,
+    SearchRequest as ServerSearchRequest,
+    SearchResponse as ServerSearchResponse,
+)
+from nautilusdb.server_models.query_api import (
+    QueryRequest as ServerQueryRequest,
+    QueryResponse as ServerQueryResponse,
 )
 from nautilusdb.utils.config import Config
 from nautilusdb.client_models.vector import Vector
@@ -50,7 +63,7 @@ class Collection(BaseModel):
     # A set of metadata columns associated with vectors in this collection.
     #       Key: Column name
     #       Value: Column type(avro primitive type)
-    metadata_columns: Dict[str, ColumnType] = {}
+    metadata_columns: Optional[Dict[str, ColumnType]] = None
 
     # Distance metric used for vector search.
     # Only 'l2' distance is supported.
@@ -79,7 +92,6 @@ class Collection(BaseModel):
 
     def delete_vectors(
         self,
-        collection_name: str,
         vector_ids: List[str] = None,
         metadata_filter: str = None,
         delete_all=False
@@ -145,7 +157,7 @@ class Collection(BaseModel):
                 "Exactly one of `vector_ids`, `metadata_filter` "
                 "and `delete_all` must be specified")
         req = DeleteVectorsRequest(
-            collection_name=collection_name,
+            collection_name=self.name,
             vector_ids=vector_ids,
             where=metadata_filter,
             delete_all=delete_all)
@@ -215,16 +227,29 @@ class Collection(BaseModel):
             [AnswerReference(doc_name=name) for name in unique_doc_names]
         )
 
-    def search(self, queries: List[SearchRequest]) -> List[SearchResponse]:
+    def search(self, queries: List[SearchRequest]) -> List[VectorResponse]:
         """
         Searches the collection
         """
-
-        req = ServerQueryRequest(
+        req = ServerSearchRequest(
             collection_name=self.name, queries=[
                 SearchWithEmbedding.from_client_request(q) for q in queries])
 
         url = f'{Config.get_base_url()}/vectors/search'
+
+        resp = Config.post(url=url, data=req.model_dump_json())
+        resp = ServerSearchResponse.model_validate(resp.json())
+        return [r.to_client_response() for r in resp.results]
+
+    def query(self, queries: List[QueryRequest]) -> List[VectorResponse]:
+        """
+        Queries the collection
+        """
+        req = ServerQueryRequest(
+            collection_name=self.name, queries=[
+                Query.from_client_request(q) for q in queries])
+
+        url = f'{Config.get_base_url()}/vectors/query'
 
         resp = Config.post(url=url, data=req.model_dump_json())
         resp = ServerQueryResponse.model_validate(resp.json())
