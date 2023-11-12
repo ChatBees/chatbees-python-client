@@ -261,7 +261,7 @@ class CollectionStats(BaseModel):
 
 
 class CollectionWithStats(Collection):
-    collection_stats: CollectionStats
+    stats: CollectionStats
 
 
 def describe_response_to_collection(
@@ -271,5 +271,5 @@ def describe_response_to_collection(
         name=resp.collection_name,
         dimension=resp.dimension,
         metadata_columns=resp.metas,
-        collection_stats=CollectionStats(vector_count=resp.vector_count),
+        stats=CollectionStats(vector_count=resp.vector_count),
     )
