@@ -1,12 +1,17 @@
 from typing import List
 
-from nautilusdb.client_models.collection import Collection
+from nautilusdb.client_models.collection import (
+    Collection,
+    describe_response_to_collection,
+)
+from nautilusdb.client_models.collection import CollectionWithStats
 from nautilusdb.utils.config import Config
 
 from nautilusdb.server_models.collection_api import (
     CreateCollectionRequest,
     ListCollectionsResponse,
     DeleteCollectionRequest,
+    DescribeCollectionRequest, DescribeCollectionResponse,
 )
 
 __all__ = [
@@ -14,6 +19,7 @@ __all__ = [
     "collection",
     "list_collections",
     "delete_collection",
+    "describe_collection",
 ]
 
 
@@ -72,3 +78,20 @@ def delete_collection(collection_name: str):
     req = DeleteCollectionRequest(name=collection_name)
     url = f'{Config.get_base_url()}/collections/delete'
     Config.post(url=url, data=req.model_dump_json())
+
+
+def describe_collection(collection_name: str) -> CollectionWithStats:
+    """
+    Describe a collection.
+
+    Args:
+        collection_name (str): The name of the collection.
+    Returns:
+        CollectionWithStats: A collection with collection statistics
+    """
+
+    req = DescribeCollectionRequest(collection_name=collection_name)
+    url = f'{Config.get_base_url()}/collections/describe'
+    resp = DescribeCollectionResponse.model_validate(
+        Config.post(url=url, data=req.model_dump_json()).json())
+    return describe_response_to_collection(resp)

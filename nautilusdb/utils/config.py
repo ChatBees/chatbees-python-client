@@ -35,14 +35,11 @@ class Config:
         return resp
 
     @classmethod
-    def get(cls, url: str, data=None):
+    def get(cls, url: str):
         if cls.api_key is None or cls.api_key == "":
             raise ValueError("API key is required for using NautilusDB")
 
-        # Encode data if it is a string
-        if data is not None and isinstance(data, str):
-            data = data.encode('utf-8')
-        resp = requests.get(url, data=data, headers=cls._construct_header())
+        resp = requests.get(url, headers=cls._construct_header())
         raise_for_error(resp)
         return resp
 

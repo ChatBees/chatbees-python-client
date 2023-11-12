@@ -7,9 +7,10 @@ import requests_mock
 
 import nautilusdb as ndb
 from nautilusdb import CollectionBuilder, Vector
-from nautilusdb.client_models.search import SearchRequest, SearchResponse
+from nautilusdb.client_models.search import SearchRequest
+from nautilusdb.client_models.query import VectorResponse
 from nautilusdb.server_models.collection_api import (
-    ListCollectionsResponse,
+    ListCollectionsResponse, DescribeCollectionResponse,
 )
 from nautilusdb.server_models.vector_api import (
     UpsertResponse,
@@ -19,7 +20,7 @@ from nautilusdb.server_models.app_api import AskResponse, AnswerReference
 from nautilusdb.server_models.search_api import (
     SearchRequest as ServerQueryRequest,
     SearchResponse as ServerQueryResponse,
-    SearchResult as ServerQueryResult,
+    VectorResult as ServerQueryResult,
 )
 
 
@@ -168,7 +169,7 @@ class APISurfaceTest(unittest.TestCase):
             ).model_dump_json(),
         )
 
-        result: List[SearchResponse] = ndb.collection('fakename').search(
+        result: List[VectorResponse] = ndb.collection('fakename').search(
             [SearchRequest(embedding=[1.1, 2.2], metadata_filter='where clause')])
         assert len(result) == 1
         assert len(result[0].vectors) == 1
@@ -208,3 +209,38 @@ class APISurfaceTest(unittest.TestCase):
         answer, _ = ndb.collection('openai-web').ask(
             "what is the meaning of life?")
         assert answer == '42'
+
+    @requests_mock.mock()
+    def test_describe_collection(self, mock):
+        def match_request_text(request):
+            return request.text == '{"collection_name":"fakename"}'
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/collections/describe',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+            text=DescribeCollectionResponse(
+                collection_name='test',
+                dimension=2,
+                vector_count=1,
+            ).model_dump_json(),
+        )
+
+        ndb.describe_collection('fakename')
+
+    @requests_mock.mock()
+    def test_delete_vectors(self, mock):
+        def match_request_text(request):
+            return request.text == ('{"collection_name":"fakename",'
+                                    '"vector_ids":null,"delete_all":false,'
+                                    '"where":"a = 1"}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/vectors/delete',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+        )
+
+        ndb.collection('fakename').delete_vectors(metadata_filter='a = 1')

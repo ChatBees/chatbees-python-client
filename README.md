@@ -226,6 +226,49 @@ col.upsert_vector([
 ])
 ```
 
+### Describing a collection with stats
+You can retrieve collection configurations as well as simple statistics 
+about the collection via ```describe``` API.
+
+```python
+import nautilusdb as ndb
+
+ndb.init(api_key='<my_api_key>')
+
+# Retrieve collection config and stats
+col = ndb.describe_collection('custom_collection')
+print(f"Collection {col.name} has {col.stats.vector_count} vectors!")
+```
+
+### Deleting vectors from a collection
+You can delete vectors from the collection. We support three deletion conditions
+- <ins>**Delete by ID**</ins>
+  - You can delete a set of vectors by their IDs
+- <ins>**Delete by metadata filter**</ins>
+  - You can delete all vectors that satisfy a metadata filter
+- <ins>**Delete all**</ins>
+  - You can delete all vectors from a collection
+
+Exactly one condition can be specified in each API call.
+
+```python
+import nautilusdb as ndb
+
+ndb.init(api_key='<my_api_key>')
+
+col = ndb.collection('custom_collection')
+
+# Delete 3 vectors, 'foo', 'bar', and 'baz'.
+col.delete_vectors(vector_ids=['foo', 'bar', 'baz'])
+
+# Delete all vectors created before Sunday, January 1, 2023 12:00:00 AM GMT
+col.delete_vectors(metadata_filter="created_on < 1672531200")
+
+# Delete all vectors in the collection
+col.delete_vectors(delete_all=True)
+
+```
+
 ### Searching a collection
 You can search a collection with a set of vectors, as well as a set of optional 
 metadata column filters. Metadata filter is SQL-compatible and supports a wide 
@@ -257,5 +300,28 @@ col.search(
         # Closest vectors are 100, 200, 300
         ndb.SearchRequest(
             embedding=[0.1, 0.1], metadata_filter='str_col is null'),
+    ])
+```
+### Querying a collection
+You can also perform a pure metadata query against vectors in a collection 
+using metadata filter (see search documentation above for filter syntax).
+
+Currently, returned vectors are not ranked. We're working on supporting text 
+search with relevance scoring soon, stay tuned!
+
+
+```python
+import nautilusdb as ndb
+
+ndb.init(api_key='<my_api_key>')
+
+col = ndb.collection('custom_collection')
+
+# Metadata query
+col.query(
+    [
+        ndb.QueryRequest(metadata_filter='int_col != 1'),
+        ndb.QueryRequest(metadata_filter='int_col = 1'),
+        ndb.QueryRequest(metadata_filter='str_col is null'),
     ])
 ```

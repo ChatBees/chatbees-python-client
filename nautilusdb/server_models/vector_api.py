@@ -28,7 +28,7 @@ class Vector(BaseModel):
 class VectorWithScore(Vector):
     score: float
 
-    def to_client_vector_resut(self):
+    def to_client_vector_request(self):
         return ClientVectorResult(
             score=self.score,
             vid=self.id,
