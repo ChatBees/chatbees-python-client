@@ -261,8 +261,8 @@ col = ndb.collection('custom_collection')
 # Delete 3 vectors, 'foo', 'bar', and 'baz'.
 col.delete_vectors(vector_ids=['foo', 'bar', 'baz'])
 
-# Delete all vectors created before Sunday, January 1, 2023 12:00:00 AM GMT
-col.delete_vectors(metadata_filter="created_on < 1672531200")
+# Delete all vectors where 'int_col' is specified, and the value is less than 3.
+col.delete_vectors(metadata_filter="int_col < 3")
 
 # Delete all vectors in the collection
 col.delete_vectors(delete_all=True)
