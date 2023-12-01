@@ -6,6 +6,7 @@ from nautilusdb.client_models.vector import (
     Vector as ClientVector,
     VectorResult as ClientVectorResult,
 )
+from nautilusdb.server_models.collection_api import CollectionBaseRequest
 
 
 class Vector(BaseModel):
@@ -37,8 +38,7 @@ class VectorWithScore(Vector):
         )
 
 
-class UpsertRequest(BaseModel):
-    collection_name: str
+class UpsertRequest(CollectionBaseRequest):
     vectors: List[Vector]
 
 

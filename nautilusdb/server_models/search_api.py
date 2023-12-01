@@ -9,6 +9,7 @@ from nautilusdb.client_models.query import (
     QueryRequest as ClientQueryRequest,
     VectorResponse as ClientVectorResponse,
 )
+from nautilusdb.server_models.collection_api import CollectionBaseRequest
 from nautilusdb.server_models.vector_api import VectorWithScore
 
 
@@ -54,8 +55,7 @@ class SearchWithEmbedding(Query):
         )
 
 
-class SearchRequest(BaseModel):
-    collection_name: str
+class SearchRequest(CollectionBaseRequest):
     queries: List[SearchWithEmbedding]
 
 

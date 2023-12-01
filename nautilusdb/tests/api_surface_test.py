@@ -26,10 +26,11 @@ from nautilusdb.server_models.search_api import (
 
 class APISurfaceTest(unittest.TestCase):
     API_KEY = 'fakeapikey'
+    PROJECT = 'fakeproject'
     API_ENDPOINT = 'https://public.us-west-2.aws.nautilusdb.com'
 
     def setUp(self):
-        ndb.init(api_key=APISurfaceTest.API_KEY)
+        ndb.init(api_key=APISurfaceTest.API_KEY, project=APISurfaceTest.PROJECT)
 
     @requests_mock.mock()
     def test_create_api_key(self, mock):
@@ -45,7 +46,7 @@ class APISurfaceTest(unittest.TestCase):
     def test_create_collection(self, mock):
         def match_request_text(request):
             return request.text == (
-                '{"name":"fakename","dimension":10,'
+                '{"project_name":"fakeproject","collection_name":"fakename","dimension":10,'
                 '"description":"descr",' '"metas":{}}')
 
         mock.register_uri(
@@ -65,7 +66,7 @@ class APISurfaceTest(unittest.TestCase):
     def test_create_qa_collection(self, mock):
         def match_request_text(request):
             return request.text == (
-                '{"name":"fakename","dimension":1536,'
+                '{"project_name":"fakeproject","collection_name":"fakename","dimension":1536,'
                 '"description":"This is a demo collection. '
                 'Embeddings are generated using OpenAI ada_002 server_models",'
                 '"metas":{"text":"string","tokens":"int","filename":"string"}}')
@@ -82,19 +83,22 @@ class APISurfaceTest(unittest.TestCase):
     @requests_mock.mock()
     def test_list_collections(self, mock):
         resp = ListCollectionsResponse(names=['a', 'b', 'c'])
+        def match_request_text(request):
+            return request.text == '{"project_name":"fakeproject"}'
+
         mock.register_uri(
-            'GET',
+            'POST',
             f'{APISurfaceTest.API_ENDPOINT}/collections/list',
             request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
             text=resp.model_dump_json(),
         )
-
         assert set(ndb.list_collections()) == {'a', 'b', 'c'}
 
     @requests_mock.mock()
     def test_delete_collection(self, mock):
         def match_request_text(request):
-            return request.text == '{"name":"fakename"}'
+            return request.text == '{"project_name":"fakeproject","collection_name":"fakename"}'
 
         mock.register_uri(
             'POST',
@@ -109,7 +113,7 @@ class APISurfaceTest(unittest.TestCase):
     def test_upsert_vector(self, mock):
         def match_request_text(request):
             return request.text == (
-                '{"collection_name":"fakename",'
+                '{"project_name":"fakeproject","collection_name":"fakename",'
                 '"vectors":[{"id":"foo","embedding":[1.1,2.2],"metas":null}]}')
 
         mock.register_uri(
@@ -127,7 +131,7 @@ class APISurfaceTest(unittest.TestCase):
     def test_ask(self, mock):
         def match_request_text(request):
             return request.text == (
-                '{"collection_name":"fakename",'
+                '{"project_name":"fakeproject","collection_name":"fakename",'
                 '"question":"what is the meaning of life?"}')
 
         mock.register_uri(
@@ -149,7 +153,8 @@ class APISurfaceTest(unittest.TestCase):
     def test_search(self, mock):
         def match_request_text(request):
             req = ServerQueryRequest.model_validate_json(request.text)
-            return (req.collection_name == 'fakename'
+            return (req.project_name == 'fakeproject'
+                    and req.collection_name == 'fakename'
                     and len(req.queries) == 1
                     and req.queries[ 0].where == 'where clause')
 
@@ -179,7 +184,7 @@ class APISurfaceTest(unittest.TestCase):
     @requests_mock.mock()
     def test_api_key_required(self, mock):
         # require API key for all APIs
-        ndb.init(api_key=None)
+        ndb.init(api_key=None, project=APISurfaceTest.PROJECT)
         collection = ndb.collection('foo')
         self.assertRaises(ValueError, ndb.list_collections)
         self.assertRaises(ValueError, ndb.delete_collection, 'foo')
@@ -192,7 +197,7 @@ class APISurfaceTest(unittest.TestCase):
         # The only exception is ask() API for openai-web collection
         def match_request_text(request):
             return request.text == (
-                '{"collection_name":"openai-web",'
+                '{"project_name":"fakeproject","collection_name":"openai-web",'
                 '"question":"what is the meaning of life?"}')
 
 
@@ -213,7 +218,7 @@ class APISurfaceTest(unittest.TestCase):
     @requests_mock.mock()
     def test_describe_collection(self, mock):
         def match_request_text(request):
-            return request.text == '{"collection_name":"fakename"}'
+            return request.text == '{"project_name":"fakeproject","collection_name":"fakename"}'
 
         mock.register_uri(
             'POST',
@@ -232,7 +237,7 @@ class APISurfaceTest(unittest.TestCase):
     @requests_mock.mock()
     def test_delete_vectors(self, mock):
         def match_request_text(request):
-            return request.text == ('{"collection_name":"fakename",'
+            return request.text == ('{"project_name":"fakeproject","collection_name":"fakename",'
                                     '"vector_ids":null,"delete_all":false,'
                                     '"where":"a = 1"}')
 

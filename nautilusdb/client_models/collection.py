@@ -40,16 +40,12 @@ from nautilusdb.utils.file_upload import (
     validate_url_file,
 )
 
-__all__ = ["Collection", "CollectionStats", "CollectionWithStats"]
+__all__ = ["Collection"]
 
 
 class Collection(BaseModel):
     """
     A Collection is a named vector search index with a fixed embedding dimension.
-
-    Usage:
-        import nautilusdb as ndb
-        collection =  ndb.create_collection(ndb.
     """
     #  Name of the collection
     name: str
@@ -84,6 +80,7 @@ class Collection(BaseModel):
         """
         url = f'{Config.get_base_url()}/vectors/upsert'
         req = UpsertRequest(
+            project_name=Config.project,
             collection_name=self.name,
             vectors=[ServerVector.from_client_vector(v) for v in vectors])
         resp = Config.post(url=url, data=req.model_dump_json())
@@ -157,6 +154,7 @@ class Collection(BaseModel):
                 "Exactly one of `vector_ids`, `metadata_filter` "
                 "and `delete_all` must be specified")
         req = DeleteVectorsRequest(
+            project_name=Config.project,
             collection_name=self.name,
             vector_ids=vector_ids,
             where=metadata_filter,
@@ -173,7 +171,8 @@ class Collection(BaseModel):
         :return:
         """
         url = f'{Config.get_base_url()}/qadocs/add'
-        req = AddDocRequest(collection_name=self.name)
+        req = AddDocRequest(project_name=Config.project,
+                            collection_name=self.name)
         if is_url(path_or_url):
             validate_url_file(path_or_url)
             with request.urlopen(path_or_url) as f:
@@ -205,7 +204,10 @@ class Collection(BaseModel):
                           collection
         """
         url = f'{Config.get_base_url()}/qadocs/ask'
-        req = AskRequest(collection_name=self.name, question=question)
+
+        req = AskRequest(project_name=Config.project,
+                         collection_name=self.name,
+                         question=question)
         enforce_api_key = True
 
         # Only allow openai-web collection to be accessed without API key to
@@ -232,7 +234,9 @@ class Collection(BaseModel):
         Searches the collection
         """
         req = ServerSearchRequest(
-            collection_name=self.name, queries=[
+            project_name=Config.project,
+            collection_name=self.name,
+            queries=[
                 SearchWithEmbedding.from_client_request(q) for q in queries])
 
         url = f'{Config.get_base_url()}/vectors/search'
@@ -246,7 +250,9 @@ class Collection(BaseModel):
         Queries the collection
         """
         req = ServerQueryRequest(
-            collection_name=self.name, queries=[
+            project_name=Config.project,
+            collection_name=self.name,
+            queries=[
                 Query.from_client_request(q) for q in queries])
 
         url = f'{Config.get_base_url()}/vectors/query'
@@ -256,20 +262,11 @@ class Collection(BaseModel):
         return [r.to_client_response() for r in resp.results]
 
 
-class CollectionStats(BaseModel):
-    vector_count: int
-
-
-class CollectionWithStats(Collection):
-    stats: CollectionStats
-
-
 def describe_response_to_collection(
     resp: DescribeCollectionResponse
-) -> CollectionWithStats:
-    return CollectionWithStats(
+) -> Collection:
+    return Collection(
         name=resp.collection_name,
         dimension=resp.dimension,
         metadata_columns=resp.metas,
-        stats=CollectionStats(vector_count=resp.vector_count),
     )
