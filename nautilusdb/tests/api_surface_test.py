@@ -69,7 +69,7 @@ class APISurfaceTest(unittest.TestCase):
                 '{"project_name":"fakeproject","collection_name":"fakename","dimension":1536,'
                 '"description":"This is a demo collection. '
                 'Embeddings are generated using OpenAI ada_002 server_models",'
-                '"metas":{"text":"string","tokens":"int","filename":"string"}}')
+                '"metas":{"TEXT":"string","TOKENS":"int","PAGE":"int","FILENAME":"string"}}')
 
         mock.register_uri(
             'POST',
@@ -83,6 +83,7 @@ class APISurfaceTest(unittest.TestCase):
     @requests_mock.mock()
     def test_list_collections(self, mock):
         resp = ListCollectionsResponse(names=['a', 'b', 'c'])
+
         def match_request_text(request):
             return request.text == '{"project_name":"fakeproject"}'
 
@@ -156,7 +157,7 @@ class APISurfaceTest(unittest.TestCase):
             return (req.project_name == 'fakeproject'
                     and req.collection_name == 'fakename'
                     and len(req.queries) == 1
-                    and req.queries[ 0].where == 'where clause')
+                    and req.queries[0].where == 'where clause')
 
         mock.register_uri(
             'POST',
@@ -199,7 +200,6 @@ class APISurfaceTest(unittest.TestCase):
             return request.text == (
                 '{"project_name":"fakeproject","collection_name":"openai-web",'
                 '"question":"what is the meaning of life?"}')
-
 
         mock.register_uri(
             'POST',
