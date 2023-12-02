@@ -29,3 +29,11 @@ class AnswerReference(BaseModel):
 class AskResponse(BaseModel):
     answer: str
     refs: List[AnswerReference]
+
+
+class SummaryRequest(CollectionBaseRequest):
+    doc_name: str
+
+
+class SummaryResponse(BaseModel):
+    summary: str
