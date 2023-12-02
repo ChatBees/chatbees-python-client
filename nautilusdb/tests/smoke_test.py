@@ -262,15 +262,24 @@ class SmokeTest(unittest.TestCase):
 
         files = [
             f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt',
-            #f'{os.path.dirname(os.path.abspath(__file__))}/data/española.txt',
-            #f'{os.path.dirname(os.path.abspath(__file__))}/data/française.txt',
-            #f'{os.path.dirname(os.path.abspath(__file__))}/data/中文.txt',
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/española.txt',
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/française.txt',
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/中文.txt',
         ]
 
         try:
             for file in files:
                 col.upload_document(file)
             col.ask('question?')
+
+            chat1 = col.chat()
+            chat2 = col.chat()
+
+            chat1.ask("q1")
+            chat1.ask("q2")
+            chat1.ask("q3")
+            chat2.ask("q1")
+            chat2.ask("q2")
+            chat2.ask("q3")
         finally:
-            pass
-            #ndb.delete_collection(col.name)
+            ndb.delete_collection(col.name)
