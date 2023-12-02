@@ -2,6 +2,7 @@ from typing import Optional, List, Tuple
 
 from pydantic import BaseModel
 
+from nautilusdb.client_models.app import AnswerReference
 from nautilusdb.utils.ask import ask
 from nautilusdb.utils.config import Config
 
@@ -15,7 +16,7 @@ class Chat(BaseModel):
     doc_name: Optional[str] = None
     history_messages: Optional[List[Tuple[str, str]]] = None
 
-    def ask(self, question: str) -> str:
+    def ask(self, question: str) -> (str, List[AnswerReference]):
         (answer, references) = ask(
             Config.project,
             self.collection_name,
@@ -25,4 +26,4 @@ class Chat(BaseModel):
         if self.history_messages is None:
             self.history_messages = []
         self.history_messages.append((question, answer))
-        return answer
+        return answer, references
