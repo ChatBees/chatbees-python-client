@@ -11,7 +11,7 @@ from nautilusdb.client_models.search import SearchRequest
 from nautilusdb.server_models.app_api import (
     AddDocRequest,
     AskRequest,
-    AskResponse,
+    AskResponse, SummaryRequest, SummaryResponse,
 )
 from nautilusdb.server_models.collection_api import (
     DeleteVectorsRequest,
@@ -189,6 +189,23 @@ class Collection(BaseModel):
                 Config.post(
                     url=url, files={'file': (fname, f)},
                     data={'request': req.model_dump_json()})
+
+    def summarize_document(self, path_or_url) -> str:
+        """
+        Returns a summary of the document.
+
+        :param path_or_url: Local path or url to the uploaded document
+        :return: A summary of the document
+        """
+        url = f'{Config.get_base_url()}/qadocs/summary'
+        req = SummaryRequest(
+            project_name=Config.project,
+            collection_name=self.name,
+            doc_name=path_or_url
+        )
+        resp = Config.post(url=url, data=req.model_dump_json())
+        resp = SummaryResponse.model_validate(resp.json())
+        return resp.summary
 
     def ask(
         self,
