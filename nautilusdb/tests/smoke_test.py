@@ -270,6 +270,8 @@ class SmokeTest(unittest.TestCase):
         try:
             for file in files:
                 col.upload_document(file)
+                fname = os.path.basename(file)
+                col.summarize_document(fname)
             col.ask('question?')
 
             chat1 = col.chat()

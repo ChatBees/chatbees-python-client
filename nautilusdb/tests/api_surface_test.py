@@ -16,7 +16,7 @@ from nautilusdb.server_models.vector_api import (
     UpsertResponse,
     VectorWithScore as ServerVectorWithScore,
 )
-from nautilusdb.server_models.app_api import AskResponse, AnswerReference
+from nautilusdb.server_models.app_api import AskResponse, AnswerReference, SummaryResponse
 from nautilusdb.server_models.search_api import (
     SearchRequest as ServerQueryRequest,
     SearchResponse as ServerQueryResponse,
@@ -293,3 +293,22 @@ class APISurfaceTest(unittest.TestCase):
         )
         chat.ask("q2")
         assert(chat.history_messages == [('q1', 'a1'), ('q2', 'a2')])
+
+    @requests_mock.mock()
+    def test_summary(self, mock):
+        def match_request_text(request):
+            return request.text == ('{"project_name":"fakeproject",'
+                                    '"collection_name":"fakename",'
+                                    '"doc_name":"path/to/file"}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/qadocs/summary',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+            text=SummaryResponse(
+                summary='test summary',
+            ).model_dump_json(),
+        )
+
+        assert(ndb.collection('fakename').summarize_document("path/to/file") == "test summary")
