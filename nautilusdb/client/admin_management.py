@@ -6,7 +6,8 @@ __all__ = ["init", "create_api_key"]
 
 def init(
     api_key: str = None,
-    account_name: str = Config.PUBLIC_ACCOUNT
+    account_name: str = Config.PUBLIC_ACCOUNT,
+    project: str = Config.PUBLIC_PROJECT
 ):
     """
     Initialize the NautilusDB client.
@@ -17,11 +18,13 @@ def init(
                                  public collections without an API key.
         account_name (str, optional): The name of the account. Defaults to
                                       "public"
+        project (str, optional): The project to use.
     Raises:
         ValueError: If the provided config is invalid
     """
     Config.api_key = api_key
     Config.account_name = account_name
+    Config.project = project
     Config.validate_setup()
 
 

@@ -4,14 +4,15 @@ from nautilusdb.client_models.collection import (
     Collection,
     describe_response_to_collection,
 )
-from nautilusdb.client_models.collection import CollectionWithStats
 from nautilusdb.utils.config import Config
 
 from nautilusdb.server_models.collection_api import (
     CreateCollectionRequest,
+    ListCollectionsRequest,
     ListCollectionsResponse,
     DeleteCollectionRequest,
-    DescribeCollectionRequest, DescribeCollectionResponse,
+    DescribeCollectionRequest,
+    DescribeCollectionResponse,
 )
 
 __all__ = [
@@ -35,7 +36,8 @@ def create_collection(col: Collection) -> Collection:
     """
     url = f'{Config.get_base_url()}/collections/create'
     req = CreateCollectionRequest(
-        name=col.name,
+        project_name=Config.project,
+        collection_name=col.name,
         dimension=col.dimension,
         description=col.description,
         metas=col.metadata_columns)
@@ -64,7 +66,8 @@ def list_collections() -> List[str]:
         List[Collection]: A list of collection objects.
     """
     url = f'{Config.get_base_url()}/collections/list'
-    resp = Config.get(url=url)
+    req = ListCollectionsRequest(project_name=Config.project)
+    resp = Config.post(url=url, data=req.model_dump_json())
     return ListCollectionsResponse.model_validate(resp.json()).names
 
 
@@ -75,22 +78,24 @@ def delete_collection(collection_name: str):
     Args:
         collection_name (str): The name of the collection.
     """
-    req = DeleteCollectionRequest(name=collection_name)
+    req = DeleteCollectionRequest(project_name=Config.project,
+                                  collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/delete'
     Config.post(url=url, data=req.model_dump_json())
 
 
-def describe_collection(collection_name: str) -> CollectionWithStats:
+def describe_collection(collection_name: str) -> Collection:
     """
     Describe a collection.
 
     Args:
         collection_name (str): The name of the collection.
     Returns:
-        CollectionWithStats: A collection with collection statistics
+        Collection: A collection
     """
 
-    req = DescribeCollectionRequest(collection_name=collection_name)
+    req = DescribeCollectionRequest(project_name=Config.project,
+                                    collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/describe'
     resp = DescribeCollectionResponse.model_validate(
         Config.post(url=url, data=req.model_dump_json()).json())

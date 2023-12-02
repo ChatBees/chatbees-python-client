@@ -2,11 +2,11 @@ from typing import List
 
 from pydantic import BaseModel
 
+from nautilusdb.server_models.collection_api import CollectionBaseRequest
 from nautilusdb.server_models.search_api import VectorResult, Query
 
 
-class QueryRequest(BaseModel):
-    collection_name: str
+class QueryRequest(CollectionBaseRequest):
     queries: List[Query]
 
 

@@ -7,7 +7,9 @@ ENV_TEST_BASE_URL = os.environ.get("ENV_TEST_BASE_URL", "")
 
 class Config:
     PUBLIC_ACCOUNT: str = "public"
+    PUBLIC_PROJECT: str = "public"
     api_key: str = None
+    project: str = PUBLIC_PROJECT
     account_name: str = PUBLIC_ACCOUNT
 
     @classmethod
