@@ -192,7 +192,7 @@ class Collection(BaseModel):
                     url=url, files={'file': (fname, f)},
                     data={'request': req.model_dump_json()})
 
-    def summarize_document(self, path_or_url) -> str:
+    def summarize_document(self, doc_name) -> str:
         """
         Returns a summary of the document.
 
@@ -203,7 +203,7 @@ class Collection(BaseModel):
         req = SummaryRequest(
             project_name=Config.project,
             collection_name=self.name,
-            doc_name=path_or_url
+            doc_name=doc_name,
         )
         resp = Config.post(url=url, data=req.model_dump_json())
         resp = SummaryResponse.model_validate(resp.json())
