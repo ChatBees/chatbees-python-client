@@ -133,7 +133,8 @@ class APISurfaceTest(unittest.TestCase):
         def match_request_text(request):
             return request.text == (
                 '{"project_name":"fakeproject","collection_name":"fakename",'
-                '"question":"what is the meaning of life?"}')
+                '"question":"what is the meaning of life?","top_k":5,'
+                '"doc_name":null,"history_messages":null}')
 
         mock.register_uri(
             'POST',
@@ -199,7 +200,8 @@ class APISurfaceTest(unittest.TestCase):
         def match_request_text(request):
             return request.text == (
                 '{"project_name":"fakeproject","collection_name":"openai-web",'
-                '"question":"what is the meaning of life?"}')
+                '"question":"what is the meaning of life?","top_k":5,'
+                '"doc_name":null,"history_messages":null}')
 
         mock.register_uri(
             'POST',
@@ -249,6 +251,48 @@ class APISurfaceTest(unittest.TestCase):
         )
 
         ndb.collection('fakename').delete_vectors(metadata_filter='a = 1')
+
+    @requests_mock.mock()
+    def test_chat(self, mock):
+        def match_request_text(request):
+            return request.text == ('{"project_name":"fakeproject",'
+                                    '"collection_name":"openai-web",'
+                                    '"question":"q1","top_k":5,'
+                                    '"doc_name":null,'
+                                    '"history_messages":null}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/qadocs/ask',
+            additional_matcher=match_request_text,
+            text=AskResponse(
+                answer='a1',
+                refs=[AnswerReference(doc_name="doc")]
+            ).model_dump_json(),
+        )
+
+        chat = ndb.collection('openai-web').chat()
+        chat.ask("q1")
+
+
+        def match_request_text2(request):
+            return request.text == ('{"project_name":"fakeproject",'
+                                    '"collection_name":"openai-web",'
+                                    '"question":"q2","top_k":5,'
+                                    '"doc_name":null,'
+                                    '"history_messages":[["q1","a1"]]}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/qadocs/ask',
+            additional_matcher=match_request_text2,
+            text=AskResponse(
+                answer='a2',
+                refs=[AnswerReference(doc_name="doc")]
+            ).model_dump_json(),
+        )
+        chat.ask("q2")
+        assert(chat.history_messages == [('q1', 'a1'), ('q2', 'a2')])
 
     @requests_mock.mock()
     def test_summary(self, mock):

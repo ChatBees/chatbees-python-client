@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import List, Optional, Tuple
 
 from pydantic import BaseModel
 
@@ -20,6 +20,9 @@ class AddDocRequest(CollectionBaseRequest):
 
 class AskRequest(CollectionBaseRequest):
     question: str
+    top_k: Optional[int] = 5
+    doc_name: Optional[str] = None
+    history_messages: Optional[List[Tuple[str, str]]] = None
 
 
 class AnswerReference(BaseModel):

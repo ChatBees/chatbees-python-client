@@ -4,6 +4,7 @@ from urllib import request
 
 from pydantic import BaseModel
 
+from nautilusdb.client_models.chat import Chat
 from nautilusdb.client_models.column_type import ColumnType
 from nautilusdb.client_models.app import AnswerReference
 from nautilusdb.client_models.query import QueryRequest, VectorResponse
@@ -29,6 +30,7 @@ from nautilusdb.server_models.query_api import (
     QueryRequest as ServerQueryRequest,
     QueryResponse as ServerQueryResponse,
 )
+from nautilusdb.utils.ask import ask
 from nautilusdb.utils.config import Config
 from nautilusdb.client_models.vector import Vector
 from nautilusdb.server_models.vector_api import (
@@ -222,31 +224,7 @@ class Collection(BaseModel):
             - references: A list of most relevant document references in the
                           collection
         """
-        url = f'{Config.get_base_url()}/qadocs/ask'
-
-        req = AskRequest(project_name=Config.project,
-                         collection_name=self.name,
-                         question=question)
-        enforce_api_key = True
-
-        # Only allow openai-web collection to be accessed without API key to
-        # simplify demo.
-        if self.name == 'openai-web':
-            enforce_api_key = False
-
-        resp = Config.post(
-            url=url,
-            data=req.model_dump_json(),
-            enforce_api_key=enforce_api_key
-        )
-        resp = AskResponse.model_validate(resp.json())
-
-        unique_doc_names = {ref.doc_name for ref in resp.refs}
-
-        return (
-            resp.answer,
-            [AnswerReference(doc_name=name) for name in unique_doc_names]
-        )
+        return ask(Config.project, self.name, question)
 
     def search(self, queries: List[SearchRequest]) -> List[VectorResponse]:
         """
@@ -280,6 +258,18 @@ class Collection(BaseModel):
         resp = ServerQueryResponse.model_validate(resp.json())
         return [r.to_client_response() for r in resp.results]
 
+    def chat(self, doc_name=None) -> Chat:
+        """
+        Creates a new chatbot within the collection.
+
+        :param doc_name: If specified, chatbot is scoped to the given document only
+        :return: A new Chat object
+        """
+        return Chat(
+            project_name=Config.project,
+            collection_name=self.name,
+            doc_name=doc_name
+        )
 
 def describe_response_to_collection(
     resp: DescribeCollectionResponse

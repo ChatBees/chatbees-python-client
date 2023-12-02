@@ -273,5 +273,15 @@ class SmokeTest(unittest.TestCase):
                 fname = os.path.basename(file)
                 col.summarize_document(fname)
             col.ask('question?')
+
+            chat1 = col.chat()
+            chat2 = col.chat()
+
+            chat1.ask("q1")
+            chat1.ask("q2")
+            chat1.ask("q3")
+            chat2.ask("q1")
+            chat2.ask("q2")
+            chat2.ask("q3")
         finally:
             ndb.delete_collection(col.name)
