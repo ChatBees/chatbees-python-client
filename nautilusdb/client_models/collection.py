@@ -11,7 +11,9 @@ from nautilusdb.client_models.search import SearchRequest
 from nautilusdb.server_models.app_api import (
     AddDocRequest,
     AskRequest,
-    AskResponse, SummaryRequest, SummaryResponse,
+    AskResponse,
+    SummaryRequest,
+    SummaryResponse,
 )
 from nautilusdb.server_models.collection_api import (
     DeleteVectorsRequest,
