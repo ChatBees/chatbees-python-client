@@ -8,9 +8,11 @@ from nautilusdb.utils.config import Config
 
 from nautilusdb.server_models.collection_api import (
     CreateCollectionRequest,
+    ListCollectionsRequest,
     ListCollectionsResponse,
     DeleteCollectionRequest,
-    DescribeCollectionRequest, DescribeCollectionResponse, ListCollectionsRequest,
+    DescribeCollectionRequest,
+    DescribeCollectionResponse,
 )
 
 __all__ = [
