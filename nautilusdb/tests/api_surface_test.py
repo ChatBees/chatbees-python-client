@@ -143,7 +143,7 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
             text=AskResponse(
                 answer='42',
-                refs=[AnswerReference(doc_name="doc")]
+                refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")]
             ).model_dump_json(),
         )
 
@@ -209,7 +209,7 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
             text=AskResponse(
                 answer='42',
-                refs=[AnswerReference(doc_name="doc")]
+                refs = [AnswerReference(doc_name="doc", page_num=1, sample_text="")]
             ).model_dump_json(),
         )
 
@@ -267,7 +267,7 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
             text=AskResponse(
                 answer='a1',
-                refs=[AnswerReference(doc_name="doc")]
+                refs = [AnswerReference(doc_name="doc", page_num=1, sample_text="")]
             ).model_dump_json(),
         )
 
@@ -288,7 +288,7 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text2,
             text=AskResponse(
                 answer='a2',
-                refs=[AnswerReference(doc_name="doc")]
+                refs = [AnswerReference(doc_name="doc", page_num=1, sample_text="")]
             ).model_dump_json(),
         )
         chat.ask("q2")
