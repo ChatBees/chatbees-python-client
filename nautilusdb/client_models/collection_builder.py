@@ -29,7 +29,7 @@ class CollectionBuilder:
         return CollectionBuilder().set_dimension(1536).set_name(name)
 
     @classmethod
-    def question_answer(cls, name: str = "") -> "CollectionBuilder":
+    def question_answer(cls, name: str) -> "CollectionBuilder":
         """
         Canned collection config that is compatible with Q/A API.
 

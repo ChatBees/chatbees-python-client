@@ -34,9 +34,9 @@ def ask(
     )
     resp = AskResponse.model_validate(resp.json())
 
-    unique_doc_names = {ref.doc_name for ref in resp.refs}
-
     return (
         resp.answer,
-        [AnswerReference(doc_name=name) for name in unique_doc_names]
+        [AnswerReference(doc_name=ref.doc_name,
+                         page_num=ref.page_num,
+                         sample_text=ref.sample_text) for ref in resp.refs]
     )

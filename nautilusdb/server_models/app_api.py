@@ -27,6 +27,8 @@ class AskRequest(CollectionBaseRequest):
 
 class AnswerReference(BaseModel):
     doc_name: str
+    page_num: int
+    sample_text: str
 
 
 class AskResponse(BaseModel):
