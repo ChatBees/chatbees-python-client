@@ -294,5 +294,6 @@ class SmokeTest(unittest.TestCase):
 
 
     def assertRefsAreFromDoc(self, refs: List[AnswerReference], doc: str):
+        assert len(refs) > 0
         for ref in refs:
             assert ref.doc_name == doc
