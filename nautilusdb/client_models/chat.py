@@ -21,7 +21,8 @@ class Chat(BaseModel):
             Config.project,
             self.collection_name,
             question,
-            history_messages=self.history_messages
+            doc_name=self.doc_name,
+            history_messages=self.history_messages,
         )
         if self.history_messages is None:
             self.history_messages = []

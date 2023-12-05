@@ -275,7 +275,7 @@ class SmokeTest(unittest.TestCase):
             col.ask('question?')
 
             chat1 = col.chat()
-            chat2 = col.chat()
+            chat2 = col.chat(doc_name="text_file.txt")
 
             chat1.ask("q1")
             chat1.ask("q2")
