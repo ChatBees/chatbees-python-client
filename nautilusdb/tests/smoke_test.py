@@ -2,9 +2,11 @@ import io
 import os
 import unittest
 import uuid
+from typing import List
 
 import nautilusdb as ndb
 from nautilusdb import ColumnType
+from nautilusdb.client_models.app import AnswerReference
 
 
 class SmokeTest(unittest.TestCase):
@@ -280,8 +282,17 @@ class SmokeTest(unittest.TestCase):
             chat1.ask("q1")
             chat1.ask("q2")
             chat1.ask("q3")
-            chat2.ask("q1")
-            chat2.ask("q2")
-            chat2.ask("q3")
+
+            a, refs = chat2.ask("q1")
+            self.assertRefsAreFromDoc(refs, "text_file.txt")
+            a, refs = chat2.ask("q2")
+            self.assertRefsAreFromDoc(refs, "text_file.txt")
+            a, refs = chat2.ask("q3")
+            self.assertRefsAreFromDoc(refs, "text_file.txt")
         finally:
             ndb.delete_collection(col.name)
+
+
+    def assertRefsAreFromDoc(self, refs: List[AnswerReference], doc: str):
+        for ref in refs:
+            assert ref.doc_name == doc
