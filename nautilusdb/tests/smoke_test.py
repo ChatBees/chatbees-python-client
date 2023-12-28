@@ -6,7 +6,7 @@ from typing import List
 
 import nautilusdb as ndb
 from nautilusdb import ColumnType
-from nautilusdb.client_models.app import AnswerReference
+from nautilusdb.client_models.doc import AnswerReference
 
 
 class SmokeTest(unittest.TestCase):

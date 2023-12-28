@@ -6,7 +6,7 @@ from nautilusdb.client_models.column_type import ColumnType
 
 
 class CollectionBaseRequest(BaseModel):
-    project_name: str
+    namespace_name: str
     collection_name: str
 
 
@@ -19,7 +19,7 @@ class DeleteCollectionRequest(CollectionBaseRequest):
 
 
 class ListCollectionsRequest(BaseModel):
-    project_name: str
+    namespace_name: str
 
 
 class ListCollectionsResponse(BaseModel):

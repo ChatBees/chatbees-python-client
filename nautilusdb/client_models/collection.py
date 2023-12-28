@@ -72,7 +72,7 @@ class Collection(BaseModel):
         """
         url = f'{Config.get_base_url()}/vectors/upsert'
         req = UpsertRequest(
-            project_name=Config.project,
+            namespace_name=Config.namespace,
             collection_name=self.name,
             vectors=[ServerVector.from_client_vector(v) for v in vectors])
         resp = Config.post(url=url, data=req.model_dump_json())
@@ -146,7 +146,7 @@ class Collection(BaseModel):
                 "Exactly one of `vector_ids`, `metadata_filter` "
                 "and `delete_all` must be specified")
         req = DeleteVectorsRequest(
-            project_name=Config.project,
+            namespace_name=Config.namespace,
             collection_name=self.name,
             vector_ids=vector_ids,
             where=metadata_filter,
@@ -163,7 +163,7 @@ class Collection(BaseModel):
         :return:
         """
         url = f'{Config.get_base_url()}/docs/add'
-        req = AddDocRequest(project_name=Config.project,
+        req = AddDocRequest(namespace_name=Config.namespace,
                             collection_name=self.name)
         if is_url(path_or_url):
             validate_url_file(path_or_url)
@@ -191,7 +191,7 @@ class Collection(BaseModel):
         """
         url = f'{Config.get_base_url()}/docs/summary'
         req = SummaryRequest(
-            project_name=Config.project,
+            namespace_name=Config.namespace,
             collection_name=self.name,
             doc_name=doc_name,
         )
@@ -212,14 +212,14 @@ class Collection(BaseModel):
             - references: A list of most relevant document references in the
                           collection
         """
-        return ask(Config.project, self.name, question)
+        return ask(Config.namespace, self.name, question)
 
     def search(self, queries: List[SearchRequest]) -> List[VectorResponse]:
         """
         Searches the collection
         """
         req = ServerSearchRequest(
-            project_name=Config.project,
+            namespace_name=Config.namespace,
             collection_name=self.name,
             queries=[
                 SearchWithEmbedding.from_client_request(q) for q in queries])
@@ -235,7 +235,7 @@ class Collection(BaseModel):
         Queries the collection
         """
         req = ServerQueryRequest(
-            project_name=Config.project,
+            namespace_name=Config.namespace,
             collection_name=self.name,
             queries=[
                 Query.from_client_request(q) for q in queries])
@@ -254,7 +254,7 @@ class Collection(BaseModel):
         :return: A new Chat object
         """
         return Chat(
-            project_name=Config.project,
+            namespace_name=Config.namespace,
             collection_name=self.name,
             doc_name=doc_name
         )

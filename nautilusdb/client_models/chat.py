@@ -11,14 +11,14 @@ class Chat(BaseModel):
     """
     A new chatbot instance that supports conversational Q and A.
     """
-    project_name: str
+    namespace_name: str
     collection_name: str
     doc_name: Optional[str] = None
     history_messages: Optional[List[Tuple[str, str]]] = None
 
     def ask(self, question: str) -> (str, List[AnswerReference]):
         (answer, references) = ask(
-            Config.project,
+            Config.namespace,
             self.collection_name,
             question,
             doc_name=self.doc_name,

@@ -5,7 +5,7 @@ from nautilusdb.utils.config import Config
 
 
 def ask(
-    project_name: str,
+    namespace_name: str,
     collection_name: str,
     question: str,
     doc_name=None,
@@ -14,7 +14,7 @@ def ask(
     url = f'{Config.get_base_url()}/docs/ask'
 
     req = AskRequest(
-        project_name=project_name,
+        namespace_name=namespace_name,
         collection_name=collection_name,
         doc_name=doc_name,
         question=question,
