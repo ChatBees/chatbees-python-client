@@ -16,11 +16,12 @@ class Chat(BaseModel):
     doc_name: Optional[str] = None
     history_messages: Optional[List[Tuple[str, str]]] = None
 
-    def ask(self, question: str) -> (str, List[AnswerReference]):
+    def ask(self, question: str, top_k: int = 5) -> (str, List[AnswerReference]):
         (answer, references) = ask(
             Config.namespace,
             self.collection_name,
             question,
+            top_k,
             doc_name=self.doc_name,
             history_messages=self.history_messages,
         )

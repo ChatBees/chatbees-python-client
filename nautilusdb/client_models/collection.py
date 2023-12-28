@@ -66,7 +66,7 @@ class Collection(BaseModel):
                     url=url, files={'file': (fname, f)},
                     data={'request': req.model_dump_json()})
 
-    def summarize_document(self, doc_name) -> str:
+    def summarize_document(self, doc_name: str) -> str:
         """
         Returns a summary of the document.
 
@@ -84,8 +84,7 @@ class Collection(BaseModel):
         return resp.summary
 
     def ask(
-        self,
-        question: str,
+        self, question: str, top_k: int = 5, doc_name: str = None,
     ) -> (str, List[AnswerReference]):
         """
         Ask a question within the context of this collection.
@@ -96,9 +95,9 @@ class Collection(BaseModel):
             - references: A list of most relevant document references in the
                           collection
         """
-        return ask(Config.namespace, self.name, question)
+        return ask(Config.namespace, self.name, question, top_k, doc_name)
 
-    def chat(self, doc_name=None) -> Chat:
+    def chat(self, doc_name: str = None) -> Chat:
         """
         Creates a new chatbot within the collection.
 
