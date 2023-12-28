@@ -6,7 +6,8 @@ from typing import List
 import requests_mock
 
 import nautilusdb as ndb
-from nautilusdb import CollectionBuilder, Vector
+from nautilusdb import Vector
+from nautilusdb.client_models.collection import Collection
 from nautilusdb.client_models.search import SearchRequest
 from nautilusdb.client_models.query import VectorResponse
 from nautilusdb.server_models.collection_api import (
@@ -16,7 +17,7 @@ from nautilusdb.server_models.vector_api import (
     UpsertResponse,
     VectorWithScore as ServerVectorWithScore,
 )
-from nautilusdb.server_models.app_api import AskResponse, AnswerReference, SummaryResponse
+from nautilusdb.server_models.doc_api import AskResponse, AnswerReference, SummaryResponse
 from nautilusdb.server_models.search_api import (
     SearchRequest as ServerQueryRequest,
     SearchResponse as ServerQueryResponse,
@@ -46,8 +47,8 @@ class APISurfaceTest(unittest.TestCase):
     def test_create_collection(self, mock):
         def match_request_text(request):
             return request.text == (
-                '{"project_name":"fakeproject","collection_name":"fakename","dimension":10,'
-                '"description":"descr",' '"metas":{}}')
+                '{"project_name":"fakeproject","collection_name":"fakename",'
+                '"description":"descr"}')
 
         mock.register_uri(
             'POST',
@@ -57,28 +58,7 @@ class APISurfaceTest(unittest.TestCase):
         )
 
         assert ndb.create_collection(
-            CollectionBuilder()
-            .set_name('fakename')
-            .set_dimension(10)
-            .set_description('descr').build())
-
-    @requests_mock.mock()
-    def test_create_qa_collection(self, mock):
-        def match_request_text(request):
-            return request.text == (
-                '{"project_name":"fakeproject","collection_name":"fakename","dimension":1536,'
-                '"description":"This is a demo collection. '
-                'Embeddings are generated using OpenAI ada_002 server_models",'
-                '"metas":{"TEXT":"string","TOKENS":"int","PAGE":"int","FILENAME":"string"}}')
-
-        mock.register_uri(
-            'POST',
-            f'{APISurfaceTest.API_ENDPOINT}/collections/create',
-            request_headers={'api-key': 'fakeapikey'},
-            additional_matcher=match_request_text,
-        )
-
-        assert ndb.create_collection(CollectionBuilder.question_answer("fakename").build())
+            Collection(name='fakename', description='descr'))
 
     @requests_mock.mock()
     def test_list_collections(self, mock):
@@ -138,7 +118,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            f'{APISurfaceTest.API_ENDPOINT}/qadocs/ask',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/ask',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
             text=AskResponse(
@@ -205,7 +185,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            f'{APISurfaceTest.API_ENDPOINT}/qadocs/ask',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/ask',
             additional_matcher=match_request_text,
             text=AskResponse(
                 answer='42',
@@ -227,11 +207,7 @@ class APISurfaceTest(unittest.TestCase):
             f'{APISurfaceTest.API_ENDPOINT}/collections/describe',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
-            text=DescribeCollectionResponse(
-                collection_name='test',
-                dimension=2,
-                vector_count=1,
-            ).model_dump_json(),
+            text=DescribeCollectionResponse().model_dump_json(),
         )
 
         ndb.describe_collection('fakename')
@@ -263,7 +239,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            f'{APISurfaceTest.API_ENDPOINT}/qadocs/ask',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/ask',
             additional_matcher=match_request_text,
             text=AskResponse(
                 answer='a1',
@@ -284,7 +260,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            f'{APISurfaceTest.API_ENDPOINT}/qadocs/ask',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/ask',
             additional_matcher=match_request_text2,
             text=AskResponse(
                 answer='a2',
@@ -303,7 +279,7 @@ class APISurfaceTest(unittest.TestCase):
 
         mock.register_uri(
             'POST',
-            f'{APISurfaceTest.API_ENDPOINT}/qadocs/summary',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/summary',
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text,
             text=SummaryResponse(

@@ -6,10 +6,10 @@ from pydantic import BaseModel
 
 from nautilusdb.client_models.chat import Chat
 from nautilusdb.client_models.column_type import ColumnType
-from nautilusdb.client_models.app import AnswerReference
+from nautilusdb.client_models.doc import AnswerReference
 from nautilusdb.client_models.query import QueryRequest, VectorResponse
 from nautilusdb.client_models.search import SearchRequest
-from nautilusdb.server_models.app_api import (
+from nautilusdb.server_models.doc_api import (
     AddDocRequest,
     AskRequest,
     AskResponse,
@@ -54,20 +54,8 @@ class Collection(BaseModel):
     #  Name of the collection
     name: str
 
-    # Dimension of the vectors in this collection
-    dimension: int = 0
-
     # Description of the collection
     description: str = ""
-
-    # A set of metadata columns associated with vectors in this collection.
-    #       Key: Column name
-    #       Value: Column type(avro primitive type)
-    metadata_columns: Optional[Dict[str, ColumnType]] = None
-
-    # Distance metric used for vector search.
-    # Only 'l2' distance is supported.
-    distance_metric: str = 'l2'
 
     def upsert_vector(self, vectors: List[Vector]) -> int:
         """
@@ -174,7 +162,7 @@ class Collection(BaseModel):
                             contain scheme (http or https) prefix.
         :return:
         """
-        url = f'{Config.get_base_url()}/qadocs/add'
+        url = f'{Config.get_base_url()}/docs/add'
         req = AddDocRequest(project_name=Config.project,
                             collection_name=self.name)
         if is_url(path_or_url):
@@ -201,7 +189,7 @@ class Collection(BaseModel):
         :param path_or_url: Local path or url to the uploaded document
         :return: A summary of the document
         """
-        url = f'{Config.get_base_url()}/qadocs/summary'
+        url = f'{Config.get_base_url()}/docs/summary'
         req = SummaryRequest(
             project_name=Config.project,
             collection_name=self.name,
@@ -272,10 +260,13 @@ class Collection(BaseModel):
         )
 
 def describe_response_to_collection(
+    collection_name: str,
     resp: DescribeCollectionResponse
 ) -> Collection:
+    description = ""
+    if resp.description is not None:
+        description = resp.description
     return Collection(
-        name=resp.collection_name,
-        dimension=resp.dimension,
-        metadata_columns=resp.metas,
+        name=collection_name,
+        description=description,
     )

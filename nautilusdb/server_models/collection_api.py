@@ -11,9 +11,7 @@ class CollectionBaseRequest(BaseModel):
 
 
 class CreateCollectionRequest(CollectionBaseRequest):
-    dimension: int
     description: Optional[str] = None
-    metas: Optional[Dict[str, ColumnType]] = None
 
 
 class DeleteCollectionRequest(CollectionBaseRequest):
@@ -33,10 +31,7 @@ class DescribeCollectionRequest(CollectionBaseRequest):
 
 
 class DescribeCollectionResponse(BaseModel):
-    collection_name: str
-    dimension: int
-    metric: str = 'l2'
-    metas: Optional[Dict[str, ColumnType]] = None
+    description: Optional[str] = None
 
 
 class DeleteVectorsRequest(CollectionBaseRequest):

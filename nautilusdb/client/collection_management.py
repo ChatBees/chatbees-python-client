@@ -38,9 +38,7 @@ def create_collection(col: Collection) -> Collection:
     req = CreateCollectionRequest(
         project_name=Config.project,
         collection_name=col.name,
-        dimension=col.dimension,
-        description=col.description,
-        metas=col.metadata_columns)
+        description=col.description)
     Config.post(url=url, data=req.model_dump_json())
     return col
 
@@ -99,4 +97,4 @@ def describe_collection(collection_name: str) -> Collection:
     url = f'{Config.get_base_url()}/collections/describe'
     resp = DescribeCollectionResponse.model_validate(
         Config.post(url=url, data=req.model_dump_json()).json())
-    return describe_response_to_collection(resp)
+    return describe_response_to_collection(collection_name, resp)
