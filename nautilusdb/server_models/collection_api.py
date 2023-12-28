@@ -2,8 +2,6 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
-from nautilusdb.client_models.column_type import ColumnType
-
 
 class CollectionBaseRequest(BaseModel):
     namespace_name: str
@@ -32,17 +30,3 @@ class DescribeCollectionRequest(CollectionBaseRequest):
 
 class DescribeCollectionResponse(BaseModel):
     description: Optional[str] = None
-
-
-class DeleteVectorsRequest(CollectionBaseRequest):
-    """
-    Delete vectors in a collection by ids, all or by where clause. Exactly one
-    of these three fields can be specified.
-    """
-    vector_ids: Optional[List[str]] = None
-    delete_all: bool = False
-    where: Optional[str] = None
-
-
-class DeleteVectorsResponse(BaseModel):
-    pass
