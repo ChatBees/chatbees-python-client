@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 from urllib import request
 
 from pydantic import BaseModel
@@ -15,6 +15,13 @@ from nautilusdb.server_models.doc_api import (
     AskResponse,
     SummaryRequest,
     SummaryResponse,
+    CreateCrawlRequest,
+    CreateCrawlResponse,
+    GetCrawlRequest,
+    GetCrawlResponse,
+    CrawlStatus,
+    PageStats,
+    IndexCrawlRequest,
 )
 from nautilusdb.server_models.collection_api import (
     DescribeCollectionResponse,
@@ -143,6 +150,60 @@ class Collection(BaseModel):
             collection_name=self.name,
             doc_name=doc_name
         )
+
+    def create_crawl(self, root_url: str, max_urls_to_crawl: int) -> str:
+        """
+        Create a crawl task to crawl the root_url.
+
+        :param root_url: the root url to carwl
+        :param max_urls_to_crawl: the max number of urls to crawl
+        :return: the id of the crawl
+        """
+        url = f'{Config.get_base_url()}/docs/create_crawl'
+        req = CreateCrawlRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            root_url=root_url,
+            max_urls_to_crawl=max_urls_to_crawl,
+        )
+        resp = Config.post(url=url, data=req.model_dump_json())
+        crawl_resp = CreateCrawlResponse.model_validate(resp.json())
+        return crawl_resp.crawl_id
+
+    def get_crawl(
+        self, crawl_id: str,
+    ) -> Tuple[CrawlStatus, Dict[str, PageStats]]:
+        """
+        Create a crawl task to crawl the root_url.
+
+        :param crawl_id: the id of the crawl
+        :return: A tuple
+            - crawl status: the status of crawl
+            - page stats: A dict of page urls and stats
+        """
+        url = f'{Config.get_base_url()}/docs/get_crawl'
+        req = GetCrawlRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            crawl_id=crawl_id,
+        )
+        resp = Config.post(url=url, data=req.model_dump_json())
+        crawl_resp = GetCrawlResponse.model_validate(resp.json())
+        return (crawl_resp.crawl_status, crawl_resp.crawl_result)
+
+    def index_crawl(self, crawl_id: str):
+        """
+        Index the crawled pages.
+
+        :param crawl_id: the id of the crawl
+        """
+        url = f'{Config.get_base_url()}/docs/index_crawl'
+        req = IndexCrawlRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            crawl_id=crawl_id,
+        )
+        Config.post(url=url, data=req.model_dump_json())
 
 def describe_response_to_collection(
     collection_name: str,
