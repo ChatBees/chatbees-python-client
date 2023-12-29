@@ -8,6 +8,9 @@ from nautilusdb.client_models.chat import Chat
 from nautilusdb.client_models.doc import AnswerReference
 from nautilusdb.server_models.doc_api import (
     AddDocRequest,
+    DeleteDocRequest,
+    ListDocsRequest,
+    ListDocsResponse,
     AskRequest,
     AskResponse,
     SummaryRequest,
@@ -66,11 +69,40 @@ class Collection(BaseModel):
                     url=url, files={'file': (fname, f)},
                     data={'request': req.model_dump_json()})
 
+    def delete_document(self, doc_name: str):
+        """
+        Deletes the document.
+
+        :param doc_name: the document to delete
+        """
+        url = f'{Config.get_base_url()}/docs/delete'
+        req = DeleteDocRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            doc_name=doc_name,
+        )
+        Config.post(url=url, data=req.model_dump_json())
+
+    def list_documents(self) -> List[str]:
+        """
+        List the documents.
+
+        :return: A list of the documents
+        """
+        url = f'{Config.get_base_url()}/docs/list'
+        req = ListDocsRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+        )
+        resp = Config.post(url=url, data=req.model_dump_json())
+        list_resp = ListDocsResponse.model_validate(resp.json())
+        return list_resp.doc_names
+
     def summarize_document(self, doc_name: str) -> str:
         """
         Returns a summary of the document.
 
-        :param path_or_url: Local path or url to the uploaded document
+        :param doc_name: the document to summarize
         :return: A summary of the document
         """
         url = f'{Config.get_base_url()}/docs/summary'
@@ -90,6 +122,8 @@ class Collection(BaseModel):
         Ask a question within the context of this collection.
 
         :param question: Question in plain text.
+        :param top_k: the top k relevant contexts to get answer from.
+        :param doc_name: if specified, ask is scoped to the given document only.
         :return: A tuple
             - answer: A plain-text answer to the given question
             - references: A list of most relevant document references in the

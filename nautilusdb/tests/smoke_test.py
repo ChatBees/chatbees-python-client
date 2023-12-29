@@ -5,7 +5,6 @@ import uuid
 from typing import List
 
 import nautilusdb as ndb
-from nautilusdb import ColumnType
 from nautilusdb.client_models.doc import AnswerReference
 
 
@@ -85,14 +84,36 @@ class SmokeTest(unittest.TestCase):
             f'{os.path.dirname(os.path.abspath(__file__))}/data/française.txt',
             f'{os.path.dirname(os.path.abspath(__file__))}/data/中文.txt',
         ]
+        doc_names = {'text_file.txt', 'española.txt', 'française.txt', '中文.txt'}
 
         try:
+            # add and summarize
             for file in files:
                 col.upload_document(file)
                 fname = os.path.basename(file)
                 col.summarize_document(fname)
-            col.ask('question?')
 
+            # list
+            print("list_documents")
+            list_doc_names = col.list_documents()
+            assert doc_names == set(list_doc_names)
+
+            # ask with top_k
+            print("ask")
+            a, refs = col.ask('question?', 4)
+            assert 4 == len(refs)
+
+            # delete, then list and ask again
+            col.delete_document('española.txt')
+            doc_names = {'text_file.txt', 'française.txt', '中文.txt'}
+
+            list_doc_names = col.list_documents()
+            assert doc_names == set(list_doc_names)
+
+            a, refs = col.ask('question?', 4)
+            assert 4 == len(refs)
+
+            # chat
             chat1 = col.chat()
             chat2 = col.chat(doc_name="text_file.txt")
 

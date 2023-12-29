@@ -18,6 +18,18 @@ class AddDocRequest(CollectionBaseRequest):
         return json.dumps(self.__dict__)
 
 
+class DeleteDocRequest(CollectionBaseRequest):
+    doc_name: str
+
+
+class ListDocsRequest(CollectionBaseRequest):
+    pass
+
+
+class ListDocsResponse(BaseModel):
+    doc_names: List[str]
+
+
 class AskRequest(CollectionBaseRequest):
     question: str
     top_k: Optional[int] = 5

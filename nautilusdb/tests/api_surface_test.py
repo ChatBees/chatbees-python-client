@@ -10,7 +10,12 @@ from nautilusdb.client_models.collection import Collection
 from nautilusdb.server_models.collection_api import (
     ListCollectionsResponse, DescribeCollectionResponse,
 )
-from nautilusdb.server_models.doc_api import AskResponse, AnswerReference, SummaryResponse
+from nautilusdb.server_models.doc_api import (
+    AskResponse,
+    AnswerReference,
+    SummaryResponse,
+    ListDocsResponse,
+)
 
 
 class APISurfaceTest(unittest.TestCase):
@@ -230,3 +235,40 @@ class APISurfaceTest(unittest.TestCase):
         )
 
         assert(ndb.collection('fakename').summarize_document("path/to/file") == "test summary")
+
+    @requests_mock.mock()
+    def test_delete_doc(self, mock):
+        def match_request_text(request):
+            return request.text == ('{"namespace_name":"fakenamespace",'
+                                    '"collection_name":"fakename",'
+                                    '"doc_name":"path/to/file"}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/delete',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+        )
+
+        ndb.collection('fakename').delete_document("path/to/file")
+
+    @requests_mock.mock()
+    def test_list_documents(self, mock):
+        def match_request_text(request):
+            return request.text == ('{"namespace_name":"fakenamespace",'
+                                    '"collection_name":"fakename"}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/list',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+            text=ListDocsResponse(
+                doc_names=['doc1', 'doc2'],
+            ).model_dump_json(),
+        )
+
+        doc_names = ndb.collection('fakename').list_documents()
+        assert 2 == len(doc_names)
+        assert 'doc1' == doc_names[0]
+        assert 'doc2' == doc_names[1]
