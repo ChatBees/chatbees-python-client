@@ -2,7 +2,7 @@ from typing import Optional, List, Tuple
 
 from pydantic import BaseModel
 
-from nautilusdb.client_models.app import AnswerReference
+from nautilusdb.client_models.doc import AnswerReference
 from nautilusdb.utils.ask import ask
 from nautilusdb.utils.config import Config
 
@@ -11,16 +11,17 @@ class Chat(BaseModel):
     """
     A new chatbot instance that supports conversational Q and A.
     """
-    project_name: str
+    namespace_name: str
     collection_name: str
     doc_name: Optional[str] = None
     history_messages: Optional[List[Tuple[str, str]]] = None
 
-    def ask(self, question: str) -> (str, List[AnswerReference]):
+    def ask(self, question: str, top_k: int = 5) -> (str, List[AnswerReference]):
         (answer, references) = ask(
-            Config.project,
+            Config.namespace,
             self.collection_name,
             question,
+            top_k,
             doc_name=self.doc_name,
             history_messages=self.history_messages,
         )

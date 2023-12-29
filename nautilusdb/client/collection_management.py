@@ -36,11 +36,9 @@ def create_collection(col: Collection) -> Collection:
     """
     url = f'{Config.get_base_url()}/collections/create'
     req = CreateCollectionRequest(
-        project_name=Config.project,
+        namespace_name=Config.namespace,
         collection_name=col.name,
-        dimension=col.dimension,
-        description=col.description,
-        metas=col.metadata_columns)
+        description=col.description)
     Config.post(url=url, data=req.model_dump_json())
     return col
 
@@ -66,7 +64,7 @@ def list_collections() -> List[str]:
         List[Collection]: A list of collection objects.
     """
     url = f'{Config.get_base_url()}/collections/list'
-    req = ListCollectionsRequest(project_name=Config.project)
+    req = ListCollectionsRequest(namespace_name=Config.namespace)
     resp = Config.post(url=url, data=req.model_dump_json())
     return ListCollectionsResponse.model_validate(resp.json()).names
 
@@ -78,7 +76,7 @@ def delete_collection(collection_name: str):
     Args:
         collection_name (str): The name of the collection.
     """
-    req = DeleteCollectionRequest(project_name=Config.project,
+    req = DeleteCollectionRequest(namespace_name=Config.namespace,
                                   collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/delete'
     Config.post(url=url, data=req.model_dump_json())
@@ -94,9 +92,9 @@ def describe_collection(collection_name: str) -> Collection:
         Collection: A collection
     """
 
-    req = DescribeCollectionRequest(project_name=Config.project,
+    req = DescribeCollectionRequest(namespace_name=Config.namespace,
                                     collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/describe'
     resp = DescribeCollectionResponse.model_validate(
         Config.post(url=url, data=req.model_dump_json()).json())
-    return describe_response_to_collection(resp)
+    return describe_response_to_collection(collection_name, resp)
