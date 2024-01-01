@@ -1,5 +1,6 @@
 import json
-from typing import List, Optional, Tuple
+from enum import Enum
+from typing import List, Optional, Tuple, Dict
 
 from pydantic import BaseModel
 
@@ -54,3 +55,40 @@ class SummaryRequest(CollectionBaseRequest):
 
 class SummaryResponse(BaseModel):
     summary: str
+
+
+class CreateCrawlRequest(CollectionBaseRequest):
+    root_url: str
+    max_urls_to_crawl: int = 200
+
+
+class CreateCrawlResponse(BaseModel):
+    crawl_id: str
+
+
+class GetCrawlRequest(CollectionBaseRequest):
+    crawl_id: str
+
+
+class CrawlStatus(Enum):
+    RUNNING = 1
+    SUCCEEDED = 2
+    FAILED = 3
+
+
+class PageStats(BaseModel):
+    char_count: int
+    error_code: Optional[str] = None
+    error_msg: Optional[str] = None
+
+
+class GetCrawlResponse(BaseModel):
+    root_url: str
+    created_on: int
+    max_pages: int
+    crawl_status: CrawlStatus
+    crawl_result: Optional[Dict[str, PageStats]] = None
+
+
+class IndexCrawlRequest(CollectionBaseRequest):
+    crawl_id: str

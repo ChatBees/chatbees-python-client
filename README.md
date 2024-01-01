@@ -141,6 +141,26 @@ collection.upload_document('/path/to/file.pdf')
 collection.upload_document('https://path/to/file.pdf')
 ```
 
+## Crawl a website
+You can pass the website root url. NautilusDB will automatically crawl it.
+
+```python
+import nautilusdb as ndb
+
+ndb.init(api_key="<my_api_key>")
+
+# Create the crawl task
+collection = ndb.Collection(name='example-web')
+ndb.create_collection(collection)
+crawl_id = collection.create_crawl('https://www.example.com')
+
+# Query the crawl status
+resp = collection.get_crawl(crawl_id)
+
+# check resp.crawl_status becomes CrawlStatus.SUCCEEDED, and index the pages
+collection.index_crawl(crawl_id)
+```
+
 ## Asking a question
 You can ask questions within a collection. API key is required for private
 collections only. ```ask()``` method returns a plain-text answer to 
@@ -153,11 +173,12 @@ the answer.
 ```python
 import nautilusdb as ndb
 
+ndb.init(api_key="<my_api_key>")
+
 # Get a plain text answer, as well as a list of references from the collection
 # that are the most relevant to the question.
 answer, refs = ndb.collection('openai-web').ask('what is red team?')
 
-ndb.init(api_key="<my_api_key>")
 answer, refs = ndb.collection('llm_research').ask('what is a transformer?')
 ```
 

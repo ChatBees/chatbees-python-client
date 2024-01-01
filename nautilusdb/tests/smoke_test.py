@@ -1,10 +1,12 @@
 import io
 import os
+import time
 import unittest
 import uuid
 from typing import List
 
 import nautilusdb as ndb
+from nautilusdb.server_models.doc_api import CrawlStatus
 from nautilusdb.client_models.doc import AnswerReference
 
 
@@ -134,3 +136,26 @@ class SmokeTest(unittest.TestCase):
         assert len(refs) > 0
         for ref in refs:
             assert ref.doc_name == doc
+
+    def test_crawl_apis(self):
+        owner = self.apikey1
+        ndb.init(owner)
+        col = self.create_collection()
+
+        try:
+            crawl_id = col.create_crawl('https://www.openai.com', 10)
+
+            max_waits = 100
+            waits = 0
+            while waits < max_waits:
+                status, pages = col.get_crawl(crawl_id)
+                if status != CrawlStatus.RUNNING:
+                    break
+                time.sleep(1)
+
+            assert status == CrawlStatus.SUCCEEDED
+            assert 10 == len(pages)
+
+            col.index_crawl(crawl_id)
+        finally:
+            ndb.delete_collection(col.name)
