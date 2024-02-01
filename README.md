@@ -1,24 +1,25 @@
-# nautilusdb-python-client
-Python client for [NautilusDB](http://nautilusdb.com), a fully-managed, cloud-native chat service.
+# chatbees-python-client
+Python client for [ChatBees](http://chatbees.ai), a fully-managed, 
+cloud-native AI assistant platform.
 
-NautilusDB is currently in <ins>**public alpha**</ins>. We're actively improving 
+ChatBees is currently in <ins>**public alpha**</ins>. We're actively improving 
 the product and releasing new features, and we'd love to hear your feedback! 
 Please take a moment to fill out this [feedback form](https://forms.gle/pif6Vx2LqPjW5v4w5) to help us understand your use-case better.
 
 > By default, all collections are subject to permanent deletion after 2 weeks. Please let us know if you need to keep it for longer via the feedback form.
 
-NautilusDB python client provides very simple APIs for you to directly upload files and ask questions.
+ChatBees python client provides very simple APIs for you to directly upload files and ask questions.
 
 
 ## Quickstart
 
-You can try out NautilusDB in just a few lines of code. We have 
+You can try out ChatBees in just a few lines of code. We have 
 prepared a special public collection ```openai-web``` that can answer 
 questions about the contents of ```www.openai.com``` 
 ```python
-import nautilusdb as ndb
+import chatbees as cdb
 
-answer, _ = ndb.collection('openai-web').ask('what is red team?')
+answer, _ = cdb.collection('openai-web').ask('what is red team?')
 print(answer)
 """
 Sample answer:
@@ -35,17 +36,17 @@ specific to your data assets. The following example walks you through the
 process of creating a collection and indexing [the original transformer paper](https://arxiv.org/abs/1706.03762) into that collection.
 
 ```python
-import nautilusdb as ndb
+import chatbees as cdb
 
 # Create an API key
-my_api_key = ndb.create_api_key()
+my_api_key = cdb.create_api_key()
 
-# Configure ndb to use the newly minted API key
-ndb.init(api_key=my_api_key)
+# Configure cdb to use the newly minted API key
+cdb.init(api_key=my_api_key)
 
 # Create a new collection
-llm_research = ndb.Collection(name="llm_research")
-ndb.create_collection(llm_research)
+llm_research = cdb.Collection(name="llm_research")
+cdb.create_collection(llm_research)
 
 # Index the original Transformer paper into this collection.
 llm_research.upload_document("https://arxiv.org/pdf/1706.03762.pdf")
@@ -57,12 +58,12 @@ llm_research.ask("what is a transformer?")
 
 ## Installation
 
-Install a released NautilusDB python client from pip.
+Install a released ChatBees python client from pip.
 
 python3 version ```>= 3.10``` is required
 
 ```shell
-pip3 install nautilusdb-client
+pip3 install chatbees-python-client
 ```
 
 ## Creating an API key
@@ -72,10 +73,10 @@ can only be accessed by the API key that created it.
 Account management and related functionalities will be released soon.
 
 ```python
-import nautilusdb as ndb
+import chatbees as cdb
 
 # Create a new API key
-my_api_key = ndb.create_api_key()
+my_api_key = cdb.create_api_key()
 
 # Please record this API key and keep it a secrete
 #
@@ -84,22 +85,22 @@ my_api_key = ndb.create_api_key()
 print(my_api_key)
 
 # Use this API key in all subsequent calls
-ndb.init(api_key=my_api_key)
+cdb.init(api_key=my_api_key)
 ```
 
 ## Creating a Collection
-See [this page](https://www.nautilusdb.com/guides.html) for a brief overview of NautilusDB data model 
+See [this page](https://www.chatbees.com/guides.html) for a brief overview of ChatBees data model 
 
 You can create a collection that is only accessible with a specific API key.
 
 ```python
-import nautilusdb as ndb
+import chatbees as cdb
 
-ndb.init(api_key="<my_api_key>")
+cdb.init(api_key="<my_api_key>")
 
 # Create a collection called llm_research
-collection = ndb.Collection(name='llm_research')
-ndb.create_collection(collection)
+collection = cdb.Collection(name='llm_research')
+cdb.create_collection(collection)
 ```
 
 ## Listing collection
@@ -108,11 +109,11 @@ will include all collections that were created using the currently configured
 API key.
 
 ```python
-import nautilusdb as ndb
+import chatbees as cdb
 
-ndb.init(api_key="<my_api_key>")
+cdb.init(api_key="<my_api_key>")
 
-collections = ndb.list_collections()
+collections = cdb.list_collections()
 ```
 
 
@@ -128,12 +129,12 @@ collection.
 - ```.docx``` Microsoft word documents
 
 ```python
-import nautilusdb as ndb
+import chatbees as cdb
 
-ndb.init(api_key="<my_api_key>")
+cdb.init(api_key="<my_api_key>")
 
 # llm_research collection was created in the previous step
-collection = ndb.collection('llm_research')
+collection = cdb.collection('llm_research')
 
 # Local file and URLs are both supported.
 # URL must contain the full scheme prefix (http:// or https://)
@@ -142,16 +143,16 @@ collection.upload_document('https://path/to/file.pdf')
 ```
 
 ## Crawl a website
-You can pass the website root url. NautilusDB will automatically crawl it.
+You can pass the website root url. ChatBees will automatically crawl it.
 
 ```python
-import nautilusdb as ndb
+import chatbees as cdb
 
-ndb.init(api_key="<my_api_key>")
+cdb.init(api_key="<my_api_key>")
 
 # Create the crawl task
-collection = ndb.Collection(name='example-web')
-ndb.create_collection(collection)
+collection = cdb.Collection(name='example-web')
+cdb.create_collection(collection)
 crawl_id = collection.create_crawl('https://www.example.com')
 
 # Query the crawl status
@@ -171,24 +172,24 @@ the answer.
 - ```openai-web```: Contains contents of ```www.openai.com```
 
 ```python
-import nautilusdb as ndb
+import chatbees as cdb
 
-ndb.init(api_key="<my_api_key>")
+cdb.init(api_key="<my_api_key>")
 
 # Get a plain text answer, as well as a list of references from the collection
 # that are the most relevant to the question.
-answer, refs = ndb.collection('openai-web').ask('what is red team?')
+answer, refs = cdb.collection('openai-web').ask('what is red team?')
 
-answer, refs = ndb.collection('llm_research').ask('what is a transformer?')
+answer, refs = cdb.collection('llm_research').ask('what is a transformer?')
 ```
 
 ## Deleting a collection
 You can delete a collection using the same API key that was used to create it.
 
 ```python
-import nautilusdb as ndb
+import chatbees as cdb
 
-ndb.init(api_key="<my_api_key>")
+cdb.init(api_key="<my_api_key>")
 
-ndb.delete_collection('llm_research')
+cdb.delete_collection('llm_research')
 ```

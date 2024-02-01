@@ -1,12 +1,12 @@
 from typing import List
 
-from nautilusdb.client_models.collection import (
+from chatbees.client_models.collection import (
     Collection,
     describe_response_to_collection,
 )
-from nautilusdb.utils.config import Config
+from chatbees.utils.config import Config
 
-from nautilusdb.server_models.collection_api import (
+from chatbees.server_models.collection_api import (
     CreateCollectionRequest,
     ListCollectionsRequest,
     ListCollectionsResponse,

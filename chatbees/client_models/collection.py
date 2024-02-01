@@ -4,9 +4,9 @@ from urllib import request
 
 from pydantic import BaseModel
 
-from nautilusdb.client_models.chat import Chat
-from nautilusdb.client_models.doc import AnswerReference
-from nautilusdb.server_models.doc_api import (
+from chatbees.client_models.chat import Chat
+from chatbees.client_models.doc import AnswerReference
+from chatbees.server_models.doc_api import (
     AddDocRequest,
     DeleteDocRequest,
     ListDocsRequest,
@@ -23,12 +23,12 @@ from nautilusdb.server_models.doc_api import (
     PageStats,
     IndexCrawlRequest,
 )
-from nautilusdb.server_models.collection_api import (
+from chatbees.server_models.collection_api import (
     DescribeCollectionResponse,
 )
-from nautilusdb.utils.ask import ask
-from nautilusdb.utils.config import Config
-from nautilusdb.utils.file_upload import (
+from chatbees.utils.ask import ask
+from chatbees.utils.config import Config
+from chatbees.utils.file_upload import (
     is_url,
     validate_file,
     validate_url_file,

@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
-from nautilusdb.server_models.doc_api import AskRequest, AskResponse, AnswerReference
-from nautilusdb.utils.config import Config
+from chatbees.server_models.doc_api import AskRequest, AskResponse, AnswerReference
+from chatbees.utils.config import Config
 
 
 def ask(

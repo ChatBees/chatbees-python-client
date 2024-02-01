@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple, Dict
 
 from pydantic import BaseModel
 
-from nautilusdb.server_models.collection_api import CollectionBaseRequest
+from chatbees.server_models.collection_api import CollectionBaseRequest
 
 
 class AddDocRequest(CollectionBaseRequest):

@@ -2,9 +2,9 @@ from typing import Optional, List, Tuple
 
 from pydantic import BaseModel
 
-from nautilusdb.client_models.doc import AnswerReference
-from nautilusdb.utils.ask import ask
-from nautilusdb.utils.config import Config
+from chatbees.client_models.doc import AnswerReference
+from chatbees.utils.ask import ask
+from chatbees.utils.config import Config
 
 
 class Chat(BaseModel):
