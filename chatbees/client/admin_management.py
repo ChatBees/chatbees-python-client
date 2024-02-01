@@ -10,7 +10,7 @@ def init(
     namespace: str = Config.PUBLIC_NAMESPACE
 ):
     """
-    Initialize the NautilusDB client.
+    Initialize the ChatBees client.
 
     Args:
         api_key (str, optional): The API key to authenticate requests.
