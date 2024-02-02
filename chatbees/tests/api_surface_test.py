@@ -1,16 +1,14 @@
-import math
 import os
 import unittest
-from typing import List
 
 import requests_mock
 
-import nautilusdb as ndb
-from nautilusdb.client_models.collection import Collection
-from nautilusdb.server_models.collection_api import (
+import chatbees as ndb
+from chatbees.client_models.collection import Collection
+from chatbees.server_models.collection_api import (
     ListCollectionsResponse, DescribeCollectionResponse,
 )
-from nautilusdb.server_models.doc_api import (
+from chatbees.server_models.doc_api import (
     AskResponse,
     AnswerReference,
     SummaryResponse,
@@ -21,7 +19,7 @@ from nautilusdb.server_models.doc_api import (
 class APISurfaceTest(unittest.TestCase):
     API_KEY = 'fakeapikey'
     NAMESPACE = 'fakenamespace'
-    API_ENDPOINT = 'https://public.us-west-2.aws.nautilusdb.com'
+    API_ENDPOINT = 'https://public.us-west-2.aws.chatbees.com'
 
     def setUp(self):
         ndb.init(api_key=APISurfaceTest.API_KEY, namespace=APISurfaceTest.NAMESPACE)

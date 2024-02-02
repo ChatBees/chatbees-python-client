@@ -5,15 +5,15 @@ import unittest
 import uuid
 from typing import List
 
-import nautilusdb as ndb
-from nautilusdb.server_models.doc_api import CrawlStatus
-from nautilusdb.client_models.doc import AnswerReference
+import chatbees as ndb
+from chatbees.server_models.doc_api import CrawlStatus
+from chatbees.client_models.doc import AnswerReference
 
 
 class SmokeTest(unittest.TestCase):
     """
     Verifies basic functionality of client. Not a hermetic test, it invokes real
-    nautilusdb APIs
+    chatbees APIs
     """
     apikey1: str
     apikey2: str
@@ -71,7 +71,7 @@ class SmokeTest(unittest.TestCase):
             ndb.delete_collection(private_col_key2.name)
 
     def create_collection(self) -> ndb.Collection:
-        unique_col = 'cl-' + uuid.uuid4().hex
+        unique_col = 'cl_' + uuid.uuid4().hex
         col = ndb.Collection(name=unique_col)
         return ndb.create_collection(col)
 

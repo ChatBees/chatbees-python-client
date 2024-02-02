@@ -1,5 +1,5 @@
-from nautilusdb.server_models.admin_api import CreateApiKeyRequest, CreateApiKeyResponse
-from nautilusdb.utils.config import Config
+from chatbees.server_models.admin_api import CreateApiKeyRequest, CreateApiKeyResponse
+from chatbees.utils.config import Config
 
 __all__ = ["init", "create_api_key"]
 
@@ -10,7 +10,7 @@ def init(
     namespace: str = Config.PUBLIC_NAMESPACE
 ):
     """
-    Initialize the NautilusDB client.
+    Initialize the ChatBees client.
 
     Args:
         api_key (str, optional): The API key to authenticate requests.

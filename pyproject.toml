@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "nautilusdb-client"
+name = "chatbees-python-client"
 packages = [
-    { include="nautilusdb", from="." },
+    { include="chatbees", from="." },
 ]
 version = "0.8.0"
-description = "Python client for NautilusDB"
-authors = ["NautilusDB <contact@nautilusdb.com>"]
+description = "Python client for ChatBees"
+authors = ["ChatBees <build@chatbees.ai>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

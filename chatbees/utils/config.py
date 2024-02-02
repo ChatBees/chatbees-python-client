@@ -21,12 +21,12 @@ class Config:
     def get_base_url(cls):
         if ENV_TEST_BASE_URL != "":
             return ENV_TEST_BASE_URL
-        return f"https://{cls.account_name}.us-west-2.aws.nautilusdb.com"
+        return f"https://{cls.account_name}.us-west-2.aws.chatbees.ai"
 
     @classmethod
     def post(cls, url, data=None, files=None, enforce_api_key=True):
         if enforce_api_key and cls.api_key is None or cls.api_key == "":
-            raise ValueError("API key is required for using NautilusDB")
+            raise ValueError("API key is required for using ChatBees")
 
         # Encode data if it is a string
         if data is not None and isinstance(data, str):
@@ -39,7 +39,7 @@ class Config:
     @classmethod
     def get(cls, url: str):
         if cls.api_key is None or cls.api_key == "":
-            raise ValueError("API key is required for using NautilusDB")
+            raise ValueError("API key is required for using ChatBees")
 
         resp = requests.get(url, headers=cls._construct_header())
         raise_for_error(resp)

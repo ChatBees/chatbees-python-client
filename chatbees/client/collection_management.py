@@ -1,12 +1,12 @@
 from typing import List
 
-from nautilusdb.client_models.collection import (
+from chatbees.client_models.collection import (
     Collection,
     describe_response_to_collection,
 )
-from nautilusdb.utils.config import Config
+from chatbees.utils.config import Config
 
-from nautilusdb.server_models.collection_api import (
+from chatbees.server_models.collection_api import (
     CreateCollectionRequest,
     ListCollectionsRequest,
     ListCollectionsResponse,
@@ -26,7 +26,7 @@ __all__ = [
 
 def create_collection(col: Collection) -> Collection:
     """
-    Create a new collection in NautilusDB.
+    Create a new collection in ChatBees.
 
     Args:
         col (Collection): The collection to create.
@@ -58,7 +58,7 @@ def collection(collection_name: str) -> Collection:
 
 def list_collections() -> List[str]:
     """
-    List all collections in NautilusDB.
+    List all collections in ChatBees.
 
     Returns:
         List[Collection]: A list of collection objects.
@@ -71,7 +71,7 @@ def list_collections() -> List[str]:
 
 def delete_collection(collection_name: str):
     """
-    Delete a collection from NautilusDB.
+    Delete a collection from ChatBees.
 
     Args:
         collection_name (str): The name of the collection.
