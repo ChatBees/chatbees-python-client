@@ -1,6 +1,5 @@
 # chatbees-python-client
-Python client for [ChatBees](http://chatbees.ai), a fully-managed, 
-cloud-native AI assistant platform.
+Python client for [ChatBees](http://www.chatbees.ai), a Serverless Chat Platform for your knowledge base. ChatBees provides simple and scalable APIs, enabling you to craft a LLM app in mere minutes.
 
 ChatBees is currently in <ins>**public alpha**</ins>. We're actively improving 
 the product and releasing new features, and we'd love to hear your feedback! 
