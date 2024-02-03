@@ -22,17 +22,10 @@ def ask(
         doc_name=doc_name,
         history_messages=history_messages,
     )
-    enforce_api_key = True
-
-    # Only allow openai-web collection to be accessed without API key to
-    # simplify demo.
-    if collection_name == 'openai-web':
-        enforce_api_key = False
 
     resp = Config.post(
         url=url,
-        data=req.model_dump_json(),
-        enforce_api_key=enforce_api_key
+        data=req.model_dump_json()
     )
     resp = AskResponse.model_validate(resp.json())
 

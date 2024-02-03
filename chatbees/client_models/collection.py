@@ -48,6 +48,9 @@ class Collection(BaseModel):
     # Description of the collection
     description: str = ""
 
+    # If true, collection can be read without an API key
+    public_readable: bool = False
+
     def upload_document(self, path_or_url: str):
         """
         Uploads a local or web document into this collection.
@@ -189,7 +192,7 @@ class Collection(BaseModel):
         )
         resp = Config.post(url=url, data=req.model_dump_json())
         crawl_resp = GetCrawlResponse.model_validate(resp.json())
-        return (crawl_resp.crawl_status, crawl_resp.crawl_result)
+        return crawl_resp.crawl_status, crawl_resp.crawl_result
 
     def index_crawl(self, crawl_id: str):
         """
@@ -212,7 +215,11 @@ def describe_response_to_collection(
     description = ""
     if resp.description is not None:
         description = resp.description
+    public_readable = False
+    if resp.public_read is not None:
+        public_readable = resp.public_read
     return Collection(
         name=collection_name,
         description=description,
+        public_readable=public_readable
     )

@@ -70,10 +70,20 @@ class SmokeTest(unittest.TestCase):
             ndb.init(api_key=apikey2)
             ndb.delete_collection(private_col_key2.name)
 
-    def create_collection(self) -> ndb.Collection:
+    def create_collection(self, public_readable: bool=False) -> ndb.Collection:
         unique_col = 'cl_' + uuid.uuid4().hex
-        col = ndb.Collection(name=unique_col)
+        col = ndb.Collection(name=unique_col, public_readable=public_readable)
         return ndb.create_collection(col)
+
+    def test_public_collection(self):
+        owner = self.apikey1
+        ndb.init(owner)
+        col = self.create_collection(public_readable=True)
+        col.upload_document(f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt')
+
+        # Clear API key and ask questions again
+        ndb.init(api_key=None)
+        col.ask('should not fail')
 
     def test_doc_apis(self):
         owner = self.apikey1
