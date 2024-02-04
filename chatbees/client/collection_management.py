@@ -99,3 +99,6 @@ def describe_collection(collection_name: str) -> Collection:
     resp = DescribeCollectionResponse.model_validate(
         Config.post(url=url, data=req.model_dump_json()).json())
     return describe_response_to_collection(collection_name, resp)
+
+
+def configure_chat(persona: str=None, negative_response: str=None, temperature: float=None)
