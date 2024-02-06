@@ -292,7 +292,7 @@ class APISurfaceTest(unittest.TestCase):
         def match_request_text(request):
             return request.text == ('{"namespace_name":"fakenamespace",'
                                     '"collection_name":"fakename","chat_attributes":{"persona":"persona",'
-                                    '"negative_response":"negative_resp"}}')
+                                    '"negative_response":"negative_resp","temperature":null}}')
 
         mock.register_uri(
             'POST',
