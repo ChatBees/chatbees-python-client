@@ -216,6 +216,8 @@ class Collection(BaseModel):
         """
         Configures custom chatbot behavior for this collection
 
+        NOTE: New configurations could take up to 2 minutes to take effect.
+
         :param persona: The chatbot's persona, ie "The chatbot will talk like {persona}". Examples:
             - 'a 1600s pirate'
             - 'a helpful assistant'
