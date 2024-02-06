@@ -26,7 +26,7 @@ class Config:
     @classmethod
     def post(cls, url, data=None, files=None, enforce_api_key=True):
         if enforce_api_key and (cls.api_key is None or cls.api_key == ""):
-            raise ValueError("API key is required for using ChatBees")
+            raise ValueError(f"API key is required for using ChatBees, current config {cls.api_key}")
         # Encode data if it is a string
         if data is not None and isinstance(data, str):
             data = data.encode('utf-8')
