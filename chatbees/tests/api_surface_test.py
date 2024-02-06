@@ -292,7 +292,7 @@ class APISurfaceTest(unittest.TestCase):
         def match_request_text(request):
             return request.text == ('{"namespace_name":"fakenamespace",'
                                     '"collection_name":"fakename","chat_attributes":{"persona":"persona",'
-                                    '"negative_response":"negative_resp","temperature":0.1}}')
+                                    '"negative_response":"negative_resp"}}')
 
         mock.register_uri(
             'POST',
@@ -300,4 +300,4 @@ class APISurfaceTest(unittest.TestCase):
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text)
 
-        ndb.collection('fakename').configure_chat('persona', 'negative_resp', 0.1)
+        ndb.collection('fakename').configure_chat('persona', 'negative_resp')

@@ -141,7 +141,7 @@ class SmokeTest(unittest.TestCase):
             self.assertRefsAreFromDoc(refs, "text_file.txt")
 
             # ensure we can configure chat attrs
-            col.configure_chat('a pirate from 1600s', 'the word snowday and nothing else', 0.1)
+            col.configure_chat('a pirate from 1600s', 'the word snowday and nothing else')
             ans, ref = col.ask('what is the color of my hair?')
         finally:
             ndb.delete_collection(col.name)

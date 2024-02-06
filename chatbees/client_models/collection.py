@@ -211,7 +211,6 @@ class Collection(BaseModel):
         self,
         persona: str = None,
         negative_response: str = None,
-        temperature: float = None
     ):
         """
         Configures custom chatbot behavior for this collection
@@ -224,8 +223,6 @@ class Collection(BaseModel):
         :param negative_response: Chatbot's response when it cannot find the answer,
                                   ie "say {negative_response} if you don't know the answer". Examples:
             - 'i don't know, please reach out to #help for help'
-        :param temperature: OpenAI's temperature parameter
-                            https://platform.openai.com/docs/api-reference/audio/createTranscription#audio-createtranscription-temperature
         """
         req = ConfigureChatRequest(
             namespace_name=Config.namespace,
@@ -233,7 +230,6 @@ class Collection(BaseModel):
             chat_attributes=ChatAttributes(
                 persona=persona,
                 negative_response=negative_response,
-                temperature=temperature
             )
         )
 
