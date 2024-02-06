@@ -24,7 +24,9 @@ class Config:
         return f"https://{cls.account_name}.us-west-2.aws.chatbees.ai"
 
     @classmethod
-    def post(cls, url, data=None, files=None):
+    def post(cls, url, data=None, files=None, enforce_api_key=True):
+        if enforce_api_key and (cls.api_key is None or cls.api_key == ""):
+            raise ValueError("API key is required for using ChatBees")
         # Encode data if it is a string
         if data is not None and isinstance(data, str):
             data = data.encode('utf-8')

@@ -269,3 +269,35 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text)
 
         ndb.collection('fakename').configure_chat('persona', 'negative_resp', 0.1)
+
+    @requests_mock.mock()
+    def test_api_key_required(self, mock):
+        # require API key for all APIs
+        ndb.init(api_key=None, namespace=APISurfaceTest.NAMESPACE)
+        collection = ndb.collection('foo')
+        self.assertRaises(ValueError, ndb.list_collections)
+        self.assertRaises(ValueError, ndb.delete_collection, 'foo')
+        self.assertRaises(ValueError, ndb.create_collection, ndb.collection('foo'))
+        fname = f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt'
+        self.assertRaises(ValueError, collection.upload_document, fname)
+
+        # The only exception is ask() API for openai-web collection
+        def match_request_text(request):
+            return request.text == (
+                '{"namespace_name":"fakenamespace","collection_name":"openai-web",'
+                '"question":"what is the meaning of life?","top_k":5,'
+                '"doc_name":null,"history_messages":null}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/ask',
+            additional_matcher=match_request_text,
+            text=AskResponse(
+                answer='42',
+                refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")]
+            ).model_dump_json(),
+        )
+
+        answer, _ = ndb.collection('openai-web').ask(
+            "what is the meaning of life?")
+        assert answer == '42'

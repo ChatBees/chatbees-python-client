@@ -25,7 +25,8 @@ def ask(
 
     resp = Config.post(
         url=url,
-        data=req.model_dump_json()
+        data=req.model_dump_json(),
+        enforce_api_key=False
     )
     resp = AskResponse.model_validate(resp.json())
 
