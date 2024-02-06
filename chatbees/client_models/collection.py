@@ -1,18 +1,17 @@
 import os
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Tuple
 from urllib import request
 
 from pydantic import BaseModel
 
 from chatbees.client_models.chat import Chat
 from chatbees.client_models.doc import AnswerReference
+from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
 from chatbees.server_models.doc_api import (
     AddDocRequest,
     DeleteDocRequest,
     ListDocsRequest,
     ListDocsResponse,
-    AskRequest,
-    AskResponse,
     SummaryRequest,
     SummaryResponse,
     CreateCrawlRequest,
@@ -47,6 +46,9 @@ class Collection(BaseModel):
 
     # Description of the collection
     description: str = ""
+
+    # If true, collection can be read without an API key
+    public_readable: bool = False
 
     def upload_document(self, path_or_url: str):
         """
@@ -189,7 +191,7 @@ class Collection(BaseModel):
         )
         resp = Config.post(url=url, data=req.model_dump_json())
         crawl_resp = GetCrawlResponse.model_validate(resp.json())
-        return (crawl_resp.crawl_status, crawl_resp.crawl_result)
+        return crawl_resp.crawl_status, crawl_resp.crawl_result
 
     def index_crawl(self, crawl_id: str):
         """
@@ -205,6 +207,35 @@ class Collection(BaseModel):
         )
         Config.post(url=url, data=req.model_dump_json())
 
+    def configure_chat(
+        self,
+        persona: str = None,
+        negative_response: str = None,
+    ):
+        """
+        Configures custom chatbot behavior for this collection
+
+        NOTE: New configurations could take up to 2 minutes to take effect.
+
+        :param persona: The chatbot's persona, ie "The chatbot will talk like {persona}". Examples:
+            - 'a 1600s pirate'
+            - 'a helpful assistant'
+        :param negative_response: Chatbot's response when it cannot find the answer,
+                                  ie "say {negative_response} if you don't know the answer". Examples:
+            - 'i don't know, please reach out to #help for help'
+        """
+        req = ConfigureChatRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            chat_attributes=ChatAttributes(
+                persona=persona,
+                negative_response=negative_response,
+            )
+        )
+
+        url = f'{Config.get_base_url()}/docs/configure_chat'
+        Config.post(url=url, data=req.model_dump_json())
+
 def describe_response_to_collection(
     collection_name: str,
     resp: DescribeCollectionResponse
@@ -212,7 +243,11 @@ def describe_response_to_collection(
     description = ""
     if resp.description is not None:
         description = resp.description
+    public_readable = False
+    if resp.public_read is not None:
+        public_readable = resp.public_read
     return Collection(
         name=collection_name,
         description=description,
+        public_readable=public_readable
     )

@@ -11,6 +11,9 @@ class CollectionBaseRequest(BaseModel):
 class CreateCollectionRequest(CollectionBaseRequest):
     description: Optional[str] = None
 
+    # If true, create a collection that can be read without an API key
+    public_read: Optional[bool] = None
+
 
 class DeleteCollectionRequest(CollectionBaseRequest):
     pass
@@ -30,3 +33,6 @@ class DescribeCollectionRequest(CollectionBaseRequest):
 
 class DescribeCollectionResponse(BaseModel):
     description: Optional[str] = None
+
+    # If true, the collection can be read without an API key
+    public_read: Optional[bool] = None

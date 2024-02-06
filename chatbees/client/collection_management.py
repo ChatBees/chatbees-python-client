@@ -38,7 +38,8 @@ def create_collection(col: Collection) -> Collection:
     req = CreateCollectionRequest(
         namespace_name=Config.namespace,
         collection_name=col.name,
-        description=col.description)
+        description=col.description,
+        public_read=col.public_readable)
     Config.post(url=url, data=req.model_dump_json())
     return col
 
@@ -76,8 +77,9 @@ def delete_collection(collection_name: str):
     Args:
         collection_name (str): The name of the collection.
     """
-    req = DeleteCollectionRequest(namespace_name=Config.namespace,
-                                  collection_name=collection_name)
+    req = DeleteCollectionRequest(
+        namespace_name=Config.namespace,
+        collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/delete'
     Config.post(url=url, data=req.model_dump_json())
 
@@ -92,8 +94,9 @@ def describe_collection(collection_name: str) -> Collection:
         Collection: A collection
     """
 
-    req = DescribeCollectionRequest(namespace_name=Config.namespace,
-                                    collection_name=collection_name)
+    req = DescribeCollectionRequest(
+        namespace_name=Config.namespace,
+        collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/describe'
     resp = DescribeCollectionResponse.model_validate(
         Config.post(url=url, data=req.model_dump_json()).json())
