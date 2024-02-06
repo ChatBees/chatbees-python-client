@@ -254,3 +254,18 @@ class APISurfaceTest(unittest.TestCase):
         assert 2 == len(doc_names)
         assert 'doc1' == doc_names[0]
         assert 'doc2' == doc_names[1]
+
+    @requests_mock.mock()
+    def test_configure_chat(self, mock):
+        def match_request_text(request):
+            return request.text == ('{"namespace_name":"fakenamespace",'
+                                    '"collection_name":"fakename","chat_attributes":{"persona":"persona",'
+                                    '"negative_response":"negative_resp","temperature":0.1}}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/configure_chat',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text)
+
+        ndb.collection('fakename').configure_chat('persona', 'negative_resp', 0.1)

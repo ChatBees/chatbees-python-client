@@ -2,6 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from chatbees.server_models.collection_api import CollectionBaseRequest
+
 
 class ChatAttributes(BaseModel):
     # Configure chatbot personality and style. For example:
@@ -18,3 +20,10 @@ class ChatAttributes(BaseModel):
     # Configures whether the chatbot gives conservative or creative answers.
     # Must be between 0 and 1, inclusive of both ends.
     temperature: Optional[float] = None
+
+
+class ConfigureChatRequest(CollectionBaseRequest):
+    """
+    Configures a collection with custom q/a attributes
+    """
+    chat_attributes: ChatAttributes

@@ -77,8 +77,9 @@ def delete_collection(collection_name: str):
     Args:
         collection_name (str): The name of the collection.
     """
-    req = DeleteCollectionRequest(namespace_name=Config.namespace,
-                                  collection_name=collection_name)
+    req = DeleteCollectionRequest(
+        namespace_name=Config.namespace,
+        collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/delete'
     Config.post(url=url, data=req.model_dump_json())
 
@@ -93,12 +94,10 @@ def describe_collection(collection_name: str) -> Collection:
         Collection: A collection
     """
 
-    req = DescribeCollectionRequest(namespace_name=Config.namespace,
-                                    collection_name=collection_name)
+    req = DescribeCollectionRequest(
+        namespace_name=Config.namespace,
+        collection_name=collection_name)
     url = f'{Config.get_base_url()}/collections/describe'
     resp = DescribeCollectionResponse.model_validate(
         Config.post(url=url, data=req.model_dump_json()).json())
     return describe_response_to_collection(collection_name, resp)
-
-
-def configure_chat(persona: str=None, negative_response: str=None, temperature: float=None)

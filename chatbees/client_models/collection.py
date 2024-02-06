@@ -1,18 +1,17 @@
 import os
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Tuple
 from urllib import request
 
 from pydantic import BaseModel
 
 from chatbees.client_models.chat import Chat
 from chatbees.client_models.doc import AnswerReference
+from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
 from chatbees.server_models.doc_api import (
     AddDocRequest,
     DeleteDocRequest,
     ListDocsRequest,
     ListDocsResponse,
-    AskRequest,
-    AskResponse,
     SummaryRequest,
     SummaryResponse,
     CreateCrawlRequest,
@@ -206,6 +205,37 @@ class Collection(BaseModel):
             collection_name=self.name,
             crawl_id=crawl_id,
         )
+        Config.post(url=url, data=req.model_dump_json())
+
+    def configure_chat(
+        self,
+        persona: str = None,
+        negative_response: str = None,
+        temperature: float = None
+    ):
+        """
+        Configures custom chatbot behavior for this collection
+
+        :param persona: The chatbot's persona, ie "The chatbot will talk like {persona}". Examples:
+            - 'a 1600s pirate'
+            - 'a helpful assistant'
+        :param negative_response: Chatbot's response when it cannot find the answer,
+                                  ie "say {negative_response} if you don't know the answer". Examples:
+            - 'i don't know, please reach out to #help for help'
+        :param temperature: OpenAI's temperature parameter
+                            https://platform.openai.com/docs/api-reference/audio/createTranscription#audio-createtranscription-temperature
+        """
+        req = ConfigureChatRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            chat_attributes=ChatAttributes(
+                persona=persona,
+                negative_response=negative_response,
+                temperature=temperature
+            )
+        )
+
+        url = f'{Config.get_base_url()}/docs/configure_chat'
         Config.post(url=url, data=req.model_dump_json())
 
 def describe_response_to_collection(
