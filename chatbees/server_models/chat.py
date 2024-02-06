@@ -17,10 +17,6 @@ class ChatAttributes(BaseModel):
     # - I do not have that information.
     negative_response: Optional[str] = None
 
-    # Configures whether the chatbot gives conservative or creative answers.
-    # Must be between 0 and 1, inclusive of both ends.
-    temperature: Optional[float] = None
-
 
 class ConfigureChatRequest(CollectionBaseRequest):
     """
