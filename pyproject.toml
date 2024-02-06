@@ -3,7 +3,7 @@ name = "chatbees-python-client"
 packages = [
     { include="chatbees", from="." },
 ]
-version = "0.8.2"
+version = "0.9.0"
 description = "Python client for ChatBees"
 authors = ["ChatBees <build@chatbees.ai>"]
 readme = "README.md"
