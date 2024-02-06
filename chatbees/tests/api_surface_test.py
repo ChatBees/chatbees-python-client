@@ -121,6 +121,27 @@ class APISurfaceTest(unittest.TestCase):
             "what is the meaning of life?")
         assert answer == '42'
 
+        def match_request_text2(request):
+            return request.text == (
+                '{"namespace_name":"fakenamespace","collection_name":"fakename",'
+                '"question":"what is the meaning of life?","top_k":2,'
+                '"doc_name":null,"history_messages":null}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/ask',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text2,
+            text=AskResponse(
+                answer='42',
+                refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")]
+            ).model_dump_json(),
+        )
+
+        answer, _ = ndb.collection('fakename').ask(
+            "what is the meaning of life?", 2)
+        assert answer == '42'
+
         @requests_mock.mock()
         def test_api_key_required(self, mock):
             # require API key for all APIs
@@ -152,27 +173,6 @@ class APISurfaceTest(unittest.TestCase):
             answer, _ = ndb.collection('openai-web').ask(
                 "what is the meaning of life?")
             assert answer == '42'
-
-        def match_request_text2(request):
-            return request.text == (
-                '{"namespace_name":"fakenamespace","collection_name":"fakename",'
-                '"question":"what is the meaning of life?","top_k":2,'
-                '"doc_name":null,"history_messages":null}')
-
-        mock.register_uri(
-            'POST',
-            f'{APISurfaceTest.API_ENDPOINT}/docs/ask',
-            request_headers={'api-key': 'fakeapikey'},
-            additional_matcher=match_request_text2,
-            text=AskResponse(
-                answer='42',
-                refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")]
-            ).model_dump_json(),
-        )
-
-        answer, _ = ndb.collection('fakename').ask(
-            "what is the meaning of life?", 2)
-        assert answer == '42'
 
     @requests_mock.mock()
     def test_describe_collection(self, mock):
