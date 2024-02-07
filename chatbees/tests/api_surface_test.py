@@ -66,7 +66,7 @@ class APISurfaceTest(unittest.TestCase):
         )
 
         assert ndb.create_collection(
-            Collection(name='fakename', description='descr', public_readable=True))
+            Collection(name='fakename', description='descr', public_read=True))
 
     @requests_mock.mock()
     def test_list_collections(self, mock):
