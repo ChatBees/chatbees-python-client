@@ -3,7 +3,7 @@ import unittest
 
 import requests_mock
 
-import chatbees as ndb
+import chatbees as cdb
 from chatbees.client_models.collection import Collection
 from chatbees.server_models.collection_api import (
     ListCollectionsResponse, DescribeCollectionResponse,
@@ -22,7 +22,7 @@ class APISurfaceTest(unittest.TestCase):
     API_ENDPOINT = 'https://public.us-west-2.aws.chatbees.ai'
 
     def setUp(self):
-        ndb.init(api_key=APISurfaceTest.API_KEY, namespace=APISurfaceTest.NAMESPACE)
+        cdb.init(api_key=APISurfaceTest.API_KEY, namespace=APISurfaceTest.NAMESPACE)
 
     @requests_mock.mock()
     def test_create_api_key(self, mock):
@@ -32,7 +32,7 @@ class APISurfaceTest(unittest.TestCase):
             text='{"api_key": "anotherfakeapikey"}',
         )
 
-        assert ndb.create_api_key() == 'anotherfakeapikey'
+        assert cdb.create_api_key() == 'anotherfakeapikey'
 
     @requests_mock.mock()
     def test_create_collection(self, mock):
@@ -48,7 +48,7 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
         )
 
-        assert ndb.create_collection(
+        assert cdb.create_collection(
             Collection(name='fakename', description='descr'))
 
     @requests_mock.mock()
@@ -65,7 +65,7 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
         )
 
-        assert ndb.create_collection(
+        assert cdb.create_collection(
             Collection(name='fakename', description='descr', public_read=True))
 
     @requests_mock.mock()
@@ -82,7 +82,7 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
             text=resp.model_dump_json(),
         )
-        assert set(ndb.list_collections()) == {'a', 'b', 'c'}
+        assert set(cdb.list_collections()) == {'a', 'b', 'c'}
 
     @requests_mock.mock()
     def test_delete_collection(self, mock):
@@ -96,7 +96,7 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
         )
 
-        ndb.delete_collection('fakename')
+        cdb.delete_collection('fakename')
 
     @requests_mock.mock()
     def test_ask(self, mock):
@@ -117,7 +117,7 @@ class APISurfaceTest(unittest.TestCase):
             ).model_dump_json(),
         )
 
-        answer, _ = ndb.collection('fakename').ask(
+        answer, _ = cdb.collection('fakename').ask(
             "what is the meaning of life?")
         assert answer == '42'
 
@@ -138,18 +138,18 @@ class APISurfaceTest(unittest.TestCase):
             ).model_dump_json(),
         )
 
-        answer, _ = ndb.collection('fakename').ask(
+        answer, _ = cdb.collection('fakename').ask(
             "what is the meaning of life?", 2)
         assert answer == '42'
 
         @requests_mock.mock()
         def test_api_key_required(self, mock):
             # require API key for all APIs
-            ndb.init(api_key=None, namespace=APISurfaceTest.NAMESPACE)
-            collection = ndb.collection('foo')
-            self.assertRaises(ValueError, ndb.list_collections)
-            self.assertRaises(ValueError, ndb.delete_collection, 'foo')
-            self.assertRaises(ValueError, ndb.create_collection, ndb.collection('foo'))
+            cdb.init(api_key=None, namespace=APISurfaceTest.NAMESPACE)
+            collection = cdb.collection('foo')
+            self.assertRaises(ValueError, cdb.list_collections)
+            self.assertRaises(ValueError, cdb.delete_collection, 'foo')
+            self.assertRaises(ValueError, cdb.create_collection, cdb.collection('foo'))
             fname = f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt'
             self.assertRaises(ValueError, collection.upload_document, fname)
 
@@ -170,7 +170,7 @@ class APISurfaceTest(unittest.TestCase):
                 ).model_dump_json(),
             )
 
-            answer, _ = ndb.collection('openai-web').ask(
+            answer, _ = cdb.collection('openai-web').ask(
                 "what is the meaning of life?")
             assert answer == '42'
 
@@ -187,7 +187,7 @@ class APISurfaceTest(unittest.TestCase):
             text=DescribeCollectionResponse().model_dump_json(),
         )
 
-        ndb.describe_collection('fakename')
+        cdb.describe_collection('fakename')
 
     @requests_mock.mock()
     def test_chat(self, mock):
@@ -208,7 +208,7 @@ class APISurfaceTest(unittest.TestCase):
             ).model_dump_json(),
         )
 
-        chat = ndb.collection('openai-web').chat()
+        chat = cdb.collection('openai-web').chat()
         chat.ask("q1")
 
 
@@ -248,7 +248,7 @@ class APISurfaceTest(unittest.TestCase):
             ).model_dump_json(),
         )
 
-        assert(ndb.collection('fakename').summarize_document("path/to/file") == "test summary")
+        assert(cdb.collection('fakename').summarize_document("path/to/file") == "test summary")
 
     @requests_mock.mock()
     def test_delete_doc(self, mock):
@@ -264,7 +264,7 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
         )
 
-        ndb.collection('fakename').delete_document("path/to/file")
+        cdb.collection('fakename').delete_document("path/to/file")
 
     @requests_mock.mock()
     def test_list_documents(self, mock):
@@ -282,7 +282,7 @@ class APISurfaceTest(unittest.TestCase):
             ).model_dump_json(),
         )
 
-        doc_names = ndb.collection('fakename').list_documents()
+        doc_names = cdb.collection('fakename').list_documents()
         assert 2 == len(doc_names)
         assert 'doc1' == doc_names[0]
         assert 'doc2' == doc_names[1]
@@ -300,4 +300,4 @@ class APISurfaceTest(unittest.TestCase):
             request_headers={'api-key': 'fakeapikey'},
             additional_matcher=match_request_text)
 
-        ndb.collection('fakename').configure_chat('persona', 'negative_resp')
+        cdb.collection('fakename').configure_chat('persona', 'negative_resp')
