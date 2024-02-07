@@ -48,7 +48,7 @@ class Collection(BaseModel):
     description: str = ""
 
     # If true, collection can be read without an API key
-    public_readable: bool = False
+    public_read: bool = False
 
     def upload_document(self, path_or_url: str):
         """
@@ -243,11 +243,11 @@ def describe_response_to_collection(
     description = ""
     if resp.description is not None:
         description = resp.description
-    public_readable = False
+    public_read = False
     if resp.public_read is not None:
-        public_readable = resp.public_read
+        public_read = resp.public_read
     return Collection(
         name=collection_name,
         description=description,
-        public_readable=public_readable
+        public_read=public_read
     )

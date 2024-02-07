@@ -5,7 +5,7 @@ import unittest
 import uuid
 from typing import List
 
-import chatbees as ndb
+import chatbees as cdb
 from chatbees.server_models.doc_api import CrawlStatus
 from chatbees.client_models.doc import AnswerReference
 
@@ -23,14 +23,14 @@ class SmokeTest(unittest.TestCase):
         # TODO: we have the ability to delete API keys
         #self.apikey1 = 'MS1hOTJmZDE1Ni1lNTg1LTcyM2ItMzZiNy0yYjEyYzdjZDQ3ZWE='
         #self.apikey2 = 'MS1iMjA0ZDc1Yi03MTc5LTZlMTgtMjBmMC02OWQzODZiOTExZDM='
-        self.apikey1 = ndb.create_api_key()
-        self.apikey2 = ndb.create_api_key()
+        self.apikey1 = cdb.create_api_key()
+        self.apikey2 = cdb.create_api_key()
 
     def test_invalid_api_key(self):
-        ndb.init(api_key='invalid')
+        cdb.init(api_key='invalid')
 
         # Invalid api_key triggers exception
-        self.assertRaises(ndb.UnAuthorized, ndb.list_collections)
+        self.assertRaises(cdb.UnAuthorized, cdb.list_collections)
 
     def test_collection_apis(self):
         # Clear API key from config
@@ -38,56 +38,56 @@ class SmokeTest(unittest.TestCase):
         apikey2 = self.apikey2
 
         # Create private collections, one for each created key
-        ndb.init(api_key=apikey1)
+        cdb.init(api_key=apikey1)
         private_col_key1 = self.create_collection()
 
-        ndb.init(api_key=apikey2)
+        cdb.init(api_key=apikey2)
         private_col_key2 = self.create_collection()
 
         try:
             # List collections using API key1
-            ndb.init(api_key=apikey1)
-            collections_visible_to_key1 = set(ndb.list_collections())
+            cdb.init(api_key=apikey1)
+            collections_visible_to_key1 = set(cdb.list_collections())
             assert private_col_key2.name not in collections_visible_to_key1
             assert private_col_key1.name in collections_visible_to_key1
             # Key1 is not authorized to delete a collection created by key2
-            self.assertRaises(ndb.UnAuthorized, ndb.delete_collection, private_col_key2.name)
+            self.assertRaises(cdb.UnAuthorized, cdb.delete_collection, private_col_key2.name)
 
             # List collections using API key2
-            ndb.init(api_key=apikey2)
-            collections_visible_to_key2 = set(ndb.list_collections())
+            cdb.init(api_key=apikey2)
+            collections_visible_to_key2 = set(cdb.list_collections())
             assert private_col_key1.name not in collections_visible_to_key2
             assert private_col_key2.name in collections_visible_to_key2
             # Key2 is not authorized to delete a collection created by key1
-            self.assertRaises(ndb.UnAuthorized, ndb.delete_collection, private_col_key1.name)
+            self.assertRaises(cdb.UnAuthorized, cdb.delete_collection, private_col_key1.name)
 
         finally:
             # key1 is authorized to delete its own collections as well as public
             # collections
-            ndb.init(api_key=apikey1)
-            ndb.delete_collection(private_col_key1.name)
+            cdb.init(api_key=apikey1)
+            cdb.delete_collection(private_col_key1.name)
 
-            ndb.init(api_key=apikey2)
-            ndb.delete_collection(private_col_key2.name)
+            cdb.init(api_key=apikey2)
+            cdb.delete_collection(private_col_key2.name)
 
-    def create_collection(self, public_readable: bool=False) -> ndb.Collection:
+    def create_collection(self, public_read: bool=False) -> cdb.Collection:
         unique_col = 'cl_' + uuid.uuid4().hex
-        col = ndb.Collection(name=unique_col, public_readable=public_readable)
-        return ndb.create_collection(col)
+        col = cdb.Collection(name=unique_col, public_read=public_read)
+        return cdb.create_collection(col)
 
     def test_public_collection(self):
         owner = self.apikey1
-        ndb.init(owner)
-        col = self.create_collection(public_readable=True)
+        cdb.init(owner)
+        col = self.create_collection(public_read=True)
         col.upload_document(f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt')
 
         # Clear API key and ask questions again
-        ndb.init(api_key=None)
+        cdb.init(api_key=None)
         col.ask('should not fail')
 
     def test_doc_apis(self):
         owner = self.apikey1
-        ndb.init(owner)
+        cdb.init(owner)
         col = self.create_collection()
 
         files = [
@@ -144,7 +144,7 @@ class SmokeTest(unittest.TestCase):
             col.configure_chat('a pirate from 1600s', 'the word snowday and nothing else')
             ans, ref = col.ask('what is the color of my hair?')
         finally:
-            ndb.delete_collection(col.name)
+            cdb.delete_collection(col.name)
 
     def assertRefsAreFromDoc(self, refs: List[AnswerReference], doc: str):
         assert len(refs) > 0
@@ -153,7 +153,7 @@ class SmokeTest(unittest.TestCase):
 
     def test_crawl_apis(self):
         owner = self.apikey1
-        ndb.init(owner)
+        cdb.init(owner)
         col = self.create_collection()
 
         try:
@@ -172,4 +172,4 @@ class SmokeTest(unittest.TestCase):
 
             col.index_crawl(crawl_id)
         finally:
-            ndb.delete_collection(col.name)
+            cdb.delete_collection(col.name)

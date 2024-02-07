@@ -39,7 +39,7 @@ def create_collection(col: Collection) -> Collection:
         namespace_name=Config.namespace,
         collection_name=col.name,
         description=col.description,
-        public_read=col.public_readable)
+        public_read=col.public_read)
     Config.post(url=url, data=req.model_dump_json())
     return col
 
