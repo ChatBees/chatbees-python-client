@@ -88,8 +88,6 @@ cdb.init(api_key=my_api_key)
 ```
 
 ## Creating a Collection
-See [this page](https://www.chatbees.com/guides.html) for a brief overview of ChatBees data model 
-
 You can create a collection that is only accessible with a specific API key.
 
 ```python
@@ -152,10 +150,15 @@ cdb.init(api_key="<my_api_key>")
 # Create the crawl task
 collection = cdb.Collection(name='example-web')
 cdb.create_collection(collection)
-crawl_id = collection.create_crawl('https://www.example.com')
+
+root_url = 'https://www.example.com'
+crawl_id = collection.create_crawl(root_url)
 
 # Query the crawl status
 resp = collection.get_crawl(crawl_id)
+
+# If re-crawl the same root_url, delete the old indexed crawl results
+collection.delete_crawl(root_url)
 
 # check resp.crawl_status becomes CrawlStatus.SUCCEEDED, and index the pages
 collection.index_crawl(crawl_id)

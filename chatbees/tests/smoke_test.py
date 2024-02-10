@@ -157,7 +157,8 @@ class SmokeTest(unittest.TestCase):
         col = self.create_collection()
 
         try:
-            crawl_id = col.create_crawl('https://www.openai.com', 10)
+            root_url = 'https://www.openai.com'
+            crawl_id = col.create_crawl(root_url, 3)
 
             max_waits = 100
             waits = 0
@@ -165,11 +166,17 @@ class SmokeTest(unittest.TestCase):
                 status, pages = col.get_crawl(crawl_id)
                 if status != CrawlStatus.RUNNING:
                     break
-                time.sleep(1)
+                time.sleep(2)
 
             assert status == CrawlStatus.SUCCEEDED
-            assert 10 == len(pages)
+            assert 3 == len(pages)
 
             col.index_crawl(crawl_id)
+            list_doc_names = col.list_documents()
+            assert 3 == len(list_doc_names)
+
+            col.delete_crawl(root_url)
+            list_doc_names = col.list_documents()
+            assert 0 == len(list_doc_names)
         finally:
             cdb.delete_collection(col.name)

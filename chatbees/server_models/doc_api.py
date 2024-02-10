@@ -66,6 +66,15 @@ class CreateCrawlResponse(BaseModel):
     crawl_id: str
 
 
+# delete the index for the crawled pages of root_url
+class DeleteCrawlRequest(CollectionBaseRequest):
+    root_url: str
+
+
+class DeleteCrawlResponse(BaseModel):
+    pass
+
+
 class GetCrawlRequest(CollectionBaseRequest):
     crawl_id: str
 

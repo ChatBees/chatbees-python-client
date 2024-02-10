@@ -21,6 +21,7 @@ from chatbees.server_models.doc_api import (
     CrawlStatus,
     PageStats,
     IndexCrawlRequest,
+    DeleteCrawlRequest,
 )
 from chatbees.server_models.collection_api import (
     DescribeCollectionResponse,
@@ -204,6 +205,20 @@ class Collection(BaseModel):
             namespace_name=Config.namespace,
             collection_name=self.name,
             crawl_id=crawl_id,
+        )
+        Config.post(url=url, data=req.model_dump_json())
+
+    def delete_crawl(self, root_url: str):
+        """
+        Delete the index for the crawled pages of the root_url.
+
+        :param root_url: the root url to delete
+        """
+        url = f'{Config.get_base_url()}/docs/delete_crawl'
+        req = DeleteCrawlRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            root_url=root_url,
         )
         Config.post(url=url, data=req.model_dump_json())
 
