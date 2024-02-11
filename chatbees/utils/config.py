@@ -6,22 +6,22 @@ from .exceptions import raise_for_error
 ENV_TEST_BASE_URL = os.environ.get("ENV_TEST_BASE_URL", "")
 
 class Config:
-    PUBLIC_ACCOUNT: str = "public"
+    PUBLIC_ACCOUNT_ID: str = "public"
     PUBLIC_NAMESPACE: str = "public"
     api_key: str = None
     namespace: str = PUBLIC_NAMESPACE
-    account_name: str = PUBLIC_ACCOUNT
+    account_id: str = PUBLIC_ACCOUNT_ID
 
     @classmethod
     def validate_setup(cls):
-        if cls.account_name is None or cls.account_name != cls.PUBLIC_ACCOUNT:
-            raise ValueError("Only public account ('public') is supported.")
+        if cls.account_id is None or cls.account_id == "":
+            raise ValueError("Please input your account id.")
 
     @classmethod
     def get_base_url(cls):
         if ENV_TEST_BASE_URL != "":
             return ENV_TEST_BASE_URL
-        return f"https://{cls.account_name}.us-west-2.aws.chatbees.ai"
+        return f"https://{cls.account_id}.us-west-2.aws.chatbees.ai"
 
     @classmethod
     def post(cls, url, data=None, files=None, enforce_api_key=True):

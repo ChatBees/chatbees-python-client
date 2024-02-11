@@ -6,7 +6,7 @@ __all__ = ["init", "create_api_key"]
 
 def init(
     api_key: str = None,
-    account_name: str = Config.PUBLIC_ACCOUNT,
+    account_id: str = Config.PUBLIC_ACCOUNT_ID,
     namespace: str = Config.PUBLIC_NAMESPACE
 ):
     """
@@ -16,26 +16,29 @@ def init(
         api_key (str, optional): The API key to authenticate requests.
                                  Defaults to None. You can still access
                                  public collections without an API key.
-        account_name (str, optional): The name of the account. Defaults to
-                                      "public"
+        account_id (str, optional): The account ID. Defaults to "public".
         namespace (str, optional): The namespace to use.
     Raises:
         ValueError: If the provided config is invalid
     """
     Config.api_key = api_key
-    Config.account_name = account_name
+    Config.account_id = account_id
     Config.namespace = namespace
     Config.validate_setup()
 
 
 def create_api_key() -> str:
     """
-    Create a new APIKey in the configured account.
+    Create a new APIKey in the public account.
 
     Returns:
         The created API key
 
     """
+    if Config.account_id != Config.PUBLIC_ACCOUNT_ID:
+        raise ValueError(
+            "Please log in and create API key on UI for the private account")
+
     url = f'{Config.get_base_url()}/apikey/create'
     req = CreateApiKeyRequest()
     resp = Config.post(
