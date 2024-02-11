@@ -1,47 +1,32 @@
 # chatbees-python-client
-Python client for [ChatBees](http://www.chatbees.ai), a Serverless Chat Platform for your knowledge base. ChatBees provides simple and scalable APIs, enabling you to craft a LLM app in mere minutes.
+Python client for [ChatBees](http://www.chatbees.ai), a Serverless Platform for your LLM Apps. ChatBees provides simple and scalable APIs, enabling you to craft a LLM app for your knowledge base in mere minutes.
 
 ChatBees is currently in <ins>**public alpha**</ins>. We're actively improving 
 the product and releasing new features, and we'd love to hear your feedback! 
 Please take a moment to fill out this [feedback form](https://forms.gle/pif6Vx2LqPjW5v4w5) to help us understand your use-case better.
 
-> By default, all collections are subject to permanent deletion after 2 weeks. Please let us know if you need to keep it for longer via the feedback form.
+Signup with your google account on https://www.chatbees.ai. You could also try it out in ChatBees public account without signup.
+
+> For the public account, by default, all collections are subject to permanent deletion after 2 weeks. Please let us know if you need to keep it for longer via the feedback form.
 
 ChatBees python client provides very simple APIs for you to directly upload files and ask questions.
 
 
 ## Quickstart
 
-You can try out ChatBees in just a few lines of code. We have 
-prepared a special public collection ```openai-web``` that can answer 
-questions about the contents of ```www.openai.com``` 
-```python
-import chatbees as cdb
-
-answer, _ = cdb.collection('openai-web').ask('what is red team?')
-print(answer)
-"""
-Sample answer:
-
-Red team refers to the group of external experts who work with OpenAI to
-identify and evaluate potential risks and harmful capabilities in new systems.
-The red team's role is to help develop taxonomies of risk and provide input
-throughout the model and product development lifecycle.
-"""
-
-```
-You can also create your own collections, upload files, then get answers 
-specific to your data assets. The following example walks you through the 
-process of creating a collection and indexing [the original transformer paper](https://arxiv.org/abs/1706.03762) into that collection.
+You can try out ChatBees in just a few lines of code. You can create your own collections, upload files, then get answers  specific to your data assets. The following example walks you through the process of creating a collection and indexing [the original transformer paper](https://arxiv.org/abs/1706.03762) into that collection.
 
 ```python
 import chatbees as cdb
 
-# Create an API key
-my_api_key = cdb.create_api_key()
+# If you signup with your google account, you will create an API key on UI and skip this step.
+# Create an API key in the public account.
+# my_api_key = cdb.create_api_key()
 
-# Configure cdb to use the newly minted API key
-cdb.init(api_key=my_api_key)
+# Configure cdb to use the newly minted API key.
+cdb.init(api_key=my_api_key, account_id=your_account_id)
+# If you use the public account, not need to configure the account_id.
+# cdb.init(api_key=my_api_key)
 
 # Create a new collection
 llm_research = cdb.Collection(name="llm_research")
@@ -74,8 +59,9 @@ Account management and related functionalities will be released soon.
 ```python
 import chatbees as cdb
 
-# Create a new API key
-my_api_key = cdb.create_api_key()
+# If you signup with your google account, you will create an API key on UI and skip this step.
+# Create an API key in the public account.
+# my_api_key = cdb.create_api_key()
 
 # Please record this API key and keep it a secrete
 #
@@ -84,8 +70,14 @@ my_api_key = cdb.create_api_key()
 print(my_api_key)
 
 # Use this API key in all subsequent calls
-cdb.init(api_key=my_api_key)
+cdb.init(api_key=my_api_key, account_id=your_account_id)
+# If you use the public account, not need to configure the account_id.
+# cdb.init(api_key=my_api_key)
+
+
 ```
+
+In the following examples, we will assume you have signup with your google account.
 
 ## Creating a Collection
 You can create a collection that is only accessible with a specific API key.
@@ -93,7 +85,7 @@ You can create a collection that is only accessible with a specific API key.
 ```python
 import chatbees as cdb
 
-cdb.init(api_key="<my_api_key>")
+cdb.init(api_key=my_api_key, account_id=your_account_id)
 
 # Create a collection called llm_research
 collection = cdb.Collection(name='llm_research')
@@ -108,7 +100,7 @@ API key.
 ```python
 import chatbees as cdb
 
-cdb.init(api_key="<my_api_key>")
+cdb.init(api_key=my_api_key, account_id=your_account_id)
 
 collections = cdb.list_collections()
 ```
@@ -128,7 +120,7 @@ collection.
 ```python
 import chatbees as cdb
 
-cdb.init(api_key="<my_api_key>")
+cdb.init(api_key=my_api_key, account_id=your_account_id)
 
 # llm_research collection was created in the previous step
 collection = cdb.collection('llm_research')
@@ -145,7 +137,7 @@ You can pass the website root url. ChatBees will automatically crawl it.
 ```python
 import chatbees as cdb
 
-cdb.init(api_key="<my_api_key>")
+cdb.init(api_key=my_api_key, account_id=your_account_id)
 
 # Create the crawl task
 collection = cdb.Collection(name='example-web')
@@ -176,7 +168,7 @@ the answer.
 ```python
 import chatbees as cdb
 
-cdb.init(api_key="<my_api_key>")
+cdb.init(api_key=my_api_key, account_id=your_account_id)
 
 # Get a plain text answer, as well as a list of references from the collection
 # that are the most relevant to the question.
@@ -191,7 +183,7 @@ You can delete a collection using the same API key that was used to create it.
 ```python
 import chatbees as cdb
 
-cdb.init(api_key="<my_api_key>")
+cdb.init(api_key=my_api_key, account_id=your_account_id)
 
 cdb.delete_collection('llm_research')
 ```
