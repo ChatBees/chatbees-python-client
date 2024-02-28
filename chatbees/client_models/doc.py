@@ -1,4 +1,4 @@
-__all__ = ["AnswerReference", "CrawlStatus"]
+__all__ = ["AnswerReference", "CrawlStatus", "SearchReference"]
 
 from enum import Enum
 
@@ -9,6 +9,9 @@ class AnswerReference(BaseModel):
     doc_name: str
     page_num: int
     sample_text: str
+
+
+SearchReference = AnswerReference
 
 
 class CrawlStatus(Enum):

@@ -6,6 +6,8 @@ from chatbees.client_models.doc import AnswerReference
 from chatbees.utils.ask import ask
 from chatbees.utils.config import Config
 
+__all__ = ["Chat"]
+
 
 class Chat(BaseModel):
     """

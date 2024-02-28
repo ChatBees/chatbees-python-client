@@ -5,7 +5,7 @@ from urllib import request
 from pydantic import BaseModel
 
 from chatbees.client_models.chat import Chat
-from chatbees.client_models.doc import AnswerReference, CrawlStatus, IngestStatus
+from chatbees.client_models.doc import AnswerReference, CrawlStatus, IngestStatus, SearchReference
 from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
 from chatbees.server_models.crawl_type import WebsiteSpec, IngestType, NotionSpec, ConfluenceSpec
 from chatbees.server_models.doc_api import (
@@ -31,6 +31,7 @@ from chatbees.server_models.ingestion_api import (
     CreateIngestionResponse,
     GetIngestionRequest, GetIngestionResponse, IndexIngestionRequest,
 )
+from chatbees.server_models.search_api import SearchRequest, SearchResponse
 from chatbees.utils.ask import ask
 from chatbees.utils.config import Config
 from chatbees.utils.file_upload import (
@@ -145,6 +146,38 @@ class Collection(BaseModel):
                           collection
         """
         return ask(Config.namespace, self.name, question, top_k, doc_name)
+
+    def search(self, question: str, top_k: int = 5) -> List[SearchReference]:
+        """
+        Semantic search
+
+        :param question: Question in plain text.
+        :param top_k: the top k relevant contexts to get answer from.
+        :return: A list of most relevant document references in the collection
+        """
+        url = f'{Config.get_base_url()}/docs/search'
+
+        req = SearchRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            question=question,
+            top_k=top_k
+        )
+
+        resp = Config.post(
+            url=url,
+            data=req.model_dump_json(),
+            enforce_api_key=False
+        )
+        resp = SearchResponse.model_validate(resp.json())
+
+        return [
+            SearchReference(
+                doc_name=ref.doc_name,
+                page_num=ref.page_num,
+                sample_text=ref.sample_text
+            ) for ref in resp.refs
+        ]
 
     def chat(self, doc_name: str = None) -> Chat:
         """
