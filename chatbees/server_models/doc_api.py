@@ -36,6 +36,7 @@ class AskRequest(CollectionBaseRequest):
     top_k: Optional[int] = 5
     doc_name: Optional[str] = None
     history_messages: Optional[List[Tuple[str, str]]] = None
+    prompt: Optional[str] = None
 
 
 class AnswerReference(BaseModel):

@@ -126,7 +126,7 @@ class Collection(BaseModel):
         return resp.summary
 
     def ask(
-        self, question: str, top_k: int = 5, doc_name: str = None,
+        self, question: str, top_k: int = 5, doc_name: str = None, prompt: str = None,
     ) -> (str, List[AnswerReference]):
         """
         Ask a question within the context of this collection.
@@ -139,7 +139,7 @@ class Collection(BaseModel):
             - references: A list of most relevant document references in the
                           collection
         """
-        return ask(Config.namespace, self.name, question, top_k, doc_name)
+        return ask(Config.namespace, self.name, question, top_k, doc_name, prompt)
 
     def chat(self, doc_name: str = None) -> Chat:
         """

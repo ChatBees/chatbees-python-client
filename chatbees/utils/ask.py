@@ -10,6 +10,7 @@ def ask(
     question: str,
     top_k: int = 5,
     doc_name: str = None,
+    prompt: str = None,
     history_messages: List[Tuple[str, str]] = None,
 ) -> (str, List[AnswerReference]):
     url = f'{Config.get_base_url()}/docs/ask'
@@ -21,6 +22,7 @@ def ask(
         top_k=top_k,
         doc_name=doc_name,
         history_messages=history_messages,
+        prompt=prompt,
     )
 
     resp = Config.post(
