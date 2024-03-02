@@ -4,6 +4,17 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 
+__all__ = [
+    "CrawlType",
+    "IngestType",
+    "CrawlSpec",
+    "SlackSpec",
+    "NotionSpec",
+    "GDriveSpec",
+    "WebsiteSpec",
+    "ConfluenceSpec",
+]
+
 class CrawlType(Enum):
     WEBSITE = 'WEBSITE'
     SLACK = 'SLACK'
@@ -12,8 +23,6 @@ class CrawlType(Enum):
 
 
 IngestType = CrawlType
-
-__all__ = ["CrawlSpec", "WebsiteSpec", "ConfluenceSpec"]
 
 class CrawlSpec(BaseModel):
     # API token for crawling. If not set, use existing connector.
