@@ -43,7 +43,7 @@ class GDriveSpec(CrawlSpec):
 
 class WebsiteSpec(CrawlSpec):
     root_url: str
-    max_urls_to_crawl: int
+    max_urls_to_crawl: int = 200
 
 
 class ConfluenceSpec(CrawlSpec):
