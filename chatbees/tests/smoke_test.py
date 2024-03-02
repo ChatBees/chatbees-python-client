@@ -1,12 +1,15 @@
-import io
 import os
 import time
 import unittest
 import uuid
 from typing import List
 
+
+# Only import from chatbees module to make sure classes are exported correctly
 import chatbees as cdb
-from chatbees.server_models.doc_api import CrawlStatus, AnswerReference
+from chatbees import Collection, IngestionType, WebsiteSpec
+from chatbees import CrawlStatus, AnswerReference
+from chatbees import IngestionStatus
 
 
 class SmokeTest(unittest.TestCase):
@@ -177,5 +180,38 @@ class SmokeTest(unittest.TestCase):
             col.delete_crawl(root_url)
             list_doc_names = col.list_documents()
             assert 0 == len(list_doc_names)
+        finally:
+            cdb.delete_collection(col.name)
+
+    def _synchronous_ingest(
+        self,
+        col: Collection,
+        ingestion_type: IngestionType,
+        ingestion_spec
+    ):
+        retry = 30
+        ingestion_id = col.create_ingestion(ingestion_type, ingestion_spec)
+        while retry > 0:
+            retry -= 1
+            status = col.get_ingestion(ingestion_id)
+            if status == IngestionStatus.FAILED:
+                raise RuntimeError(f"Unexpected ingestion failure {status}")
+            if status == IngestionStatus.SUCCEEDED:
+                break
+            time.sleep(10)
+        col.index_ingestion(ingestion_id)
+
+    def test_ingestion_api(self):
+        owner = self.apikey1
+        cdb.init(owner)
+        col = self.create_collection()
+
+        # Run some basic ingest tests
+        try:
+            root_url = 'https://www.openai.com'
+            self._synchronous_ingest(col, IngestionType.WEBSITE, WebsiteSpec(
+                root_url=root_url
+            ))
+
         finally:
             cdb.delete_collection(col.name)

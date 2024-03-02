@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 __all__ = [
     "CrawlType",
-    "IngestType",
+    "IngestionType",
     "CrawlSpec",
     "SlackSpec",
     "NotionSpec",
@@ -22,7 +22,7 @@ class CrawlType(Enum):
     CONFLUENCE = 'CONFLUENCE'
 
 
-IngestType = CrawlType
+IngestionType = CrawlType
 
 class CrawlSpec(BaseModel):
     # API token for crawling. If not set, use existing connector.

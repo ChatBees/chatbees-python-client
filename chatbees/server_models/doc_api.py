@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from chatbees.server_models.collection_api import CollectionBaseRequest
 
-__all__ = ["AnswerReference", "SearchReference", "CrawlStatus", "IngestStatus", "PageStats"]
+__all__ = ["AnswerReference", "SearchReference", "CrawlStatus", "IngestionStatus", "PageStats"]
 
 class AddDocRequest(CollectionBaseRequest):
     @classmethod
@@ -87,7 +87,7 @@ class CrawlStatus(Enum):
     SUCCEEDED = 2
     FAILED = 3
 
-IngestStatus = CrawlStatus
+IngestionStatus = CrawlStatus
 
 
 class PageStats(BaseModel):

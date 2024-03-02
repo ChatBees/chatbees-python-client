@@ -5,11 +5,16 @@ from urllib import request
 from pydantic import BaseModel
 
 from chatbees.client_models.chat import Chat
-from chatbees.server_models.doc_api import CrawlStatus, IngestStatus, AnswerReference, SearchReference
+from chatbees.server_models.doc_api import (
+    CrawlStatus,
+    IngestionStatus,
+    AnswerReference,
+    SearchReference,
+)
 from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
 from chatbees.server_models.ingestion_type import (
     WebsiteSpec,
-    IngestType,
+    IngestionType,
     NotionSpec,
     ConfluenceSpec,
     GDriveSpec, SlackSpec,
@@ -220,7 +225,7 @@ class Collection(BaseModel):
 
     def create_ingestion(
         self,
-        ingestion_type: IngestType,
+        ingestion_type: IngestionType,
         ingestion_spec: Union[
             WebsiteSpec,
             ConfluenceSpec,
@@ -251,7 +256,7 @@ class Collection(BaseModel):
         ingest_resp = CreateIngestionResponse.model_validate(resp.json())
         return ingest_resp.ingestion_id
 
-    def get_ingestion(self, ingestion_id: str) -> IngestStatus:
+    def get_ingestion(self, ingestion_id: str) -> IngestionStatus:
         """
         Gets the Ingestion task status
 
