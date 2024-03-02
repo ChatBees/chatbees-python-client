@@ -13,6 +13,7 @@ class CrawlType(Enum):
 
 IngestType = CrawlType
 
+__all__ = ["CrawlSpec", "WebsiteSpec", "ConfluenceSpec"]
 
 class CrawlSpec(BaseModel):
     # API token for crawling. If not set, use existing connector.

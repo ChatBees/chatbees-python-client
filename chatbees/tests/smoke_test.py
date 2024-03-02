@@ -6,8 +6,7 @@ import uuid
 from typing import List
 
 import chatbees as cdb
-from chatbees.server_models.doc_api import CrawlStatus
-from chatbees.client_models.doc import AnswerReference
+from chatbees.server_models.doc_api import CrawlStatus, AnswerReference
 
 
 class SmokeTest(unittest.TestCase):

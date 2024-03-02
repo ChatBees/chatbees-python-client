@@ -2,9 +2,9 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from chatbees.client_models.doc import CrawlStatus
+from chatbees.server_models.doc_api import CrawlStatus
 from chatbees.server_models.collection_api import CollectionBaseRequest
-from chatbees.server_models.crawl_type import CrawlType
+from chatbees.server_models.ingestion_type import CrawlType
 
 
 class CreateIngestionRequest(CollectionBaseRequest):

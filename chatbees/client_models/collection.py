@@ -1,13 +1,13 @@
 import os
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Any, Union
 from urllib import request
 
 from pydantic import BaseModel
 
 from chatbees.client_models.chat import Chat
-from chatbees.client_models.doc import AnswerReference, CrawlStatus, IngestStatus, SearchReference
+from chatbees.server_models.doc_api import CrawlStatus, IngestStatus, AnswerReference, SearchReference
 from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
-from chatbees.server_models.crawl_type import WebsiteSpec, IngestType, NotionSpec, ConfluenceSpec
+from chatbees.server_models.ingestion_type import WebsiteSpec, IngestType, NotionSpec, ConfluenceSpec
 from chatbees.server_models.doc_api import (
     AddDocRequest,
     DeleteDocRequest,
@@ -212,50 +212,36 @@ class Collection(BaseModel):
         crawl_resp = CreateCrawlResponse.model_validate(resp.json())
         return crawl_resp.crawl_id
 
-    def _create_ingestion(self, ingestion_type, ingestion_spec) -> str:
+    def create_ingestion(
+        self,
+        ingestion_type: IngestType,
+        ingestion_spec: Union[WebsiteSpec, ConfluenceSpec]
+    ) -> str:
+        """
+        Create an Ingestion task
+
+        :param ingestion_type: the ingestion type
+        :param ingestion_spec: the spec for the ingestion
+        :return: the id of the ingestion
+        """
         url = f'{Config.get_base_url()}/docs/create_ingestion'
         req = CreateIngestionRequest(
             namespace_name=Config.namespace,
             collection_name=self.name,
             type=ingestion_type,
-            spec=ingestion_spec)
+            spec=ingestion_spec.model_dump())
         resp = Config.post(url=url, data=req.model_dump_json())
         ingest_resp = CreateIngestionResponse.model_validate(resp.json())
         return ingest_resp.ingestion_id
 
-    def create_website_ingestion(self, root_url: str, max_urls_to_crawl) -> str:
-        """
-        Create an Ingestion task to crawl the root_url.
-
-        :param root_url: the root url to crawl
-        :param max_urls_to_crawl: the max number of urls to crawl
-        :return: the id of the ingestion
-        """
-        spec = WebsiteSpec(root_url=root_url, max_urls_to_crawl=max_urls_to_crawl)
-        return self._create_ingestion(IngestType.WEBSITE, spec)
-
-    def create_notion_ingestion(self, token: str) -> str:
-        """
-        Create an Ingestion task to crawl Notion
-
-        :param token: the authorization token returned by Notion oauth
-        :return: the id of the ingestion
-        """
-        spec = NotionSpec(token=token)
-        return self._create_ingestion(IngestType.NOTION, spec)
-
-    def create_confluence_ingestion(
-        self,
-        token: str,
-        url: str,
-        space: str,
-        user_name: Optional[str] = None
-    ) -> str:
-        spec = ConfluenceSpec(
-            token=token, url=url, space=space, user_name=user_name)
-        return self._create_ingestion(IngestType.CONFLUENCE, spec)
-
     def get_ingestion(self, ingestion_id: str) -> IngestStatus:
+        """
+        Gets the Ingestion task status
+
+        :param ingestion_id: ID of the ingestion
+        :return: Status of the ingestion task
+
+        """
         url = f'{Config.get_base_url()}/docs/get_ingestion'
         req = GetIngestionRequest(
             namespace_name=Config.namespace,
@@ -266,6 +252,12 @@ class Collection(BaseModel):
         return get_resp.ingestion_status
 
     def index_ingestion(self, ingestion_id: str):
+        """
+        Indexes the Ingested data into collection
+
+        :param ingestion_id: ID of the ingestion
+
+        """
         url = f'{Config.get_base_url()}/docs/index_ingestion'
         req = IndexIngestionRequest(
             namespace_name=Config.namespace,

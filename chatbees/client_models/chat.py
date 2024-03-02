@@ -2,7 +2,7 @@ from typing import Optional, List, Tuple
 
 from pydantic import BaseModel
 
-from chatbees.client_models.doc import AnswerReference
+from chatbees.server_models.doc_api import AnswerReference
 from chatbees.utils.ask import ask
 from chatbees.utils.config import Config
 
