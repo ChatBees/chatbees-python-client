@@ -227,12 +227,8 @@ class Collection(BaseModel):
         Create an Ingestion task
 
         :param ingestion_type: the ingestion type
-        :param ingestion_spec: the spec for the ingestion. Currently supports
-            - WebisteSpec
+        :param ingestion_spec: the spec for the ingestion. Currently, supports
             - ConfluenceSpec
-            - GDriveSpec
-            - NotionSpec
-            - SlackSpec
         :return: the id of the ingestion
         """
         url = f'{Config.get_base_url()}/docs/create_ingestion'
