@@ -13,11 +13,8 @@ from chatbees.server_models.doc_api import (
 )
 from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
 from chatbees.server_models.ingestion_type import (
-    WebsiteSpec,
     IngestionType,
-    NotionSpec,
     ConfluenceSpec,
-    GDriveSpec, SlackSpec,
 )
 from chatbees.server_models.doc_api import (
     AddDocRequest,
@@ -226,13 +223,7 @@ class Collection(BaseModel):
     def create_ingestion(
         self,
         ingestion_type: IngestionType,
-        ingestion_spec: Union[
-            WebsiteSpec,
-            ConfluenceSpec,
-            GDriveSpec,
-            NotionSpec,
-            SlackSpec,
-        ]
+        ingestion_spec: Union[ConfluenceSpec]
     ) -> str:
         """
         Create an Ingestion task
