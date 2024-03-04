@@ -21,7 +21,6 @@ class GetIngestionRequest(CollectionBaseRequest):
 
 
 class GetIngestionResponse(BaseModel):
-    ingestion_id: str
     ingestion_status: IngestionStatus
 
 
