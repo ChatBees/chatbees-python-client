@@ -99,7 +99,7 @@ class GetCrawlResponse(BaseModel):
     root_url: str
     created_on: int
     max_pages: int
-    crawl_status: IngestionStatus
+    crawl_status: CrawlStatus
     crawl_result: Optional[Dict[str, PageStats]] = None
 
 
