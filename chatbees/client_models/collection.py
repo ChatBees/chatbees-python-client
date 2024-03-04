@@ -9,7 +9,7 @@ from chatbees.server_models.doc_api import (
     IngestionStatus,
     IngestionStatus,
     AnswerReference,
-    SearchReference,
+    SearchReference, CrawlStatus,
 )
 from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
 from chatbees.server_models.ingestion_type import (
@@ -279,7 +279,7 @@ class Collection(BaseModel):
 
     def get_crawl(
         self, crawl_id: str,
-    ) -> Tuple[IngestionStatus, Dict[str, PageStats]]:
+    ) -> Tuple[CrawlStatus, Dict[str, PageStats]]:
         """
         Create a crawl task to crawl the root_url.
 
