@@ -7,7 +7,6 @@ from pydantic import BaseModel
 from chatbees.client_models.chat import Chat
 from chatbees.server_models.doc_api import (
     IngestionStatus,
-    IngestionStatus,
     AnswerReference,
     SearchReference, CrawlStatus,
 )
