@@ -7,8 +7,8 @@ from typing import List
 
 # Only import from chatbees module to make sure classes are exported correctly
 import chatbees as cdb
-from chatbees import Collection, IngestionType, WebsiteSpec, SlackSpec, NotionSpec
-from chatbees import CrawlStatus, AnswerReference
+from chatbees import Collection, IngestionType
+from chatbees import IngestionStatus, AnswerReference
 from chatbees import IngestionStatus
 
 
@@ -166,11 +166,11 @@ class SmokeTest(unittest.TestCase):
             waits = 0
             while waits < max_waits:
                 status, pages = col.get_crawl(crawl_id)
-                if status != CrawlStatus.RUNNING:
+                if status != IngestionStatus.RUNNING:
                     break
                 time.sleep(2)
 
-            assert status == CrawlStatus.SUCCEEDED
+            assert status == IngestionStatus.SUCCEEDED
             assert 3 == len(pages)
 
             col.index_crawl(crawl_id)
@@ -201,6 +201,7 @@ class SmokeTest(unittest.TestCase):
             time.sleep(10)
         col.index_ingestion(ingestion_id)
 
+    """
     def test_ingestion_api(self):
         owner = self.apikey1
         cdb.init(owner)
@@ -208,9 +209,9 @@ class SmokeTest(unittest.TestCase):
 
         # Run some basic ingest tests
         slack_token = os.getenv('ENV_SLACK_TEST_TOKEN', None)
-        assert  slack_token is not None, "A test slack token is required"
+        assert slack_token is not None, "A test slack token is required"
         notion_token = os.getenv('ENV_NOTION_TEST_TOKEN', None)
-        assert  notion_token is not None, "A test notion token is required"
+        assert notion_token is not None, "A test notion token is required"
 
         try:
             root_url = 'https://www.openai.com'
@@ -225,3 +226,5 @@ class SmokeTest(unittest.TestCase):
 
         finally:
             cdb.delete_collection(col.name)
+
+    """

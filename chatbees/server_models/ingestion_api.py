@@ -2,13 +2,13 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from chatbees.server_models.doc_api import CrawlStatus
+from chatbees.server_models.doc_api import IngestionStatus
 from chatbees.server_models.collection_api import CollectionBaseRequest
-from chatbees.server_models.ingestion_type import CrawlType
+from chatbees.server_models.ingestion_type import IngestionType
 
 
 class CreateIngestionRequest(CollectionBaseRequest):
-    type: CrawlType
+    type: IngestionType
     spec: Any
 
 
@@ -22,7 +22,7 @@ class GetIngestionRequest(CollectionBaseRequest):
 
 class GetIngestionResponse(BaseModel):
     ingestion_id: str
-    ingestion_status: CrawlStatus
+    ingestion_status: IngestionStatus
 
 
 class IndexIngestionRequest(CollectionBaseRequest):

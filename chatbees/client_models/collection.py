@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from chatbees.client_models.chat import Chat
 from chatbees.server_models.doc_api import (
-    CrawlStatus,
+    IngestionStatus,
     IngestionStatus,
     AnswerReference,
     SearchReference,
@@ -290,7 +290,7 @@ class Collection(BaseModel):
     # deprecated. Please use get_ingestion function
     def get_crawl(
         self, crawl_id: str,
-    ) -> Tuple[CrawlStatus, Dict[str, PageStats]]:
+    ) -> Tuple[IngestionStatus, Dict[str, PageStats]]:
         """
         Create a crawl task to crawl the root_url.
 

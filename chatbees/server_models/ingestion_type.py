@@ -5,48 +5,21 @@ from pydantic import BaseModel
 
 
 __all__ = [
-    "CrawlType",
     "IngestionType",
-    "CrawlSpec",
-    "SlackSpec",
-    "NotionSpec",
-    "GDriveSpec",
-    "WebsiteSpec",
+    "IngestionSpec",
     "ConfluenceSpec",
 ]
 
-class CrawlType(Enum):
-    WEBSITE = 'WEBSITE'
-    SLACK = 'SLACK'
-    NOTION = 'NOTION'
+class IngestionType(Enum):
     CONFLUENCE = 'CONFLUENCE'
 
 
-IngestionType = CrawlType
-
-class CrawlSpec(BaseModel):
+class IngestionSpec(BaseModel):
     # API token for crawling. If not set, use existing connector.
     token: Optional[str] = None
 
 
-class SlackSpec(CrawlSpec):
-    channels: Optional[List[str]] = None
-
-
-class NotionSpec(CrawlSpec):
-    page_ids: Optional[List[str]] = None
-
-
-class GDriveSpec(CrawlSpec):
-    folder_name: Optional[str] = None
-
-
-class WebsiteSpec(CrawlSpec):
-    root_url: str
-    max_urls_to_crawl: int = 200
-
-
-class ConfluenceSpec(CrawlSpec):
+class ConfluenceSpec(IngestionSpec):
     url: str
     space: str
     username: Optional[str] = None
