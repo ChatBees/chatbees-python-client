@@ -200,7 +200,6 @@ class Collection(BaseModel):
             doc_name=doc_name
         )
 
-    # deprecated. Please use create_website_ingestion function
     def create_crawl(self, root_url: str, max_urls_to_crawl: int) -> str:
         """
         Create a crawl task to crawl the root_url.
@@ -278,7 +277,6 @@ class Collection(BaseModel):
             ingestion_id=ingestion_id)
         Config.post(url=url, data=req.model_dump_json())
 
-    # deprecated. Please use get_ingestion function
     def get_crawl(
         self, crawl_id: str,
     ) -> Tuple[IngestionStatus, Dict[str, PageStats]]:
@@ -300,7 +298,6 @@ class Collection(BaseModel):
         crawl_resp = GetCrawlResponse.model_validate(resp.json())
         return crawl_resp.crawl_status, crawl_resp.crawl_result
 
-    # deprecated. Please use index_ingestion function
     def index_crawl(self, crawl_id: str):
 
         """
