@@ -14,12 +14,13 @@ from chatbees.server_models.doc_api import (
     SummaryResponse,
     ListDocsResponse,
 )
+from chatbees.utils.config import Config
 
 
 class APISurfaceTest(unittest.TestCase):
     API_KEY = 'fakeapikey'
     NAMESPACE = 'fakenamespace'
-    API_ENDPOINT = 'https://public.us-west-2.aws.chatbees.ai'
+    API_ENDPOINT = Config.get_base_url()
 
     def setUp(self):
         cdb.init(api_key=APISurfaceTest.API_KEY, namespace=APISurfaceTest.NAMESPACE)

@@ -1,13 +1,15 @@
-import io
 import os
 import time
 import unittest
 import uuid
 from typing import List
 
+
+# Only import from chatbees module to make sure classes are exported correctly
 import chatbees as cdb
-from chatbees.server_models.doc_api import CrawlStatus
-from chatbees.client_models.doc import AnswerReference
+from chatbees import Collection, IngestionType
+from chatbees import IngestionStatus, AnswerReference
+from chatbees import IngestionStatus
 
 
 class SmokeTest(unittest.TestCase):
@@ -164,11 +166,11 @@ class SmokeTest(unittest.TestCase):
             waits = 0
             while waits < max_waits:
                 status, pages = col.get_crawl(crawl_id)
-                if status != CrawlStatus.RUNNING:
+                if status != IngestionStatus.RUNNING:
                     break
                 time.sleep(2)
 
-            assert status == CrawlStatus.SUCCEEDED
+            assert status == IngestionStatus.SUCCEEDED
             assert 3 == len(pages)
 
             col.index_crawl(crawl_id)
@@ -180,3 +182,49 @@ class SmokeTest(unittest.TestCase):
             assert 0 == len(list_doc_names)
         finally:
             cdb.delete_collection(col.name)
+
+    def _synchronous_ingest(
+        self,
+        col: Collection,
+        ingestion_type: IngestionType,
+        ingestion_spec
+    ):
+        retry = 30
+        ingestion_id = col.create_ingestion(ingestion_type, ingestion_spec)
+        while retry > 0:
+            retry -= 1
+            status = col.get_ingestion(ingestion_id)
+            if status == IngestionStatus.FAILED:
+                raise RuntimeError(f"Unexpected ingestion failure {status}")
+            if status == IngestionStatus.SUCCEEDED:
+                break
+            time.sleep(10)
+        col.index_ingestion(ingestion_id)
+
+    """
+    def test_ingestion_api(self):
+        owner = self.apikey1
+        cdb.init(owner)
+        col = self.create_collection()
+
+        # Run some basic ingest tests
+        slack_token = os.getenv('ENV_SLACK_TEST_TOKEN', None)
+        assert slack_token is not None, "A test slack token is required"
+        notion_token = os.getenv('ENV_NOTION_TEST_TOKEN', None)
+        assert notion_token is not None, "A test notion token is required"
+
+        try:
+            root_url = 'https://www.openai.com'
+            self._synchronous_ingest(
+                col, IngestionType.WEBSITE, WebsiteSpec(
+                    root_url=root_url, max_urls_to_crawl=1
+            ))
+            self._synchronous_ingest(
+                col, IngestionType.SLACK, SlackSpec(token=slack_token))
+            self._synchronous_ingest(
+                col, IngestionType.NOTION, NotionSpec(token=notion_token))
+
+        finally:
+            cdb.delete_collection(col.name)
+
+    """

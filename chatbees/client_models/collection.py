@@ -1,12 +1,20 @@
 import os
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any, Union
 from urllib import request
 
 from pydantic import BaseModel
 
 from chatbees.client_models.chat import Chat
-from chatbees.client_models.doc import AnswerReference
+from chatbees.server_models.doc_api import (
+    IngestionStatus,
+    AnswerReference,
+    SearchReference, CrawlStatus,
+)
 from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
+from chatbees.server_models.ingestion_type import (
+    IngestionType,
+    ConfluenceSpec,
+)
 from chatbees.server_models.doc_api import (
     AddDocRequest,
     DeleteDocRequest,
@@ -18,7 +26,6 @@ from chatbees.server_models.doc_api import (
     CreateCrawlResponse,
     GetCrawlRequest,
     GetCrawlResponse,
-    CrawlStatus,
     PageStats,
     IndexCrawlRequest,
     DeleteCrawlRequest,
@@ -26,6 +33,12 @@ from chatbees.server_models.doc_api import (
 from chatbees.server_models.collection_api import (
     DescribeCollectionResponse,
 )
+from chatbees.server_models.ingestion_api import (
+    CreateIngestionRequest,
+    CreateIngestionResponse,
+    GetIngestionRequest, GetIngestionResponse, IndexIngestionRequest,
+)
+from chatbees.server_models.search_api import SearchRequest, SearchResponse
 from chatbees.utils.ask import ask
 from chatbees.utils.config import Config
 from chatbees.utils.file_upload import (
@@ -141,6 +154,38 @@ class Collection(BaseModel):
         """
         return ask(Config.namespace, self.name, question, top_k, doc_name, prompt)
 
+    def search(self, question: str, top_k: int = 5) -> List[SearchReference]:
+        """
+        Semantic search
+
+        :param question: Question in plain text.
+        :param top_k: the top k relevant contexts to get answer from.
+        :return: A list of most relevant document references in the collection
+        """
+        url = f'{Config.get_base_url()}/docs/search'
+
+        req = SearchRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            question=question,
+            top_k=top_k
+        )
+
+        resp = Config.post(
+            url=url,
+            data=req.model_dump_json(),
+            enforce_api_key=False
+        )
+        resp = SearchResponse.model_validate(resp.json())
+
+        return [
+            SearchReference(
+                doc_name=ref.doc_name,
+                page_num=ref.page_num,
+                sample_text=ref.sample_text
+            ) for ref in resp.refs
+        ]
+
     def chat(self, doc_name: str = None) -> Chat:
         """
         Creates a new chatbot within the collection.
@@ -173,6 +218,60 @@ class Collection(BaseModel):
         crawl_resp = CreateCrawlResponse.model_validate(resp.json())
         return crawl_resp.crawl_id
 
+    def create_ingestion(
+        self,
+        ingestion_type: IngestionType,
+        ingestion_spec: Union[ConfluenceSpec]
+    ) -> str:
+        """
+        Create an Ingestion task
+
+        :param ingestion_type: the ingestion type
+        :param ingestion_spec: the spec for the ingestion. Currently, supports
+            - ConfluenceSpec
+        :return: the id of the ingestion
+        """
+        url = f'{Config.get_base_url()}/docs/create_ingestion'
+        req = CreateIngestionRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            type=ingestion_type,
+            spec=ingestion_spec.model_dump())
+        resp = Config.post(url=url, data=req.model_dump_json())
+        ingest_resp = CreateIngestionResponse.model_validate(resp.json())
+        return ingest_resp.ingestion_id
+
+    def get_ingestion(self, ingestion_id: str) -> IngestionStatus:
+        """
+        Gets the Ingestion task status
+
+        :param ingestion_id: ID of the ingestion
+        :return: Status of the ingestion task
+
+        """
+        url = f'{Config.get_base_url()}/docs/get_ingestion'
+        req = GetIngestionRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            ingestion_id=ingestion_id)
+        resp = Config.post(url=url, data=req.model_dump_json())
+        get_resp = GetIngestionResponse.model_validate(resp.json())
+        return get_resp.ingestion_status
+
+    def index_ingestion(self, ingestion_id: str):
+        """
+        Indexes the Ingested data into collection
+
+        :param ingestion_id: ID of the ingestion
+
+        """
+        url = f'{Config.get_base_url()}/docs/index_ingestion'
+        req = IndexIngestionRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            ingestion_id=ingestion_id)
+        Config.post(url=url, data=req.model_dump_json())
+
     def get_crawl(
         self, crawl_id: str,
     ) -> Tuple[CrawlStatus, Dict[str, PageStats]]:
@@ -195,6 +294,7 @@ class Collection(BaseModel):
         return crawl_resp.crawl_status, crawl_resp.crawl_result
 
     def index_crawl(self, crawl_id: str):
+
         """
         Index the crawled pages.
 
