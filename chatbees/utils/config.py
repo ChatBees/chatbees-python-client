@@ -22,6 +22,7 @@ class Config:
         if ENV_TEST_BASE_URL != "":
             return ENV_TEST_BASE_URL
         return f"https://{cls.account_id}.us-west-2.aws.chatbees.ai"
+        #return f"https://{cls.account_id}.preprod.aws.chatbees.ai"
 
     @classmethod
     def post(cls, url, data=None, files=None, enforce_api_key=True):
