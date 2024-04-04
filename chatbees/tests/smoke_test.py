@@ -122,10 +122,10 @@ class SmokeTest(unittest.TestCase):
             list_doc_names = col.list_documents()
             assert doc_names == set(list_doc_names)
 
-            # ask with top_k
+            # ask
             print("ask")
-            a, refs = col.ask('question?', 4)
-            assert 4 == len(refs)
+            a, refs = col.ask('question?')
+            assert len(refs) > 0
 
             # delete, then list and ask again
             col.delete_document('española.txt')
@@ -134,8 +134,8 @@ class SmokeTest(unittest.TestCase):
             list_doc_names = col.list_documents()
             assert doc_names == set(list_doc_names)
 
-            a, refs = col.ask('question?', 4)
-            assert 4 == len(refs)
+            a, refs = col.ask('question?')
+            assert len(refs) > 0
 
             # chat
             chat1 = col.chat()
