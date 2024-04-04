@@ -8,6 +8,7 @@ from chatbees.utils.config import Config
 
 from chatbees.server_models.collection_api import (
     CreateCollectionRequest,
+    ConfigureCollectionRequest,
     ListCollectionsRequest,
     ListCollectionsResponse,
     DeleteCollectionRequest,
@@ -18,6 +19,7 @@ from chatbees.server_models.collection_api import (
 __all__ = [
     "create_collection",
     "collection",
+    "configure_collection",
     "list_collections",
     "delete_collection",
     "describe_collection",
@@ -55,6 +57,27 @@ def collection(collection_name: str) -> Collection:
         Collection: The collection object.
     """
     return Collection(name=collection_name)
+
+
+def configure_collection(
+    collection_name: str, public_read: bool = None, description: str = None):
+    """
+    Configure a collection.
+
+    Args:
+        collection_name (str): The name of the collection.
+        public_read (bool): Enable/disable public_read for the collection.
+        description (str): Update the description for the collection.
+    """
+    req = ConfigureCollectionRequest(
+        namespace_name=Config.namespace,
+        collection_name=collection_name)
+    if public_read is not None:
+        req.public_read = public_read
+    if description is not None:
+        req.description = description
+    url = f'{Config.get_base_url()}/collections/configure'
+    Config.post(url=url, data=req.model_dump_json())
 
 
 def list_collections() -> List[str]:

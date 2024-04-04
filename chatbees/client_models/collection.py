@@ -6,14 +6,17 @@ from pydantic import BaseModel
 
 from chatbees.client_models.chat import Chat
 from chatbees.server_models.doc_api import (
+    CrawlStatus,
     IngestionStatus,
     AnswerReference,
-    SearchReference, CrawlStatus,
+    SearchReference,
 )
 from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
 from chatbees.server_models.ingestion_type import (
     IngestionType,
     ConfluenceSpec,
+    GDriveSpec,
+    NotionSpec,
 )
 from chatbees.server_models.doc_api import (
     AddDocRequest,
@@ -221,7 +224,7 @@ class Collection(BaseModel):
     def create_ingestion(
         self,
         ingestion_type: IngestionType,
-        ingestion_spec: Union[ConfluenceSpec]
+        ingestion_spec: Union[ConfluenceSpec, GDriveSpec, NotionSpec]
     ) -> str:
         """
         Create an Ingestion task
@@ -229,6 +232,8 @@ class Collection(BaseModel):
         :param ingestion_type: the ingestion type
         :param ingestion_spec: the spec for the ingestion. Currently, supports
             - ConfluenceSpec
+            - GDriveSpec
+            - NotionSpec
         :return: the id of the ingestion
         """
         url = f'{Config.get_base_url()}/docs/create_ingestion'
