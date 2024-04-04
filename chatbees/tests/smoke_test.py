@@ -87,6 +87,16 @@ class SmokeTest(unittest.TestCase):
         cdb.init(api_key=None)
         col.ask('should not fail')
 
+        cdb.init(owner)
+        cdb.configure_collection(collection_name=col.name, public_read=False)
+        cdb.init(api_key=None)
+        self.assertRaises(cdb.UnAuthorized, col.ask, 'should fail')
+
+        cdb.init(owner)
+        cdb.configure_collection(collection_name=col.name, public_read=True)
+        cdb.init(api_key=None)
+        col.ask('should not fail')
+
     def test_doc_apis(self):
         owner = self.apikey1
         cdb.init(owner)

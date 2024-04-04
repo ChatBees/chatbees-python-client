@@ -15,6 +15,12 @@ class CreateCollectionRequest(CollectionBaseRequest):
     public_read: Optional[bool] = None
 
 
+class ConfigureCollectionRequest(CollectionBaseRequest):
+    description: Optional[str] = None
+    # whether the collection is publicly readable
+    public_read: Optional[bool] = None
+
+
 class DeleteCollectionRequest(CollectionBaseRequest):
     pass
 
