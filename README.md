@@ -1,15 +1,14 @@
 # chatbees-python-client
 Python client for [ChatBees](http://www.chatbees.ai), a Serverless Platform for your LLM Apps. ChatBees provides simple and scalable APIs, enabling you to craft a LLM app for your knowledge base in mere minutes.
 
-ChatBees is currently in <ins>**public alpha**</ins>. We're actively improving 
-the product and releasing new features, and we'd love to hear your feedback! 
+We're actively improving the product and releasing new features, and we'd love to hear your feedback!
 Please take a moment to fill out this [feedback form](https://forms.gle/pif6Vx2LqPjW5v4w5) to help us understand your use-case better.
 
 Signup with your google account on https://www.chatbees.ai. You could also try it out in ChatBees public account without signup.
 
 > For the public account, by default, all collections are subject to permanent deletion after 2 weeks. Please let us know if you need to keep it for longer via the feedback form.
 
-ChatBees python client provides very simple APIs for you to directly upload files and ask questions.
+ChatBees python client provides very simple APIs for you to directly upload files, crawl websites, ingest data sources including Confluence, Notion and Google Drive. Then you can simply ask questions.
 
 
 ## Quickstart
