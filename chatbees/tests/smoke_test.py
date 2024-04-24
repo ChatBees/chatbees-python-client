@@ -7,7 +7,7 @@ from typing import List
 
 # Only import from chatbees module to make sure classes are exported correctly
 import chatbees as cdb
-from chatbees import Collection, IngestionType
+from chatbees import Collection, IngestionType, NotionSpec, ConfluenceSpec
 from chatbees import IngestionStatus, AnswerReference
 from chatbees import IngestionStatus
 
@@ -218,22 +218,18 @@ class SmokeTest(unittest.TestCase):
         col = self.create_collection()
 
         # Run some basic ingest tests
-        slack_token = os.getenv('ENV_SLACK_TEST_TOKEN', None)
-        assert slack_token is not None, "A test slack token is required"
         notion_token = os.getenv('ENV_NOTION_TEST_TOKEN', None)
         assert notion_token is not None, "A test notion token is required"
 
         try:
-            root_url = 'https://www.openai.com'
-            self._synchronous_ingest(
-                col, IngestionType.WEBSITE, WebsiteSpec(
-                    root_url=root_url, max_urls_to_crawl=1
-            ))
-            self._synchronous_ingest(
-                col, IngestionType.SLACK, SlackSpec(token=slack_token))
             self._synchronous_ingest(
                 col, IngestionType.NOTION, NotionSpec(token=notion_token))
+            # connect to confluence first
+            self._synchronous_ingest(
+                col, IngestionType.CONFLUENCE, ConfluenceSpec(space='TestSpace'))
 
+            col.delete_ingestion(IngestionType.NOTION)
+            col.delete_ingestion(IngestionType.CONFLUENCE)
         finally:
             cdb.delete_collection(col.name)
 

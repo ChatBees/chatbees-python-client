@@ -39,7 +39,10 @@ from chatbees.server_models.collection_api import (
 from chatbees.server_models.ingestion_api import (
     CreateIngestionRequest,
     CreateIngestionResponse,
-    GetIngestionRequest, GetIngestionResponse, IndexIngestionRequest,
+    GetIngestionRequest,
+    GetIngestionResponse,
+    IndexIngestionRequest,
+    DeleteIngestionRequest,
 )
 from chatbees.server_models.search_api import SearchRequest, SearchResponse
 from chatbees.utils.ask import ask
@@ -275,6 +278,20 @@ class Collection(BaseModel):
             namespace_name=Config.namespace,
             collection_name=self.name,
             ingestion_id=ingestion_id)
+        Config.post(url=url, data=req.model_dump_json())
+
+    def delete_ingestion(self, ingestion_type: IngestionType):
+        """
+        Delete all ingested data from the collection for an ingestion type,
+        e.g. a data source.
+
+        :param ingestion_type: the ingestion type
+        """
+        url = f'{Config.get_base_url()}/docs/delete_ingestion'
+        req = DeleteIngestionRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            type=ingestion_type)
         Config.post(url=url, data=req.model_dump_json())
 
     def get_crawl(

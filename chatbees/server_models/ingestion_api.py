@@ -27,3 +27,6 @@ class GetIngestionResponse(BaseModel):
 class IndexIngestionRequest(CollectionBaseRequest):
     ingestion_id: str
 
+
+class DeleteIngestionRequest(CollectionBaseRequest):
+    type: IngestionType
