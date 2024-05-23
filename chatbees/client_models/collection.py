@@ -44,6 +44,8 @@ from chatbees.server_models.ingestion_api import (
     GetIngestionResponse,
     IndexIngestionRequest,
     DeleteIngestionRequest,
+    UpdatePeriodicIngestionRequest,
+    DeletePeriodicIngestionRequest,
 )
 from chatbees.server_models.search_api import SearchRequest, SearchResponse
 from chatbees.utils.ask import ask
@@ -206,6 +208,8 @@ class Collection(BaseModel):
             doc_name=doc_name
         )
 
+    # TODO support update ScheduleSpec for periodic crawl.
+    # TODO deprecate crawl apis and switch to ingest apis.
     def create_crawl(
         self, root_url: str, max_urls_to_crawl: int, schedule: ScheduleSpec = None,
     ) -> str:
@@ -253,6 +257,29 @@ class Collection(BaseModel):
         ingest_resp = CreateIngestionResponse.model_validate(resp.json())
         return ingest_resp.ingestion_id
 
+    def update_periodic_ingestion(
+        self,
+        ingestion_type: IngestionType,
+        ingestion_spec: Union[ConfluenceSpec, GDriveSpec, NotionSpec]
+    ):
+        """
+        Update the periodic ingestion.
+
+        :param ingestion_type: the ingestion type
+        :param ingestion_spec: the spec for the ingestion. Currently, supports
+            - ConfluenceSpec
+            - GDriveSpec
+            - NotionSpec
+        :return: the id of the ingestion
+        """
+        url = f'{Config.get_base_url()}/docs/update_periodic_ingestion'
+        req = UpdatePeriodicIngestionRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            type=ingestion_type,
+            spec=ingestion_spec.model_dump())
+        Config.post(url=url, data=req.model_dump_json())
+
     def get_ingestion(self, ingestion_id: str) -> IngestionStatus:
         """
         Gets the Ingestion task status
@@ -293,6 +320,20 @@ class Collection(BaseModel):
         """
         url = f'{Config.get_base_url()}/docs/delete_ingestion'
         req = DeleteIngestionRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            type=ingestion_type)
+        Config.post(url=url, data=req.model_dump_json())
+
+    def delete_periodic_ingestion(self, ingestion_type: IngestionType):
+        """
+        Delete the periodic ingestion for an ingestion type, e.g. a data source.
+        This does not delete the ingested data.
+
+        :param ingestion_type: the ingestion type
+        """
+        url = f'{Config.get_base_url()}/docs/delete_periodic_ingestion'
+        req = DeletePeriodicIngestionRequest(
             namespace_name=Config.namespace,
             collection_name=self.name,
             type=ingestion_type)

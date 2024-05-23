@@ -30,3 +30,12 @@ class IndexIngestionRequest(CollectionBaseRequest):
 
 class DeleteIngestionRequest(CollectionBaseRequest):
     type: IngestionType
+
+
+class UpdatePeriodicIngestionRequest(CollectionBaseRequest):
+    type: IngestionType
+    spec: Any
+
+
+class DeletePeriodicIngestionRequest(CollectionBaseRequest):
+    type: IngestionType
