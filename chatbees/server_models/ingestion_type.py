@@ -7,13 +7,27 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 __all__ = [
-    "ScheduleSpec",
     "IngestionType",
+    "IngestionStatus",
+    "ScheduleSpec",
     "IngestionSpec",
     "ConfluenceSpec",
     "GDriveSpec",
     "NotionSpec",
 ]
+
+
+class IngestionType(Enum):
+    CONFLUENCE = 'CONFLUENCE'
+    GDRIVE = 'GDRIVE'
+    NOTION = 'NOTION'
+
+
+class IngestionStatus(Enum):
+    RUNNING = 1
+    SUCCEEDED = 2
+    FAILED = 3
+
 
 class ScheduleSpec(BaseModel):
     # same format with cron, like '0 0 * * 0' means midnight every Sunday
@@ -41,12 +55,6 @@ class ScheduleSpec(BaseModel):
         except Exception as e:
             raise ValueError("Invalid cron string")
         return self
-
-
-class IngestionType(Enum):
-    CONFLUENCE = 'CONFLUENCE'
-    GDRIVE = 'GDRIVE'
-    NOTION = 'NOTION'
 
 
 class IngestionSpec(BaseModel):

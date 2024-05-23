@@ -7,13 +7,13 @@ from pydantic import BaseModel
 from chatbees.client_models.chat import Chat
 from chatbees.server_models.doc_api import (
     CrawlStatus,
-    IngestionStatus,
     AnswerReference,
     SearchReference,
 )
-from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
+from chatbees.server_models.chat import ConfigureChatRequest
 from chatbees.server_models.ingestion_type import (
     IngestionType,
+    IngestionStatus,
     ScheduleSpec,
     ConfluenceSpec,
     GDriveSpec,
@@ -35,6 +35,7 @@ from chatbees.server_models.doc_api import (
     DeleteCrawlRequest,
 )
 from chatbees.server_models.collection_api import (
+    ChatAttributes,
     DescribeCollectionResponse,
 )
 from chatbees.server_models.ingestion_api import (

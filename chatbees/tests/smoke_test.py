@@ -7,9 +7,14 @@ from typing import List
 
 # Only import from chatbees module to make sure classes are exported correctly
 import chatbees as cdb
-from chatbees import Collection, IngestionType, NotionSpec, ConfluenceSpec
-from chatbees import IngestionStatus, AnswerReference
-from chatbees import IngestionStatus
+from chatbees import (
+    Collection,
+    IngestionType,
+    IngestionStatus,
+    NotionSpec,
+    ConfluenceSpec,
+    AnswerReference,
+)
 
 
 class SmokeTest(unittest.TestCase):

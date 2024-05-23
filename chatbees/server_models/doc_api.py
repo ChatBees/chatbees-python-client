@@ -5,13 +5,12 @@ from typing import List, Optional, Tuple, Dict
 from pydantic import BaseModel
 
 from chatbees.server_models.collection_api import CollectionBaseRequest
-from chatbees.server_models.ingestion_type import ScheduleSpec
+from chatbees.server_models.ingestion_type import IngestionStatus, ScheduleSpec
 
 __all__ = [
     "AnswerReference",
     "SearchReference",
     "CrawlStatus",
-    "IngestionStatus",
     "PageStats",
 ]
 
@@ -93,11 +92,6 @@ class DeleteCrawlResponse(BaseModel):
 class GetCrawlRequest(CollectionBaseRequest):
     crawl_id: str
 
-
-class IngestionStatus(Enum):
-    RUNNING = 1
-    SUCCEEDED = 2
-    FAILED = 3
 
 CrawlStatus = IngestionStatus
 
