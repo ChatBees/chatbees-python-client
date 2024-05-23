@@ -5,8 +5,15 @@ from typing import List, Optional, Tuple, Dict
 from pydantic import BaseModel
 
 from chatbees.server_models.collection_api import CollectionBaseRequest
+from chatbees.server_models.ingestion_type import ScheduleSpec
 
-__all__ = ["AnswerReference", "SearchReference", "CrawlStatus","IngestionStatus", "PageStats"]
+__all__ = [
+    "AnswerReference",
+    "SearchReference",
+    "CrawlStatus",
+    "IngestionStatus",
+    "PageStats",
+]
 
 class AddDocRequest(CollectionBaseRequest):
     @classmethod
@@ -63,6 +70,11 @@ class SummaryResponse(BaseModel):
 class CreateCrawlRequest(CollectionBaseRequest):
     root_url: str
     max_urls_to_crawl: int = 200
+    # periodical crawl scheduling. run once if None.
+    # Only support one schedule for one collection. If a collection crawls
+    # multiple root_urls, can only specify schedule for one root_url. The old
+    # schedule will be automatically overridden.
+    schedule: Optional[ScheduleSpec] = None
 
 
 class CreateCrawlResponse(BaseModel):

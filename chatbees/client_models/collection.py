@@ -14,6 +14,7 @@ from chatbees.server_models.doc_api import (
 from chatbees.server_models.chat import ConfigureChatRequest, ChatAttributes
 from chatbees.server_models.ingestion_type import (
     IngestionType,
+    ScheduleSpec,
     ConfluenceSpec,
     GDriveSpec,
     NotionSpec,
@@ -205,7 +206,9 @@ class Collection(BaseModel):
             doc_name=doc_name
         )
 
-    def create_crawl(self, root_url: str, max_urls_to_crawl: int) -> str:
+    def create_crawl(
+        self, root_url: str, max_urls_to_crawl: int, schedule: ScheduleSpec = None,
+    ) -> str:
         """
         Create a crawl task to crawl the root_url.
 
@@ -219,6 +222,7 @@ class Collection(BaseModel):
             collection_name=self.name,
             root_url=root_url,
             max_urls_to_crawl=max_urls_to_crawl,
+            schedule=schedule,
         )
         resp = Config.post(url=url, data=req.model_dump_json())
         crawl_resp = CreateCrawlResponse.model_validate(resp.json())
