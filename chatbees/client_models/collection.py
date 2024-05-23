@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Tuple, Any, Union
+from typing import List, Dict, Tuple, Any, Union, Optional
 from urllib import request
 
 from pydantic import BaseModel
@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from chatbees.client_models.chat import Chat
 from chatbees.server_models.doc_api import (
     CrawlStatus,
-    AnswerReference,
+    AskResponse,
     SearchReference,
 )
 from chatbees.server_models.chat import ConfigureChatRequest
@@ -36,6 +36,7 @@ from chatbees.server_models.doc_api import (
 )
 from chatbees.server_models.collection_api import (
     ChatAttributes,
+    PeriodicIngest,
     DescribeCollectionResponse,
 )
 from chatbees.server_models.ingestion_api import (
@@ -49,6 +50,10 @@ from chatbees.server_models.ingestion_api import (
     DeletePeriodicIngestionRequest,
 )
 from chatbees.server_models.search_api import SearchRequest, SearchResponse
+from chatbees.server_models.feedback_api import (
+    UnregisteredUser,
+    CreateOrUpdateFeedbackRequest,
+)
 from chatbees.utils.ask import ask
 from chatbees.utils.config import Config
 from chatbees.utils.file_upload import (
@@ -73,6 +78,10 @@ class Collection(BaseModel):
 
     # If true, collection can be read without an API key
     public_read: bool = False
+
+    chat_attributes: Optional[ChatAttributes] = None
+
+    periodic_ingests: Optional[List[PeriodicIngest]] = None
 
     def upload_document(self, path_or_url: str):
         """
@@ -150,7 +159,7 @@ class Collection(BaseModel):
 
     def ask(
         self, question: str, top_k: int = 5, doc_name: str = None,
-    ) -> (str, List[AnswerReference]):
+    ) -> AskResponse:
         """
         Ask a question within the context of this collection.
 
@@ -236,7 +245,7 @@ class Collection(BaseModel):
     def create_ingestion(
         self,
         ingestion_type: IngestionType,
-        ingestion_spec: Union[ConfluenceSpec, GDriveSpec, NotionSpec]
+        ingestion_spec: Union[ConfluenceSpec, GDriveSpec, NotionSpec],
     ) -> str:
         """
         Create an Ingestion task
@@ -419,6 +428,36 @@ class Collection(BaseModel):
         url = f'{Config.get_base_url()}/docs/configure_chat'
         Config.post(url=url, data=req.model_dump_json())
 
+        # update the local chat attributes
+        self.chat_attributes = req.chat_attributes
+
+    def create_or_update_feedback(
+        self,
+        request_id: str,
+        thumb_down: bool,
+        text_feedback: str = "",
+        unregistered_user: UnregisteredUser = None,
+    ):
+        """
+        Provides feedback for the ask or search.
+
+        :param request_id: the request_id of the ask or search
+        :param thumb_down: thumb up or down
+        :param text_feedback: optional text feedback
+        :param unregistered_user: optional information of the unregistered user
+        """
+        url = f'{Config.get_base_url()}/feedback/create_or_update'
+        req = CreateOrUpdateFeedbackRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            request_id=request_id,
+            thumb_down=thumb_down,
+            text_feedback=text_feedback,
+            unregistered_user=unregistered_user,
+        )
+        print(req.model_dump_json())
+        Config.post(url=url, data=req.model_dump_json())
+
 def describe_response_to_collection(
     collection_name: str,
     resp: DescribeCollectionResponse
@@ -432,5 +471,7 @@ def describe_response_to_collection(
     return Collection(
         name=collection_name,
         description=description,
-        public_read=public_read
+        public_read=public_read,
+        chat_attributes=resp.chat_attributes,
+        periodic_ingests=resp.periodic_ingests,
     )

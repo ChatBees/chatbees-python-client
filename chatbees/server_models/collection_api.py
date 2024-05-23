@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 from pydantic import BaseModel
 
 from chatbees.server_models.ingestion_type import IngestionType, IngestionStatus

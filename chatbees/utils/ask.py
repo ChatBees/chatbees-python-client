@@ -11,7 +11,8 @@ def ask(
     top_k: int = 5,
     doc_name: str = None,
     history_messages: List[Tuple[str, str]] = None,
-) -> (str, List[AnswerReference]):
+    conversation_id: str = None,
+) -> AskResponse:
     url = f'{Config.get_base_url()}/docs/ask'
 
     req = AskRequest(
@@ -21,6 +22,7 @@ def ask(
         top_k=top_k,
         doc_name=doc_name,
         history_messages=history_messages,
+        conversation_id=conversation_id,
     )
 
     resp = Config.post(
@@ -28,11 +30,4 @@ def ask(
         data=req.model_dump_json(),
         enforce_api_key=False
     )
-    resp = AskResponse.model_validate(resp.json())
-
-    return (
-        resp.answer,
-        [AnswerReference(doc_name=ref.doc_name,
-                         page_num=ref.page_num,
-                         sample_text=ref.sample_text) for ref in resp.refs]
-    )
+    return AskResponse.model_validate(resp.json())

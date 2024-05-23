@@ -14,6 +14,9 @@ from chatbees.server_models.doc_api import (
     SummaryResponse,
     ListDocsResponse,
 )
+from chatbees.server_models.ingestion_api import (
+    CreateIngestionResponse,
+)
 from chatbees.utils.config import Config
 
 
@@ -105,7 +108,7 @@ class APISurfaceTest(unittest.TestCase):
             return request.text == (
                 '{"namespace_name":"fakenamespace","collection_name":"fakename",'
                 '"question":"what is the meaning of life?","top_k":5,'
-                '"doc_name":null,"history_messages":null}')
+                '"doc_name":null,"history_messages":null,"conversation_id":null}')
 
         mock.register_uri(
             'POST',
@@ -114,19 +117,21 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
             text=AskResponse(
                 answer='42',
-                refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")]
+                refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")],
+                request_id='id1',
+                conversation_id='id1',
             ).model_dump_json(),
         )
 
-        answer, _ = cdb.collection('fakename').ask(
-            "what is the meaning of life?")
-        assert answer == '42'
+        resp = cdb.collection('fakename').ask("what is the meaning of life?")
+        assert resp.answer == '42'
+        assert resp.request_id == 'id1'
 
         def match_request_text2(request):
             return request.text == (
                 '{"namespace_name":"fakenamespace","collection_name":"fakename",'
                 '"question":"what is the meaning of life?","top_k":2,'
-                '"doc_name":null,"history_messages":null}')
+                '"doc_name":null,"history_messages":null,"conversation_id":null}')
 
         mock.register_uri(
             'POST',
@@ -135,13 +140,15 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text2,
             text=AskResponse(
                 answer='42',
-                refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")]
+                refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")],
+                request_id='id2',
+                conversation_id='id2',
             ).model_dump_json(),
         )
 
-        answer, _ = cdb.collection('fakename').ask(
-            "what is the meaning of life?", 2)
-        assert answer == '42'
+        resp = cdb.collection('fakename').ask("what is the meaning of life?", 2)
+        assert resp.answer == '42'
+        assert resp.request_id == 'id2'
 
         @requests_mock.mock()
         def test_api_key_required(self, mock):
@@ -167,7 +174,9 @@ class APISurfaceTest(unittest.TestCase):
                 additional_matcher=match_request_text,
                 text=AskResponse(
                     answer='42',
-                    refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")]
+                    refs=[AnswerReference(doc_name="doc", page_num=1, sample_text="")],
+                    request_id='id1',
+                    conversation_id='id1',
                 ).model_dump_json(),
             )
 
@@ -197,7 +206,8 @@ class APISurfaceTest(unittest.TestCase):
                                     '"collection_name":"openai-web",'
                                     '"question":"q1","top_k":5,'
                                     '"doc_name":null,'
-                                    '"history_messages":null}')
+                                    '"history_messages":null,'
+                                    '"conversation_id":null}')
 
         mock.register_uri(
             'POST',
@@ -205,12 +215,18 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text,
             text=AskResponse(
                 answer='a1',
-                refs = [AnswerReference(doc_name="doc", page_num=1, sample_text="")]
+                refs = [AnswerReference(doc_name="doc", page_num=1, sample_text="")],
+                request_id='id1',
+                conversation_id='id1',
             ).model_dump_json(),
         )
 
         chat = cdb.collection('openai-web').chat()
-        chat.ask("q1")
+        resp = chat.ask("q1")
+        assert resp.answer == 'a1'
+        assert resp.request_id == 'id1'
+        assert resp.conversation_id == 'id1'
+        assert chat.conversation_id == 'id1'
 
 
         def match_request_text2(request):
@@ -218,7 +234,8 @@ class APISurfaceTest(unittest.TestCase):
                                     '"collection_name":"openai-web",'
                                     '"question":"q2","top_k":3,'
                                     '"doc_name":null,'
-                                    '"history_messages":[["q1","a1"]]}')
+                                    '"history_messages":[["q1","a1"]],'
+                                    '"conversation_id":"id1"}')
 
         mock.register_uri(
             'POST',
@@ -226,11 +243,17 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text2,
             text=AskResponse(
                 answer='a2',
-                refs = [AnswerReference(doc_name="doc", page_num=1, sample_text="")]
+                refs = [AnswerReference(doc_name="doc", page_num=1, sample_text="")],
+                request_id='id2',
+                conversation_id='id1',
             ).model_dump_json(),
         )
-        chat.ask("q2", 3)
+        resp = chat.ask("q2", 3)
         assert(chat.history_messages == [('q1', 'a1'), ('q2', 'a2')])
+        assert resp.answer == 'a2'
+        assert resp.request_id == 'id2'
+        assert resp.conversation_id == 'id1'
+        assert chat.conversation_id == 'id1'
 
     @requests_mock.mock()
     def test_summary(self, mock):
@@ -302,3 +325,57 @@ class APISurfaceTest(unittest.TestCase):
             additional_matcher=match_request_text)
 
         cdb.collection('fakename').configure_chat('persona', 'negative_resp')
+
+    @requests_mock.mock()
+    def test_create_ingestion(self, mock):
+        def match_request_text(request):
+            return request.text == ('{"namespace_name":"fakenamespace","collection_name":"fakename","type":"CONFLUENCE","spec":{"token":null,"schedule":null,"url":"fakeurl","username":null,"space":"fakespace","cql":null}}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/create_ingestion',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+            text=CreateIngestionResponse(
+                ingestion_id='ingestion_id1',
+            ).model_dump_json(),
+        )
+
+        spec = cdb.ConfluenceSpec(url='fakeurl', space='fakespace')
+        ingestion_id = cdb.collection('fakename').create_ingestion(
+            cdb.IngestionType.CONFLUENCE, spec)
+        assert ingestion_id == 'ingestion_id1'
+
+    @requests_mock.mock()
+    def test_update_periodic_ingestion(self, mock):
+        def match_request_text(request):
+            return request.text == ('{"namespace_name":"fakenamespace","collection_name":"fakename","type":"CONFLUENCE","spec":{"token":null,"schedule":{"cron_expr":"0 0 * * 0","timezone":"UTC"},"url":"fakeurl","username":null,"space":"fakespace","cql":null}}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/docs/update_periodic_ingestion',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+        )
+
+        schedule_spec = cdb.ScheduleSpec(cron_expr='0 0 * * 0', timezone='UTC')
+        spec = cdb.ConfluenceSpec(schedule=schedule_spec,
+                                  url='fakeurl',
+                                  space='fakespace')
+        cdb.collection('fakename').update_periodic_ingestion(
+            cdb.IngestionType.CONFLUENCE, spec)
+
+    @requests_mock.mock()
+    def test_create_or_update_feedback(self, mock):
+        def match_request_text(request):
+            return request.text == ('{"namespace_name":"fakenamespace","collection_name":"fakename","request_id":"id","thumb_down":true,"text_feedback":"text feedback","unregistered_user":null}')
+
+        mock.register_uri(
+            'POST',
+            f'{APISurfaceTest.API_ENDPOINT}/feedback/create_or_update',
+            request_headers={'api-key': 'fakeapikey'},
+            additional_matcher=match_request_text,
+        )
+
+        cdb.collection('fakename').create_or_update_feedback(
+            'id', True, 'text feedback')

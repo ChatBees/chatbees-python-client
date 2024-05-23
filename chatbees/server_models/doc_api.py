@@ -34,7 +34,26 @@ class ListDocsRequest(CollectionBaseRequest):
     pass
 
 
+class DocumentType(Enum):
+    FILE = 'FILE'
+    WEBSITE = 'WEBSITE'
+    NOTION = 'NOTION'
+    GDRIVE = 'GDRIVE'
+    CONFLUENCE = 'CONFLUENCE'
+
+
+class DocumentMetadata(BaseModel):
+    name: str
+    # URL that can be used to access this document.
+    # If None, this document cannot be accessed via URL
+    url: Optional[str] = None
+    type: DocumentType
+
+
 class ListDocsResponse(BaseModel):
+    documents: List[DocumentMetadata] = []
+
+    # To be deprecated
     doc_names: List[str]
 
 
@@ -43,6 +62,11 @@ class AskRequest(CollectionBaseRequest):
     top_k: Optional[int] = 5
     doc_name: Optional[str] = None
     history_messages: Optional[List[Tuple[str, str]]] = None
+    # this ask continues previous conversation. This is for the server to
+    # associate the questions for feedback/analysis. The caller should pass
+    # history_messages as context for the current question. This is much more
+    # efficient than the server to load history messages.
+    conversation_id: Optional[str] = None
 
 
 class AnswerReference(BaseModel):
@@ -56,6 +80,13 @@ SearchReference = AnswerReference
 class AskResponse(BaseModel):
     answer: str
     refs: List[AnswerReference]
+
+    # An ID to uniquely identify this interaction
+    request_id: str
+
+    # ID of the current conversation.
+    # Set `conversation_id` in the next Ask request to continue this conversation.
+    conversation_id: str
 
 
 class SummaryRequest(CollectionBaseRequest):
