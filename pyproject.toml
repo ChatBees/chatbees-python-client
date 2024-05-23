@@ -12,6 +12,7 @@ readme = "README.md"
 python = "^3.10"
 pydantic = "^2.4.2"
 requests = "^2.31.0"
+croniter = "^2.0.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
