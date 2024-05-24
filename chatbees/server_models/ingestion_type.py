@@ -1,3 +1,4 @@
+import os
 from croniter import croniter
 from datetime import datetime
 from enum import Enum
@@ -49,6 +50,8 @@ class ScheduleSpec(BaseModel):
             # verify cron expr >= daily
             fields = self.cron_expr.split()
             if fields[0].startswith('*') or fields[1].startswith('*'):
+                if os.environ.get('ENV_TEST_CRON', default='False').lower() == "true":
+                    return self
                 raise ValueError("minimal schedule internval is daily")
         except ZoneInfoNotFoundError as e:
             raise ValueError("Invalid timezone string")
