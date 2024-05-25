@@ -1,16 +1,22 @@
+import os
+from croniter import croniter
+from datetime import datetime
 from enum import Enum
 from typing import Optional, List
-
 from pydantic import BaseModel, model_validator
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 __all__ = [
     "IngestionType",
+    "IngestionStatus",
+    "ScheduleSpec",
     "IngestionSpec",
     "ConfluenceSpec",
     "GDriveSpec",
     "NotionSpec",
 ]
+
 
 class IngestionType(Enum):
     CONFLUENCE = 'CONFLUENCE'
@@ -18,9 +24,48 @@ class IngestionType(Enum):
     NOTION = 'NOTION'
 
 
+class IngestionStatus(Enum):
+    RUNNING = 1
+    SUCCEEDED = 2
+    FAILED = 3
+
+
+class ScheduleSpec(BaseModel):
+    # same format with cron, like '0 0 * * 0' means midnight every Sunday
+    # only support >= daily
+    cron_expr: str
+    # timezone string, such as UTC, America/Los_Angeles
+    timezone: str
+
+    @model_validator(mode='after')
+    def validate_input(self) -> 'ScheduleSpec':
+        try:
+            # validate timezone
+            tz = ZoneInfo(self.timezone)
+
+            # validate cron_expr
+            base_time = datetime.now(tz)
+            croniter(self.cron_expr, base_time)
+
+            # verify cron expr >= daily
+            fields = self.cron_expr.split()
+            if fields[0].startswith('*') or fields[1].startswith('*'):
+                if os.environ.get('ENV_TEST_CRON', default='False').lower() == "true":
+                    return self
+                raise ValueError("minimal schedule internval is daily")
+        except ZoneInfoNotFoundError as e:
+            raise ValueError("Invalid timezone string")
+        except Exception as e:
+            raise ValueError("Invalid cron string")
+        return self
+
+
 class IngestionSpec(BaseModel):
-    # API token for crawling. If not set, use existing connector.
+    # API token for ingestion. If not set, server will get the access token
+    # from the connector that is oauthed via UI.
     token: Optional[str] = None
+    # periodical ingestion scheduling. run once if None.
+    schedule: Optional[ScheduleSpec] = None
 
 
 class ConfluenceSpec(IngestionSpec):

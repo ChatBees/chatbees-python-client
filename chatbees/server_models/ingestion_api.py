@@ -2,9 +2,8 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from chatbees.server_models.doc_api import IngestionStatus
 from chatbees.server_models.collection_api import CollectionBaseRequest
-from chatbees.server_models.ingestion_type import IngestionType
+from chatbees.server_models.ingestion_type import IngestionType, IngestionStatus
 
 
 class CreateIngestionRequest(CollectionBaseRequest):
@@ -29,4 +28,13 @@ class IndexIngestionRequest(CollectionBaseRequest):
 
 
 class DeleteIngestionRequest(CollectionBaseRequest):
+    type: IngestionType
+
+
+class UpdatePeriodicIngestionRequest(CollectionBaseRequest):
+    type: IngestionType
+    spec: Any
+
+
+class DeletePeriodicIngestionRequest(CollectionBaseRequest):
     type: IngestionType
