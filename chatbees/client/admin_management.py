@@ -1,7 +1,13 @@
+from typing import List
 from chatbees.server_models.admin_api import CreateApiKeyRequest, CreateApiKeyResponse
+from chatbees.server_models.ingestion_api import (
+    ConnectorReference,
+    ListConnectorsRequest,
+    ListConnectorsResponse,
+)
 from chatbees.utils.config import Config
 
-__all__ = ["init", "create_api_key"]
+__all__ = ["init", "create_api_key", "list_connectors"]
 
 
 def init(
@@ -25,6 +31,16 @@ def init(
     Config.account_id = account_id
     Config.namespace = namespace
     Config.validate_setup()
+
+
+def list_connectors() -> List[ConnectorReference]:
+    url = f'{Config.get_base_url()}/connectors/list'
+    req = ListConnectorsRequest()
+    resp = Config.post(
+        url=url,
+        data=req.model_dump_json(),
+    )
+    return ListConnectorsResponse.model_validate(resp.json()).connectors
 
 
 def create_api_key() -> str:

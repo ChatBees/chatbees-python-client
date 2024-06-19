@@ -183,8 +183,18 @@ class RegressionTest(unittest.TestCase):
         self._test_ingestion(clname, cb.IngestionType.NOTION, spec)
 
     def _test_ingestion(self, clname: str, ingestion_type: cb.IngestionType, spec: Any):
+        connectors = cb.list_connectors()
+        connector_id = ""
+        for connector in connectors:
+            if connector.type == ingestion_type:
+                connector_id = connector.id
+                break
+        if connector_id == "":
+            raise ValueError(f"internal error - data source not connected, "
+                             f"{ingestion_type}")
+
         col = cb.Collection(name=clname)
-        ingest_id = col.create_ingestion(ingestion_type, spec)
+        ingest_id = col.create_ingestion(connector_id, ingestion_type, spec)
         max_waits = 10
         waits = 0
         while waits < max_waits:
