@@ -6,11 +6,10 @@ from .exceptions import raise_for_error
 ENV_TEST_BASE_URL = os.environ.get("ENV_TEST_BASE_URL", "")
 
 class Config:
-    PUBLIC_ACCOUNT_ID: str = "public"
+    api_key: str
+    account_id: str
     PUBLIC_NAMESPACE: str = "public"
-    api_key: str = None
     namespace: str = PUBLIC_NAMESPACE
-    account_id: str = PUBLIC_ACCOUNT_ID
 
     @classmethod
     def validate_setup(cls):
