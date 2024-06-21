@@ -244,6 +244,7 @@ class Collection(BaseModel):
 
     def create_ingestion(
         self,
+        connector_id: str,
         ingestion_type: IngestionType,
         ingestion_spec: Union[ConfluenceSpec, GDriveSpec, NotionSpec],
     ) -> str:
@@ -261,6 +262,7 @@ class Collection(BaseModel):
         req = CreateIngestionRequest(
             namespace_name=Config.namespace,
             collection_name=self.name,
+            connector_id=connector_id,
             type=ingestion_type,
             spec=ingestion_spec.model_dump())
         resp = Config.post(url=url, data=req.model_dump_json())

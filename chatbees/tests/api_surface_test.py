@@ -22,21 +22,15 @@ from chatbees.utils.config import Config
 
 class APISurfaceTest(unittest.TestCase):
     API_KEY = 'fakeapikey'
+    ACCOUNT_ID = 'fakeaccountid'
     NAMESPACE = 'fakenamespace'
-    API_ENDPOINT = Config.get_base_url()
+    API_ENDPOINT = None
 
     def setUp(self):
-        cb.init(api_key=APISurfaceTest.API_KEY, namespace=APISurfaceTest.NAMESPACE)
-
-    @requests_mock.mock()
-    def test_create_api_key(self, mock):
-        mock.register_uri(
-            'POST',
-            f'{APISurfaceTest.API_ENDPOINT}/apikey/create',
-            text='{"api_key": "anotherfakeapikey"}',
-        )
-
-        assert cb.create_api_key() == 'anotherfakeapikey'
+        cb.init(api_key=APISurfaceTest.API_KEY,
+                account_id=APISurfaceTest.ACCOUNT_ID,
+                namespace=APISurfaceTest.NAMESPACE)
+        APISurfaceTest.API_ENDPOINT = Config.get_base_url()
 
     @requests_mock.mock()
     def test_create_collection(self, mock):
@@ -329,7 +323,7 @@ class APISurfaceTest(unittest.TestCase):
     @requests_mock.mock()
     def test_create_ingestion(self, mock):
         def match_request_text(request):
-            return request.text == ('{"namespace_name":"fakenamespace","collection_name":"fakename","type":"CONFLUENCE","spec":{"token":null,"schedule":null,"url":"fakeurl","username":null,"space":"fakespace","cql":null}}')
+            return request.text == ('{"namespace_name":"fakenamespace","collection_name":"fakename","connector_id":"fake_connector_id","type":"CONFLUENCE","spec":{"token":null,"schedule":null,"url":"fakeurl","username":null,"space":"fakespace","cql":null}}')
 
         mock.register_uri(
             'POST',
@@ -343,7 +337,7 @@ class APISurfaceTest(unittest.TestCase):
 
         spec = cb.ConfluenceSpec(url='fakeurl', space='fakespace')
         ingestion_id = cb.collection('fakename').create_ingestion(
-            cb.IngestionType.CONFLUENCE, spec)
+            'fake_connector_id', cb.IngestionType.CONFLUENCE, spec)
         assert ingestion_id == 'ingestion_id1'
 
     @requests_mock.mock()
