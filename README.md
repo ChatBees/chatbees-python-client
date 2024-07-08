@@ -4,9 +4,7 @@ Python client for [ChatBees](http://www.chatbees.ai), a Serverless Platform for 
 We're actively improving the product and releasing new features, and we'd love to hear your feedback!
 Please take a moment to fill out this [feedback form](https://forms.gle/pif6Vx2LqPjW5v4w5) to help us understand your use-case better.
 
-Signup with your google account on https://www.chatbees.ai. You could also try it out in ChatBees public account without signup.
-
-> For the public account, by default, all collections are subject to permanent deletion after 2 weeks. Please let us know if you need to keep it for longer via the feedback form.
+Signup with your Google or Microsoft account on https://www.chatbees.ai.
 
 ChatBees python client provides very simple APIs for you to directly upload files, crawl websites, ingest data sources including Confluence, Notion and Google Drive. Then you can simply ask questions.
 
@@ -16,20 +14,15 @@ ChatBees python client provides very simple APIs for you to directly upload file
 You can try out ChatBees in just a few lines of code. You can create your own collections, upload files, then get answers  specific to your data assets. The following example walks you through the process of creating a collection and indexing [the original transformer paper](https://arxiv.org/abs/1706.03762) into that collection.
 
 ```python
-import chatbees as cdb
+import chatbees as cb
 
-# If you signup with your google account, you will create an API key on UI and skip this step.
-# Create an API key in the public account.
-# my_api_key = cdb.create_api_key()
-
-# Configure cdb to use the newly minted API key.
-cdb.init(api_key=my_api_key, account_id=your_account_id)
-# If you use the public account, not need to configure the account_id.
-# cdb.init(api_key=my_api_key)
+# Create an API key on UI after signup/signin.
+# Configure cb to use the newly minted API key.
+cb.init(api_key=my_api_key, account_id=your_account_id)
 
 # Create a new collection
-llm_research = cdb.Collection(name="llm_research")
-cdb.create_collection(llm_research)
+llm_research = cb.Collection(name="llm_research")
+cb.create_collection(llm_research)
 
 # Index the original Transformer paper into this collection.
 llm_research.upload_document("https://arxiv.org/pdf/1706.03762.pdf")
@@ -49,32 +42,7 @@ python3 version ```>= 3.10``` is required
 pip3 install chatbees-python-client
 ```
 
-## Creating an API key
-You need an API key to create, update, delete own collections. A collection 
-can only be accessed by the API key that created it.
 
-Account management and related functionalities will be released soon.
-
-```python
-import chatbees as cdb
-
-# If you signup with your google account, you will create an API key on UI and skip this step.
-# Create an API key in the public account.
-# my_api_key = cdb.create_api_key()
-
-# Please record this API key and keep it a secrete
-#
-# Collections created with this key can only be accessed
-# through this key!
-print(my_api_key)
-
-# Use this API key in all subsequent calls
-cdb.init(api_key=my_api_key, account_id=your_account_id)
-# If you use the public account, not need to configure the account_id.
-# cdb.init(api_key=my_api_key)
-
-
-```
 
 In the following examples, we will assume you have signup with your google account.
 
@@ -82,13 +50,13 @@ In the following examples, we will assume you have signup with your google accou
 You can create a collection that is only accessible with a specific API key.
 
 ```python
-import chatbees as cdb
+import chatbees as cb
 
-cdb.init(api_key=my_api_key, account_id=your_account_id)
+cb.init(api_key=my_api_key, account_id=your_account_id)
 
 # Create a collection called llm_research
-collection = cdb.Collection(name='llm_research')
-cdb.create_collection(collection)
+collection = cb.Collection(name='llm_research')
+cb.create_collection(collection)
 ```
 
 ## Listing collection
@@ -97,11 +65,11 @@ will include all collections that were created using the currently configured
 API key.
 
 ```python
-import chatbees as cdb
+import chatbees as cb
 
-cdb.init(api_key=my_api_key, account_id=your_account_id)
+cb.init(api_key=my_api_key, account_id=your_account_id)
 
-collections = cdb.list_collections()
+collections = cb.list_collections()
 ```
 
 
@@ -117,12 +85,12 @@ collection.
 - ```.docx``` Microsoft word documents
 
 ```python
-import chatbees as cdb
+import chatbees as cb
 
-cdb.init(api_key=my_api_key, account_id=your_account_id)
+cb.init(api_key=my_api_key, account_id=your_account_id)
 
 # llm_research collection was created in the previous step
-collection = cdb.collection('llm_research')
+collection = cb.collection('llm_research')
 
 # Local file and URLs are both supported.
 # URL must contain the full scheme prefix (http:// or https://)
@@ -134,13 +102,13 @@ collection.upload_document('https://path/to/file.pdf')
 You can pass the website root url. ChatBees will automatically crawl it.
 
 ```python
-import chatbees as cdb
+import chatbees as cb
 
-cdb.init(api_key=my_api_key, account_id=your_account_id)
+cb.init(api_key=my_api_key, account_id=your_account_id)
 
 # Create the crawl task
-collection = cdb.Collection(name='example-web')
-cdb.create_collection(collection)
+collection = cb.Collection(name='example-web')
+cb.create_collection(collection)
 
 root_url = 'https://www.example.com'
 crawl_id = collection.create_crawl(root_url)
@@ -161,28 +129,23 @@ collections only. ```ask()``` method returns a plain-text answer to
 your question, as well as a list of most relevance references used to derive 
 the answer. 
 
-**Available public collections that do not require an API key to access**
-- ```openai-web```: Contains contents of ```www.openai.com```
-
 ```python
-import chatbees as cdb
+import chatbees as cb
 
-cdb.init(api_key=my_api_key, account_id=your_account_id)
+cb.init(api_key=my_api_key, account_id=your_account_id)
 
 # Get a plain text answer, as well as a list of references from the collection
 # that are the most relevant to the question.
-answer, refs = cdb.collection('openai-web').ask('what is red team?')
-
-answer, refs = cdb.collection('llm_research').ask('what is a transformer?')
+answer, refs = cb.collection('llm_research').ask('what is a transformer?')
 ```
 
 ## Deleting a collection
 You can delete a collection using the same API key that was used to create it.
 
 ```python
-import chatbees as cdb
+import chatbees as cb
 
-cdb.init(api_key=my_api_key, account_id=your_account_id)
+cb.init(api_key=my_api_key, account_id=your_account_id)
 
-cdb.delete_collection('llm_research')
+cb.delete_collection('llm_research')
 ```
