@@ -20,7 +20,7 @@ class Config:
     def get_base_url(cls):
         if ENV_TEST_BASE_URL == 'preprod':
             return f"https://{cls.account_id}.preprod.aws.chatbees.ai"
-        if ENV_TEST_BASE_URL == "localhost":
+        if ENV_TEST_BASE_URL.find("localhost") >= 0:
             return ENV_TEST_BASE_URL
         return f"https://{cls.account_id}.us-west-2.aws.chatbees.ai"
 

@@ -97,6 +97,18 @@ class SummaryResponse(BaseModel):
     summary: str
 
 
+class OutlineFAQRequest(CollectionBaseRequest):
+    doc_name: str
+
+class FAQ(BaseModel):
+    question: str
+    answer: str
+
+class OutlineFAQResponse(BaseModel):
+    outlines: list[str]
+    faqs: list[FAQ]
+
+
 class CreateCrawlRequest(CollectionBaseRequest):
     root_url: str
     max_urls_to_crawl: int = 200
