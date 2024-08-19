@@ -33,6 +33,8 @@ from chatbees.server_models.doc_api import (
     PageStats,
     IndexCrawlRequest,
     DeleteCrawlRequest,
+    OutlineFAQRequest,
+    OutlineFAQResponse,
 )
 from chatbees.server_models.collection_api import (
     ChatAttributes,
@@ -156,6 +158,22 @@ class Collection(BaseModel):
         resp = Config.post(url=url, data=req.model_dump_json())
         resp = SummaryResponse.model_validate(resp.json())
         return resp.summary
+
+    def get_document_outline_faq(self, doc_name: str) -> OutlineFAQResponse:
+        """
+        Returns the Outlines and FAQs of the document.
+
+        :param doc_name: the document
+        :return: The Outlines and FAQs of the document
+        """
+        url = f'{Config.get_base_url()}/docs/get_outline_faq'
+        req = OutlineFAQRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            doc_name=doc_name,
+        )
+        resp = Config.post(url=url, data=req.model_dump_json())
+        return OutlineFAQResponse.model_validate(resp.json())
 
     def ask(
         self, question: str, top_k: int = 5, doc_name: str = None,

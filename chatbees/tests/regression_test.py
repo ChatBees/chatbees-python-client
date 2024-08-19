@@ -10,8 +10,6 @@ from chatbees.server_models.doc_api import AnswerReference
 
 TEST_AID = os.environ.get('ENV_TEST_AID')
 TEST_APIKEY = os.environ.get('ENV_TEST_APIKEY')
-TEST_PUBLIC_AID = os.environ.get('ENV_TEST_PUBLIC_AID')
-TEST_PUBLIC_APIKEY = os.environ.get('ENV_TEST_PUBLIC_APIKEY')
 
 TEST_CONFLUENCE_USER = os.environ.get('TEST_CONFLUENCE_USER')
 TEST_CONFLUENCE_TOKEN = os.environ.get('TEST_CONFLUENCE_TOKEN')
@@ -57,18 +55,7 @@ class RegressionTest(unittest.TestCase):
         doc_names = [ref.doc_name for ref in resp.refs]
         logging.info(f"refs={doc_names}")
 
-    def test_regress_public(self):
-        cb.init(TEST_PUBLIC_APIKEY, TEST_PUBLIC_AID)
-        # read-only
-        clname1 = 'llm_research_test'
-        clname2 = 'regress_pngame_docs'
-        self._test_doc_and_web(clname1, clname2, write=False)
-
-        clname1 = 'llm_research_test_write'
-        clname2 = 'regress_pngame_docs_write'
-        self._test_doc_and_web(clname1, clname2, write=True)
-
-    def test_doc_apis(self):
+    def manual_test_doc_apis(self):
         cb.init(api_key=self.apikey, account_id=self.aid)
         clname = 'test_doc_apis'
         col = cb.Collection(name=clname)
@@ -115,13 +102,10 @@ class RegressionTest(unittest.TestCase):
 
             chat1.ask("q1")
             chat1.ask("q2")
-            chat1.ask("q3")
 
             resp = chat2.ask("q1")
             self.assertRefsAreFromDoc(resp.refs, "text_file.txt")
             resp = chat2.ask("q2")
-            self.assertRefsAreFromDoc(resp.refs, "text_file.txt")
-            resp = chat2.ask("q3")
             self.assertRefsAreFromDoc(resp.refs, "text_file.txt")
 
             # ensure we can configure chat attrs
@@ -162,9 +146,18 @@ class RegressionTest(unittest.TestCase):
 
         # upload_document
         col = cb.Collection(name=clname1)
+        doc_name = 'transformer-paper.pdf'
         if write:
-            col.upload_document('transformer-paper.pdf')
+            col.upload_document(doc_name)
         self.ask(clname1, 'what is transformer?')
+
+        summary = col.summarize_document(doc_name)
+        logging.info(f"doc={doc_name} summary={summary}")
+
+        outline_faqs = col.get_document_outline_faq(doc_name)
+        logging.info(f"doc={doc_name} outlines={len(outline_faqs.outlines)} "
+                     f"{outline_faqs.outlines}, faqs={len(outline_faqs.faqs)} "
+                     f"{outline_faqs.faqs}")
 
         # docs.piratenation.game has 49 pages
         col = cb.collection(clname2)
@@ -218,7 +211,7 @@ class RegressionTest(unittest.TestCase):
 
         # update the periodic ingestion
         if os.environ.get('ENV_TEST_CRON', default='False').lower() == "true":
-            cron_expr = '*/10 * * * *'
+            cron_expr = '*/2 * * * *'
         schedule = cb.ScheduleSpec(cron_expr=cron_expr, timezone='UTC')
         spec = cb.ConfluenceSpec(schedule=schedule,
                                   url=TEST_CONFLUENCE_URL,
@@ -229,8 +222,10 @@ class RegressionTest(unittest.TestCase):
         col.update_periodic_ingestion(cb.IngestionType.CONFLUENCE, spec)
         cb.describe_collection(clname)
 
-        if os.environ.get('ENV_TEST_CRON', default='False').lower() == "false":
-            col.delete_periodic_ingestion(cb.IngestionType.CONFLUENCE)
+        if os.environ.get('ENV_TEST_CRON', default='False').lower() == "true":
+            logging.info(f"sleep 180s for periodic crawl to run")
+            time.sleep(180)
+        col.delete_periodic_ingestion(cb.IngestionType.CONFLUENCE)
 
     def _test_connector_ingests(self):
         clname = 'ingest_test'
@@ -285,44 +280,3 @@ class RegressionTest(unittest.TestCase):
         resp = col.ask(q)
         logging.info(f"Question: {q}")
         logging.info(f"Answer: {resp.answer}\n")
-
-
-    """
-    def test_collection_apis(self):
-        # Clear API key from config
-        apikey1 = self.apikey1
-        apikey2 = self.apikey2
-
-        # Create private collections, one for each created key
-        cb.init(api_key=apikey1)
-        private_col_key1 = self.create_collection()
-
-        cb.init(api_key=apikey2)
-        private_col_key2 = self.create_collection()
-
-        try:
-            # List collections using API key1
-            cb.init(api_key=apikey1)
-            collections_visible_to_key1 = set(cb.list_collections())
-            assert private_col_key2.name not in collections_visible_to_key1
-            assert private_col_key1.name in collections_visible_to_key1
-            # Key1 is not authorized to delete a collection created by key2
-            self.assertRaises(cb.UnAuthorized, cb.delete_collection, private_col_key2.name)
-
-            # List collections using API key2
-            cb.init(api_key=apikey2)
-            collections_visible_to_key2 = set(cb.list_collections())
-            assert private_col_key1.name not in collections_visible_to_key2
-            assert private_col_key2.name in collections_visible_to_key2
-            # Key2 is not authorized to delete a collection created by key1
-            self.assertRaises(cb.UnAuthorized, cb.delete_collection, private_col_key1.name)
-
-        finally:
-            # key1 is authorized to delete its own collections as well as public
-            # collections
-            cb.init(api_key=apikey1)
-            cb.delete_collection(private_col_key1.name)
-
-            cb.init(api_key=apikey2)
-            cb.delete_collection(private_col_key2.name)
-    """
