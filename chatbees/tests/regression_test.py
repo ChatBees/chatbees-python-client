@@ -137,6 +137,8 @@ class RegressionTest(unittest.TestCase):
         #cb.create_collection(col)
         self._test_doc_and_web(clname1, clname2, write=True)
 
+        self._test_transcribe_audio(clname1)
+
         self._test_confluence_user()
         self._test_connector_ingests()
 
@@ -154,6 +156,7 @@ class RegressionTest(unittest.TestCase):
         summary = col.summarize_document(doc_name)
         logging.info(f"doc={doc_name} summary={summary}")
 
+        # test outline_faqs
         outline_faqs = col.get_document_outline_faq(doc_name)
         logging.info(f"doc={doc_name} outlines={len(outline_faqs.outlines)} "
                      f"{outline_faqs.outlines}, faqs={len(outline_faqs.faqs)} "
@@ -170,6 +173,15 @@ class RegressionTest(unittest.TestCase):
 
         q = 'what is pirate nation?'
         self.ask(clname2, q)
+
+    def _test_transcribe_audio(self, clname1: str):
+        col = cb.Collection(name=clname1)
+
+        # transcribe a audio file
+        audio_file = f'{os.path.dirname(os.path.abspath(__file__))}/data/test_audio.mp3'
+        trans = "0.0 - 4.0: それでは、仕入れ割引について見ていきたいと思います。\n"
+        resp = col.transcribe_audio(audio_file, 'ja')
+        assert resp.transcript == trans
 
     def _test_confluence_user(self):
         clname = 'confluence_test'
