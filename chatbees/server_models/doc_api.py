@@ -2,7 +2,7 @@ import json
 from enum import Enum
 from typing import List, Optional, Tuple, Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from chatbees.server_models.collection_api import CollectionBaseRequest
 from chatbees.server_models.ingestion_type import IngestionStatus, ScheduleSpec
@@ -15,14 +15,14 @@ __all__ = [
 ]
 
 class AddDocRequest(CollectionBaseRequest):
+    # fastapi server expects "property name enclosed in double quotes" when
+    # using with UploadFile. pydantic.model_dump_json() uses single quote.
+    # explicitly uses json.loads() and dumps().
     @classmethod
     def validate_to_json(cls, value):
         return cls(**json.loads(value)) if isinstance(value, str) else value
 
     def to_json_string(self) -> str:
-        # fastapi server expects "property name enclosed in double quotes" when
-        # using with UploadFile. pydantic.model_dump_json() uses single quote.
-        # explicitly uses json.dumps for AddDocRequest.
         return json.dumps(self.__dict__)
 
 
@@ -107,6 +107,31 @@ class FAQ(BaseModel):
 class OutlineFAQResponse(BaseModel):
     outlines: list[str]
     faqs: list[FAQ]
+
+
+class TranscribeAudioRequest(CollectionBaseRequest):
+    lang: str
+
+    @model_validator(mode='after')
+    def validate_input(self) -> 'TranscribeAudioRequest':
+        # limit to japanese. user should contact us to try other language
+        if self.lang != 'ja':
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST,
+                                detail="unsupported audio language")
+        return self
+
+    # fastapi server expects "property name enclosed in double quotes" when
+    # using with UploadFile. pydantic.model_dump_json() uses single quote.
+    # explicitly uses json.loads() and dumps().
+    @classmethod
+    def validate_to_json(cls, value):
+        return cls(**json.loads(value)) if isinstance(value, str) else value
+
+    def to_json_string(self) -> str:
+        return json.dumps(self.__dict__)
+
+class TranscribeAudioResponse(BaseModel):
+    transcript: str
 
 
 class CreateCrawlRequest(CollectionBaseRequest):
