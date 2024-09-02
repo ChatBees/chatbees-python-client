@@ -183,6 +183,11 @@ class RegressionTest(unittest.TestCase):
         resp = col.transcribe_audio(audio_file, 'ja')
         assert resp.transcript == trans
 
+        # transcribe a audio file hosted on a site
+        audio_file_url = 'https://www.chatbees.ai/images/audio/test_5s.mp3'
+        resp = col.transcribe_audio(audio_file_url, 'ja')
+        assert resp.transcript == trans
+
     def _test_confluence_user(self):
         clname = 'confluence_test'
         # TODO fix stale cache

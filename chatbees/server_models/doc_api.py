@@ -112,6 +112,11 @@ class OutlineFAQResponse(BaseModel):
 class TranscribeAudioRequest(CollectionBaseRequest):
     lang: str
 
+    # optional url to download the audio file from
+    url: Optional[str] = None
+    # optional access token to download the audio file from the url
+    access_token: Optional[str] = None
+
     @model_validator(mode='after')
     def validate_input(self) -> 'TranscribeAudioRequest':
         # limit to japanese. user should contact us to try other language

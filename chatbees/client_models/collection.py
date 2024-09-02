@@ -177,26 +177,36 @@ class Collection(BaseModel):
         resp = Config.post(url=url, data=req.model_dump_json())
         return OutlineFAQResponse.model_validate(resp.json())
 
-    def transcribe_audio(self, fpath: str, lang: str) -> TranscribeAudioResponse:
+    def transcribe_audio(
+        self, path_or_url: str, lang: str, access_token: str = None,
+    ) -> TranscribeAudioResponse:
         """
         Transcribe the audio file. This is an expirement API. Please contact us
         build@chatbees.ai, if you want to try it.
 
-        :param fpath: Local file path of the audio file
+        :param path_or_url: Local file path or the audio file url. URL must
+                            contain scheme (http or https) prefix.
         :param lang: the language of the audio file
+        :param access_token: the possible token required to access the audio file url
         :return:
         """
         url = f'{Config.get_base_url()}/docs/transcribe_audio'
         req = TranscribeAudioRequest(namespace_name=Config.namespace,
                                      collection_name=self.name, lang=lang)
-        # Handle tilde "~/blah"
-        fpath = os.path.expanduser(fpath)
-        validate_file(fpath)
-        with open(fpath, 'rb') as f:
-            fname = os.path.basename(fpath)
-            resp = Config.post(url=url, files={'file': (fname, f)},
-                               data={'request': req.model_dump_json()})
-            return TranscribeAudioResponse.model_validate(resp.json())
+        if is_url(path_or_url):
+            req.url = path_or_url
+            req.access_token = access_token
+            resp = Config.post(url=url, data={'request': req.model_dump_json()})
+        else:
+            # Handle tilde "~/blah"
+            fpath = os.path.expanduser(path_or_url)
+            validate_file(fpath)
+            with open(fpath, 'rb') as f:
+                fname = os.path.basename(fpath)
+                resp = Config.post(url=url, files={'file': (fname, f)},
+                                   data={'request': req.model_dump_json()})
+
+        return TranscribeAudioResponse.model_validate(resp.json())
 
     def ask(
         self, question: str, top_k: int = 5, doc_name: str = None,
