@@ -97,6 +97,15 @@ class SummaryResponse(BaseModel):
     summary: str
 
 
+class ExtractRelevantTextsRequest(CollectionBaseRequest):
+    # find the texts relevant to the input texts in the doc
+    doc_name: str
+    input_texts: str
+
+class ExtractRelevantTextsResponse(BaseModel):
+    relevant_texts: str
+
+
 class OutlineFAQRequest(CollectionBaseRequest):
     doc_name: str
 

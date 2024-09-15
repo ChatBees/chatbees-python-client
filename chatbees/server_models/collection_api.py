@@ -35,10 +35,11 @@ class ListCollectionsResponse(BaseModel):
 
 
 class ChatAttributes(BaseModel):
-    # Configure chatbot personality and style. For example:
+    # Configure chatbot role, personality and style. For example:
     #
-    # - a 1600s pirate, your name is 'Capitan Morgan'.
-    # - a helpful AI assistant
+    # - You are an AI assistant. You will talk like a 1600s pirate.
+    # - You are an AI assistant.
+    # - You are an AI customer support agent.
     persona: Optional[str] = None
 
     # Configure chatbot response when no relevant result is found. For example:
