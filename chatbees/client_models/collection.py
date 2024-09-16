@@ -168,8 +168,8 @@ class Collection(BaseModel):
         Extract the texts relevant to the input_texts from the doc. For example,
         you want to extract the original texts in a credit report document for
         a company, instead of getting the answer.
-        This is an expirement API. Please contact us build@chatbees.ai, if you
-        want to try it.
+        This is an expirement API. Please contact us build@chatbees.ai to get
+        early access.
 
         :param doc_name: the document to extract
         :param input_texts: the input texts
