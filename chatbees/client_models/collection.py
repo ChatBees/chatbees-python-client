@@ -207,7 +207,7 @@ class Collection(BaseModel):
     ) -> TranscribeAudioResponse:
         """
         Transcribe the audio file. This is an expirement API. Please contact us
-        build@chatbees.ai, if you want to try it.
+        build@chatbees.ai to get early access.
 
         :param path_or_url: Local file path or the audio file url. URL must
                             contain scheme (http or https) prefix.
