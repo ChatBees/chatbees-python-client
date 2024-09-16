@@ -2,7 +2,7 @@ import json
 from enum import Enum
 from typing import List, Optional, Tuple, Dict
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel
 
 from chatbees.server_models.collection_api import CollectionBaseRequest
 from chatbees.server_models.ingestion_type import IngestionStatus, ScheduleSpec
@@ -97,6 +97,15 @@ class SummaryResponse(BaseModel):
     summary: str
 
 
+class ExtractRelevantTextsRequest(CollectionBaseRequest):
+    # find the texts relevant to the input texts in the doc
+    doc_name: str
+    input_texts: str
+
+class ExtractRelevantTextsResponse(BaseModel):
+    relevant_texts: str
+
+
 class OutlineFAQRequest(CollectionBaseRequest):
     doc_name: str
 
@@ -116,14 +125,6 @@ class TranscribeAudioRequest(CollectionBaseRequest):
     url: Optional[str] = None
     # optional access token to download the audio file from the url
     access_token: Optional[str] = None
-
-    @model_validator(mode='after')
-    def validate_input(self) -> 'TranscribeAudioRequest':
-        # limit to japanese. user should contact us to try other language
-        if self.lang != 'ja':
-            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST,
-                                detail="unsupported audio language")
-        return self
 
     # fastapi server expects "property name enclosed in double quotes" when
     # using with UploadFile. pydantic.model_dump_json() uses single quote.

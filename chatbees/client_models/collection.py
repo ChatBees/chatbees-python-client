@@ -37,6 +37,8 @@ from chatbees.server_models.doc_api import (
     OutlineFAQResponse,
     TranscribeAudioRequest,
     TranscribeAudioResponse,
+    ExtractRelevantTextsRequest,
+    ExtractRelevantTextsResponse,
 )
 from chatbees.server_models.collection_api import (
     ChatAttributes,
@@ -161,6 +163,29 @@ class Collection(BaseModel):
         resp = SummaryResponse.model_validate(resp.json())
         return resp.summary
 
+    def extract_relevant_texts(self, doc_name: str, input_texts: str) -> str:
+        """
+        Extract the texts relevant to the input_texts from the doc. For example,
+        you want to extract the original texts in a credit report document for
+        a company, instead of getting the answer.
+        This is an expirement API. Please contact us build@chatbees.ai to get
+        early access.
+
+        :param doc_name: the document to extract
+        :param input_texts: the input texts
+        :return: The relevant texts in the document
+        """
+        url = f'{Config.get_base_url()}/docs/extract_relevant_texts'
+        req = ExtractRelevantTextsRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+            doc_name=doc_name,
+            input_texts=input_texts,
+        )
+        resp = Config.post(url=url, data=req.model_dump_json())
+        resp = ExtractRelevantTextsResponse.model_validate(resp.json())
+        return resp.relevant_texts
+
     def get_document_outline_faq(self, doc_name: str) -> OutlineFAQResponse:
         """
         Returns the Outlines and FAQs of the document.
@@ -182,7 +207,7 @@ class Collection(BaseModel):
     ) -> TranscribeAudioResponse:
         """
         Transcribe the audio file. This is an expirement API. Please contact us
-        build@chatbees.ai, if you want to try it.
+        build@chatbees.ai to get early access.
 
         :param path_or_url: Local file path or the audio file url. URL must
                             contain scheme (http or https) prefix.
