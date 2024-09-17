@@ -22,6 +22,7 @@ class IngestionType(Enum):
     CONFLUENCE = 'CONFLUENCE'
     GDRIVE = 'GDRIVE'
     NOTION = 'NOTION'
+    HUBSPOT_TICKET = 'HUBSPOT_TICKET'
 
 
 class IngestionStatus(Enum):
