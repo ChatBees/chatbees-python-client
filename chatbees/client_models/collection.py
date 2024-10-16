@@ -37,6 +37,7 @@ from chatbees.server_models.doc_api import (
     OutlineFAQResponse,
     TranscribeAudioRequest,
     TranscribeAudioResponse,
+    ExtractType,
     ExtractRelevantTextsRequest,
     ExtractRelevantTextsResponse,
 )
@@ -163,15 +164,26 @@ class Collection(BaseModel):
         resp = SummaryResponse.model_validate(resp.json())
         return resp.summary
 
-    def extract_relevant_texts(self, doc_name: str, input_texts: str) -> str:
+    def extract_relevant_texts(
+        self, doc_name: str, extract_type: ExtractType, input_texts: str,
+    ) -> str:
         """
-        Extract the texts relevant to the input_texts from the doc. For example,
-        you want to extract the original texts in a credit report document for
-        a company, instead of getting the answer.
+        Extract the texts relevant to the input_texts from the doc. Support 3
+        extract types:
+        1. QUESTION: get a single answer, such as, the company name, date
+           information, etc.
+           Example input_texts: what is the SEC file number?
+           Example return: 001-39504
+        2. EXTRACT_TEXT: extract the original paragraphs from the document.
+        3. EXTRACT_TABLE: extract a table from the document.
+           Example input_texts: Securities Sold During The Past 3 Months
+           Example return: serialized json string of ExtractedTable.
+
         This is an expirement API. Please contact us build@chatbees.ai to get
         early access.
 
         :param doc_name: the document to extract
+        :param extract_type: the extract command type
         :param input_texts: the input texts
         :return: The relevant texts in the document
         """
@@ -180,6 +192,7 @@ class Collection(BaseModel):
             namespace_name=Config.namespace,
             collection_name=self.name,
             doc_name=doc_name,
+            extract_type=extract_type,
             input_texts=input_texts,
         )
         resp = Config.post(url=url, data=req.model_dump_json())
@@ -487,9 +500,9 @@ class Collection(BaseModel):
 
         NOTE: New configurations could take up to 2 minutes to take effect.
 
-        :param persona: The chatbot's persona, ie "The chatbot will talk like {persona}". Examples:
-            - 'a 1600s pirate'
-            - 'a helpful assistant'
+        :param persona: The chatbot's persona, default: You are an AI assistant. Examples:
+            - 'You are a 1600s pirate.'
+            - 'You are a support agent.'
         :param negative_response: Chatbot's response when it cannot find the answer,
                                   ie "say {negative_response} if you don't know the answer". Examples:
             - 'i don't know, please reach out to #help for help'
