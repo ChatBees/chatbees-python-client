@@ -6,7 +6,7 @@ import uuid
 from typing import List, Any
 
 import chatbees as cb
-from chatbees.server_models.doc_api import AnswerReference
+from chatbees.server_models.doc_api import AnswerReference, ExtractType, ExtractedTable
 
 TEST_AID = os.environ.get('ENV_TEST_AID')
 TEST_APIKEY = os.environ.get('ENV_TEST_APIKEY')
@@ -297,3 +297,26 @@ class RegressionTest(unittest.TestCase):
         resp = col.ask(q)
         logging.info(f"Question: {q}")
         logging.info(f"Answer: {resp.answer}\n")
+
+    def test_extract_api(self):
+        cb.init(api_key=self.apikey, account_id=self.aid)
+
+        clname = 'extract_test'
+        col = cb.Collection(name=clname)
+        #cb.delete_collection(clname)
+        #cb.create_collection(col)
+
+        doc_name = 'Snowflake-secfilings-2024-10-10.pdf'
+        col.upload_document(doc_name)
+
+        question = 'What is the name of issuer?'
+        texts = col.extract_relevant_texts(doc_name, ExtractType.QUESTION, question)
+        assert texts == 'Snowflake Inc.'
+
+        question = 'What is the SEC file number?'
+        texts = col.extract_relevant_texts(doc_name, ExtractType.QUESTION, question)
+        assert texts == '001-39504'
+
+        table_name = 'Securities Sold During The Past 3 Months'
+        texts = col.extract_relevant_texts(doc_name, ExtractType.EXTRACT_TABLE, table_name)
+        ExtractedTable.model_validate_json(texts)

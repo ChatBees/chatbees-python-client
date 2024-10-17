@@ -1,6 +1,6 @@
 import json
 from enum import Enum
-from typing import List, Optional, Tuple, Dict
+from typing import Any, List, Optional, Tuple, Dict
 
 from pydantic import BaseModel
 
@@ -97,9 +97,19 @@ class SummaryResponse(BaseModel):
     summary: str
 
 
+class ExtractType(str, Enum):
+    QUESTION = 'QUESTION'
+    EXTRACT_TEXT = 'EXTRACT_TEXT'
+    EXTRACT_TABLE = 'EXTRACT_TABLE'
+
+class ExtractedTable(BaseModel):
+    columns: List[str]
+    rows: List[List[Any]]
+
 class ExtractRelevantTextsRequest(CollectionBaseRequest):
     # find the texts relevant to the input texts in the doc
     doc_name: str
+    extract_type: ExtractType
     input_texts: str
 
 class ExtractRelevantTextsResponse(BaseModel):
