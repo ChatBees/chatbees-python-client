@@ -12,6 +12,7 @@ __all__ = [
     "SearchReference",
     "CrawlStatus",
     "PageStats",
+    "ExtractType",
 ]
 
 class AddDocRequest(CollectionBaseRequest):
