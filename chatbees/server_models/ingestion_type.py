@@ -78,6 +78,8 @@ class ConfluenceSpec(IngestionSpec):
     # selected pages. Please specify either space or cql, not both.
     space: Optional[str] = None
     cql: Optional[str] = None
+    # whether ingest the files attached to the confluence pages
+    attachment: Optional[bool] = None
 
     @model_validator(mode='after')
     def validate_input(self) -> 'ConfluenceSpec':

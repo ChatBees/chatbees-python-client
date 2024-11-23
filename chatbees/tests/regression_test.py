@@ -195,16 +195,19 @@ class RegressionTest(unittest.TestCase):
         #col = cb.Collection(name=clname)
         #cb.create_collection(col)
 
-        self._test_confluence(clname, TEST_CONFLUENCE_USER, TEST_CONFLUENCE_TOKEN)
-        self._test_confluence_cql(clname, TEST_CONFLUENCE_USER, TEST_CONFLUENCE_TOKEN)
+        self._test_confluence(clname, TEST_CONFLUENCE_USER, TEST_CONFLUENCE_TOKEN, False)
+        self._test_confluence_cql(clname, TEST_CONFLUENCE_USER, TEST_CONFLUENCE_TOKEN, True)
 
-    def _test_confluence(self, clname: str, user: str = None, token: str = None):
+    def _test_confluence(
+        self, clname: str, user: str = None, token: str = None, attachment: bool = None,
+    ):
         schedule = cb.ScheduleSpec(cron_expr='0 0 * * 0', timezone='UTC')
         spec = cb.ConfluenceSpec(schedule=schedule,
-                                  url=TEST_CONFLUENCE_URL,
-                                  username=user,
-                                  token=token,
-                                  space=TEST_CONFLUENCE_SPACE)
+                                 url=TEST_CONFLUENCE_URL,
+                                 username=user,
+                                 token=token,
+                                 space=TEST_CONFLUENCE_SPACE,
+                                 attachment=attachment)
 
         self._test_ingestion(clname, cb.IngestionType.CONFLUENCE, spec)
 
@@ -213,16 +216,19 @@ class RegressionTest(unittest.TestCase):
         col.delete_periodic_ingestion(cb.IngestionType.CONFLUENCE)
         cb.describe_collection(clname)
 
-    def _test_confluence_cql(self, clname: str, user: str = None, token: str = None):
+    def _test_confluence_cql(
+        self, clname: str, user: str = None, token: str = None, attachment: bool = None,
+    ):
         cql = f"type = page and space = '{TEST_CONFLUENCE_SPACE}' and lastModified >= '2024-02-17'"
 
         cron_expr = '0 0 * * *'
         schedule = cb.ScheduleSpec(cron_expr=cron_expr, timezone='UTC')
         spec = cb.ConfluenceSpec(schedule=schedule,
-                                  url=TEST_CONFLUENCE_URL,
-                                  username=user,
-                                  token=token,
-                                  cql=cql)
+                                 url=TEST_CONFLUENCE_URL,
+                                 username=user,
+                                 token=token,
+                                 cql=cql,
+                                 attachment=attachment)
 
         self._test_ingestion(clname, cb.IngestionType.CONFLUENCE, spec)
 
@@ -231,10 +237,11 @@ class RegressionTest(unittest.TestCase):
             cron_expr = '*/2 * * * *'
         schedule = cb.ScheduleSpec(cron_expr=cron_expr, timezone='UTC')
         spec = cb.ConfluenceSpec(schedule=schedule,
-                                  url=TEST_CONFLUENCE_URL,
-                                  username=user,
-                                  token=token,
-                                  cql=cql)
+                                 url=TEST_CONFLUENCE_URL,
+                                 username=user,
+                                 token=token,
+                                 cql=cql,
+                                 attachment=attachment)
         col = cb.Collection(name=clname)
         col.update_periodic_ingestion(cb.IngestionType.CONFLUENCE, spec)
         cb.describe_collection(clname)
@@ -250,7 +257,7 @@ class RegressionTest(unittest.TestCase):
         #col = cb.Collection(name=clname)
         #cb.create_collection(col)
 
-        self._test_confluence(clname)
+        self._test_confluence(clname, attachment=True)
         self._test_confluence_cql(clname)
         self._test_gdrive(clname)
         self._test_notion(clname)
