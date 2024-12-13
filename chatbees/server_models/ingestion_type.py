@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 __all__ = [
+    "ConnectorType",
     "IngestionType",
     "IngestionStatus",
     "ScheduleSpec",
@@ -15,14 +16,21 @@ __all__ = [
     "ConfluenceSpec",
     "GDriveSpec",
     "NotionSpec",
+    "HubSpotKBSpec",
 ]
 
+class ConnectorType(Enum):
+    CONFLUENCE = 'CONFLUENCE'
+    GDRIVE = 'GDRIVE'
+    NOTION = 'NOTION'
+    # HubSpot tickets and KBs share the same connector
+    HUBSPOT_TICKET = 'HUBSPOT_TICKET'
 
 class IngestionType(Enum):
     CONFLUENCE = 'CONFLUENCE'
     GDRIVE = 'GDRIVE'
     NOTION = 'NOTION'
-    HUBSPOT_TICKET = 'HUBSPOT_TICKET'
+    HUBSPOT_KB = 'HUBSPOT_KB' # KB shares the same HUBSPOT_TICKET connector
 
 
 class IngestionStatus(Enum):
@@ -96,3 +104,7 @@ class GDriveSpec(IngestionSpec):
 
 class NotionSpec(IngestionSpec):
     page_ids: Optional[List[str]] = None
+
+
+class HubSpotKBSpec(IngestionSpec):
+    kb_names: Optional[List[str]] = None

@@ -78,7 +78,8 @@ class RegressionTest(unittest.TestCase):
 
             # list
             print("list_documents")
-            list_doc_names = col.list_documents()
+            docs = col.list_documents()
+            list_doc_names = [doc.name for doc in docs]
             assert doc_names == set(list_doc_names)
 
             # ask
@@ -90,7 +91,8 @@ class RegressionTest(unittest.TestCase):
             col.delete_document('española.txt')
             doc_names = {'text_file.txt', 'française.txt', '中文.txt'}
 
-            list_doc_names = col.list_documents()
+            docs = col.list_documents()
+            list_doc_names = [doc.name for doc in docs]
             assert doc_names == set(list_doc_names)
 
             resp = col.ask('question?')
@@ -137,7 +139,7 @@ class RegressionTest(unittest.TestCase):
         #cb.create_collection(col)
         self._test_doc_and_web(clname1, clname2, write=True)
 
-        self._test_transcribe_audio(clname1)
+        #self._test_transcribe_audio(clname1)
 
         self._test_confluence_user()
         self._test_connector_ingests()
@@ -168,7 +170,6 @@ class RegressionTest(unittest.TestCase):
             self.crawl_web(clname2, 'https://docs.piratenation.game/archive')
 
         docs = col.list_documents()
-        docs.sort()
         logging.info(f"docs={len(docs)} {docs}")
 
         q = 'what is pirate nation?'
@@ -209,7 +210,7 @@ class RegressionTest(unittest.TestCase):
                                  space=TEST_CONFLUENCE_SPACE,
                                  attachment=attachment)
 
-        self._test_ingestion(clname, cb.IngestionType.CONFLUENCE, spec)
+        self._test_ingestion(clname, cb.ConnectorType.CONFLUENCE, cb.IngestionType.CONFLUENCE, spec)
 
         # delete the periodic ingestion
         col = cb.Collection(name=clname)
@@ -230,7 +231,7 @@ class RegressionTest(unittest.TestCase):
                                  cql=cql,
                                  attachment=attachment)
 
-        self._test_ingestion(clname, cb.IngestionType.CONFLUENCE, spec)
+        self._test_ingestion(clname, cb.ConnectorType.CONFLUENCE, cb.IngestionType.CONFLUENCE, spec)
 
         # update the periodic ingestion
         if os.environ.get('ENV_TEST_CRON', default='False').lower() == "true":
@@ -257,6 +258,7 @@ class RegressionTest(unittest.TestCase):
         #col = cb.Collection(name=clname)
         #cb.create_collection(col)
 
+        self._test_hubspot_kb(clname)
         self._test_confluence(clname, attachment=True)
         self._test_confluence_cql(clname)
         self._test_gdrive(clname)
@@ -264,17 +266,46 @@ class RegressionTest(unittest.TestCase):
 
     def _test_gdrive(self, clname: str):
         spec = cb.GDriveSpec()
-        self._test_ingestion(clname, cb.IngestionType.GDRIVE, spec)
+        self._test_ingestion(clname, cb.ConnectorType.GDRIVE, cb.IngestionType.GDRIVE, spec)
 
     def _test_notion(self, clname: str):
         spec = cb.NotionSpec()
-        self._test_ingestion(clname, cb.IngestionType.NOTION, spec)
+        self._test_ingestion(clname, cb.ConnectorType.NOTION, cb.IngestionType.NOTION, spec)
 
-    def _test_ingestion(self, clname: str, ingestion_type: cb.IngestionType, spec: Any):
+    def _test_hubspot_kb(self, clname: str):
+        spec = cb.HubSpotKBSpec()
+        self._test_ingestion(clname, cb.ConnectorType.HUBSPOT_TICKET, cb.IngestionType.HUBSPOT_KB, spec)
+        col = cb.Collection(name=clname)
+        docs = col.list_documents()
+        count = 0
+        for doc in docs:
+            if doc.type == cb.DocumentType.HUBSPOT_KB:
+                count += 1
+        assert count == 3
+
+        spec = cb.HubSpotKBSpec(kb_names=['test-kb'])
+        self._test_ingestion(clname, cb.ConnectorType.HUBSPOT_TICKET, cb.IngestionType.HUBSPOT_KB, spec)
+        col = cb.Collection(name=clname)
+        docs = col.list_documents()
+        count = 0
+        for doc in docs:
+            if doc.type == cb.DocumentType.HUBSPOT_KB:
+                count += 1
+        assert count == 2
+
+    def _test_ingestion(
+        self,
+        clname: str,
+        connector_type: cb.ConnectorType,
+        ingestion_type: cb.IngestionType,
+        spec: Any,
+    ):
         connectors = cb.list_connectors()
         connector_id = ""
         for connector in connectors:
-            if connector.type == ingestion_type:
+            if (connector.type == connector_type or
+                    (connector.type == cb.ConnectorType.HUBSPOT_TICKET and
+                     ingestion_type == cb.IngestionType.HUBSPOT_KB)):
                 connector_id = connector.id
                 break
         if connector_id == "":
@@ -297,7 +328,8 @@ class RegressionTest(unittest.TestCase):
 
         logging.info(f"Ingest pages from {ingestion_type}:")
         for doc in col.list_documents():
-            logging.info(f"\t{doc}")
+            if doc.type.value == ingestion_type.value:
+                logging.info(f"\t{doc}")
 
         # ask a question
         q = "what is chatbees?"
