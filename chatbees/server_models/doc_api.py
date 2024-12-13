@@ -13,6 +13,8 @@ __all__ = [
     "CrawlStatus",
     "PageStats",
     "ExtractType",
+    "DocumentMetadata",
+    "DocumentType",
 ]
 
 class AddDocRequest(CollectionBaseRequest):
@@ -41,6 +43,7 @@ class DocumentType(Enum):
     NOTION = 'NOTION'
     GDRIVE = 'GDRIVE'
     CONFLUENCE = 'CONFLUENCE'
+    HUBSPOT_KB = 'HUBSPOT_KB'
 
 
 class DocumentMetadata(BaseModel):
@@ -102,6 +105,7 @@ class ExtractType(str, Enum):
     QUESTION = 'QUESTION'
     EXTRACT_TEXT = 'EXTRACT_TEXT'
     EXTRACT_TABLE = 'EXTRACT_TABLE'
+    EXTRACT_SUMMARIZE = 'EXTRACT_SUMMARIZE'
 
 class ExtractedTable(BaseModel):
     columns: List[str]

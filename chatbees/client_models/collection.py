@@ -18,6 +18,7 @@ from chatbees.server_models.ingestion_type import (
     ConfluenceSpec,
     GDriveSpec,
     NotionSpec,
+    HubSpotKBSpec,
 )
 from chatbees.server_models.doc_api import (
     AddDocRequest,
@@ -40,6 +41,7 @@ from chatbees.server_models.doc_api import (
     ExtractType,
     ExtractRelevantTextsRequest,
     ExtractRelevantTextsResponse,
+    DocumentMetadata,
 )
 from chatbees.server_models.collection_api import (
     ChatAttributes,
@@ -132,7 +134,7 @@ class Collection(BaseModel):
         )
         Config.post(url=url, data=req.model_dump_json())
 
-    def list_documents(self) -> List[str]:
+    def list_documents(self) -> List[DocumentMetadata]:
         """
         List the documents.
 
@@ -145,7 +147,7 @@ class Collection(BaseModel):
         )
         resp = Config.post(url=url, data=req.model_dump_json())
         list_resp = ListDocsResponse.model_validate(resp.json())
-        return list_resp.doc_names
+        return list_resp.documents
 
     def summarize_document(self, doc_name: str) -> str:
         """
@@ -335,16 +337,13 @@ class Collection(BaseModel):
         self,
         connector_id: str,
         ingestion_type: IngestionType,
-        ingestion_spec: Union[ConfluenceSpec, GDriveSpec, NotionSpec],
+        ingestion_spec: Union[ConfluenceSpec, GDriveSpec, NotionSpec, HubSpotKBSpec],
     ) -> str:
         """
         Create an Ingestion task
 
         :param ingestion_type: the ingestion type
-        :param ingestion_spec: the spec for the ingestion. Currently, supports
-            - ConfluenceSpec
-            - GDriveSpec
-            - NotionSpec
+        :param ingestion_spec: the spec for the ingestion
         :return: the id of the ingestion
         """
         url = f'{Config.get_base_url()}/docs/create_ingestion'
@@ -361,16 +360,13 @@ class Collection(BaseModel):
     def update_periodic_ingestion(
         self,
         ingestion_type: IngestionType,
-        ingestion_spec: Union[ConfluenceSpec, GDriveSpec, NotionSpec]
+        ingestion_spec: Union[ConfluenceSpec, GDriveSpec, NotionSpec, HubSpotKBSpec]
     ):
         """
         Update the periodic ingestion.
 
         :param ingestion_type: the ingestion type
-        :param ingestion_spec: the spec for the ingestion. Currently, supports
-            - ConfluenceSpec
-            - GDriveSpec
-            - NotionSpec
+        :param ingestion_spec: the spec for the ingestion
         :return: the id of the ingestion
         """
         url = f'{Config.get_base_url()}/docs/update_periodic_ingestion'
