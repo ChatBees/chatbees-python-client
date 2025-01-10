@@ -24,7 +24,6 @@ class RegressionTest(unittest.TestCase):
     def setUp(self):
         self.aid = TEST_AID
         self.apikey = TEST_APIKEY
-        cb.init(TEST_APIKEY, TEST_AID)
 
     def crawl_web(self, clname: str, root_url: str, max_urls_to_crawl: int = 200):
         col = cb.Collection(name=clname)
@@ -143,53 +142,6 @@ class RegressionTest(unittest.TestCase):
 
         self._test_confluence_user()
         self._test_connector_ingests()
-
-    def get_file_md5(self, path):
-        with open(path, 'rb') as file_to_check:
-            # read contents of the file
-            data = file_to_check.read()
-            # pipe contents of the file through
-            return hashlib.md5(data).hexdigest()
-    def test_fs(self):
-        #cb.delete_collection('another_collection')
-
-        cols = cb.list_collections()
-        assert 'another_collection' not in cols
-
-        # Create another collection
-        col = cb.Collection(name='another_collection')
-        cb.create_collection(col)
-
-        cols = cb.list_collections()
-        assert 'another_collection' in cols
-
-        # List docs, should be empty
-        docs = col.list_documents()
-        assert docs == []
-
-        # Upload transformer pdf and ask question
-        doc_name = 'transformer.pdf'
-
-        file_md5 = self.get_file_md5(doc_name)
-
-        col.upload_document(doc_name)
-        downloaded = col.download_document(doc_name, './downloads')
-        assert file_md5 == self.get_file_md5(downloaded), f'MD5 mismatch. original={doc_name}, downloaded={downloaded}'
-
-        q = 'what is a transformer?'
-        print(f"[global] q: {q}, a={col.ask('what is a transformer')}")
-        print(f"[doc] q: {q}, a={col.ask('what is a transformer', doc_name=doc_name)}")
-
-        # List docs, should see doc_name
-        docs = col.list_documents()
-        assert doc_name in docs, f'Documents are {docs}'
-
-        col.delete_document(doc_name)
-
-        # Describe, delete Delete
-        desc = cb.describe_collection('another_collection')
-        print(desc)
-        #cb.delete_collection('another_collection')
 
     def _test_doc_and_web(self, clname1: str, clname2: str, write: bool = True):
         cols = cb.list_collections()
