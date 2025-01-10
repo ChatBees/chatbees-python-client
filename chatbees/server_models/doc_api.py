@@ -15,6 +15,19 @@ __all__ = [
     "ExtractType",
 ]
 
+class GetDocRequest(CollectionBaseRequest):
+    doc_name: str
+
+    # fastapi server expects "property name enclosed in double quotes" when
+    # using with UploadFile. pydantic.model_dump_json() uses single quote.
+    # explicitly uses json.loads() and dumps().
+    @classmethod
+    def validate_to_json(cls, value):
+        return cls(**json.loads(value)) if isinstance(value, str) else value
+
+    def to_json_string(self) -> str:
+        return json.dumps(self.__dict__)
+
 class AddDocRequest(CollectionBaseRequest):
     # fastapi server expects "property name enclosed in double quotes" when
     # using with UploadFile. pydantic.model_dump_json() uses single quote.

@@ -8,7 +8,7 @@ from chatbees.client_models.chat import Chat
 from chatbees.server_models.doc_api import (
     CrawlStatus,
     AskResponse,
-    SearchReference,
+    SearchReference, GetDocRequest,
 )
 from chatbees.server_models.chat import ConfigureChatRequest
 from chatbees.server_models.ingestion_type import (
@@ -89,6 +89,30 @@ class Collection(BaseModel):
     chat_attributes: Optional[ChatAttributes] = None
 
     periodic_ingests: Optional[List[PeriodicIngest]] = None
+
+
+    def download_document(self, doc_name: str, save_path = '.'):
+        """
+        Uploads a local or web document into this collection.
+
+        :param path_or_url: Local file path or the URL of a document. URL must
+                            contain scheme (http or https) prefix.
+        :return:
+        """
+        url = f'{Config.get_base_url()}/docs/get'
+        req = GetDocRequest(namespace_name=Config.namespace,
+                            collection_name=self.name, doc_name=doc_name)
+
+        response = Config.post(url=url, data=req.model_dump_json())
+        response.raise_for_status()
+        print(f'GET file response is {response}')
+
+        # Write the file to the local save path
+        filename = os.path.join(save_path, doc_name)
+        with open(filename, 'wb') as file:
+            file.write(response.content)
+        print(f"Document '{doc_name}' downloaded successfully to '{save_path}'.")
+        return filename
 
     def upload_document(self, path_or_url: str):
         """
