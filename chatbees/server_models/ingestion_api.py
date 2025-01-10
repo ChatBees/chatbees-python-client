@@ -3,7 +3,7 @@ from typing import Any, List
 from pydantic import BaseModel
 
 from chatbees.server_models.collection_api import CollectionBaseRequest
-from chatbees.server_models.ingestion_type import IngestionType, IngestionStatus
+from chatbees.server_models.ingestion_type import ConnectorType, IngestionType, IngestionStatus
 
 """
 When ingesting data from a data source, please create a connector (e.g., connect
@@ -14,7 +14,7 @@ used for the ingestion process.
 
 class ConnectorReference(BaseModel):
     id: str
-    type: IngestionType
+    type: ConnectorType
     name: str
 
 class ListConnectorsRequest(BaseModel):
