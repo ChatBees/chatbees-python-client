@@ -18,12 +18,12 @@ class Config:
 
     @classmethod
     def get_base_url(cls):
-        return "http://ec2-34-216-132-211.us-west-2.compute.amazonaws.com:10001"
-        #if ENV_TEST_BASE_URL == 'preprod':
-        #    return f"https://{cls.account_id}.preprod.aws.chatbees.ai"
-        #if ENV_TEST_BASE_URL.find("localhost") >= 0:
-        #    return ENV_TEST_BASE_URL
-        #return f"https://{cls.account_id}.us-west-2.aws.chatbees.ai"
+        # Default - prod
+        if ENV_TEST_BASE_URL == '':
+            return f"https://{cls.account_id}.us-west-2.aws.chatbees.ai"
+        if ENV_TEST_BASE_URL == 'preprod':
+            return f"https://{cls.account_id}.preprod.aws.chatbees.ai"
+        return ENV_TEST_BASE_URL
 
     @classmethod
     def post(cls, url, data=None, files=None, enforce_api_key=True):

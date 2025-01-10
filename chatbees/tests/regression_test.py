@@ -9,8 +9,8 @@ from typing import List, Any
 import chatbees as cb
 from chatbees.server_models.doc_api import AnswerReference, ExtractType, ExtractedTable
 
-TEST_AID = 'BK5XN4QN'
-TEST_APIKEY = 'MDItMDAwMDAwMDAtZWY5NWFlYzctNGMzNi05Y2EzLWUxYzctZjY1MTQ3YmY2NDc3'
+TEST_AID = os.environ.get('ENV_TEST_AID')
+TEST_APIKEY = os.environ.get('ENV_TEST_APIKEY')
 
 TEST_CONFLUENCE_USER = os.environ.get('TEST_CONFLUENCE_USER')
 TEST_CONFLUENCE_TOKEN = os.environ.get('TEST_CONFLUENCE_TOKEN')
@@ -189,7 +189,7 @@ class RegressionTest(unittest.TestCase):
         # Describe, delete Delete
         desc = cb.describe_collection('another_collection')
         print(desc)
-        cb.delete_collection('another_collection')
+        #cb.delete_collection('another_collection')
 
     def _test_doc_and_web(self, clname1: str, clname2: str, write: bool = True):
         cols = cb.list_collections()
