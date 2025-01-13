@@ -5,6 +5,7 @@ import unittest
 from typing import List
 
 import chatbees as cb
+from chatbees.server_models.application import ApplicationType
 from chatbees.server_models.doc_api import AnswerReference, ExtractType, ExtractedTable
 
 TEST_AID = os.environ.get('ENV_TEST_AID')
@@ -17,7 +18,6 @@ class LocalfsImplTest(unittest.TestCase):
     def setUp(self):
         self.aid = TEST_AID
         self.apikey = TEST_APIKEY
-        cb.init(TEST_APIKEY, TEST_AID)
 
     def ask(self, clname: str, q: str, top_k: int = 5):
         col = cb.Collection(name=clname)
@@ -25,6 +25,21 @@ class LocalfsImplTest(unittest.TestCase):
         logging.info(f"{clname} q={q} a={resp.answer}")
         doc_names = [ref.doc_name for ref in resp.refs]
         logging.info(f"refs={doc_names}")
+
+    def test_applications(self):
+        cb.init(api_key=self.apikey, account_id=self.aid)
+        clname = 'test_applications'
+        try:
+            col = cb.Collection(name=clname)
+            cb.create_collection(col)
+            cb.create_application(application_name='test', application_type=ApplicationType.COLLECTION, collection_name=clname)
+            cb.create_application(application_name='test2', application_type=ApplicationType.GPT, provider='openai', model='4o')
+            applications = cb.list_applications()
+            assert set([app.application_name for app in applications]) == {'test', 'test2'}
+            cb.delete_application('test')
+            cb.delete_application('test2')
+        except Exception:
+            cb.delete_collection(clname)
 
     def test_doc_apis(self):
         cb.init(api_key=self.apikey, account_id=self.aid)
