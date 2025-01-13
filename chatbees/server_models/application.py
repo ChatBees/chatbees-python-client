@@ -22,5 +22,6 @@ class Application(BaseModel):
 
     application_type: ApplicationType
 
-    # Application target could be one of the supported targets
+    # Application target could be one of the supported targets.
+    # json string, for example, { "namespace_name": "public", "collection_name": "test_col" }
     application_target: str
