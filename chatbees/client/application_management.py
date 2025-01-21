@@ -1,4 +1,4 @@
-__all__ = ["create_application", "delete_application", "list_applications"]
+__all__ = ["create_gpt_application", "create_collection_application", "delete_application", "list_applications"]
 
 from typing import Optional, List
 
@@ -12,50 +12,51 @@ from chatbees.server_models.application_api import (
     CreateApplicationRequest,
     DeleteApplicationRequest, ListApplicationsResponse,
 )
+from chatbees.server_models.collection_api import ChatAttributes
 from chatbees.utils.config import Config
 
-def create_application(
+def create_gpt_application(
     application_name: str,
-    application_type: ApplicationType,
-    **kwargs
+    provider: str,
+    model: str,
+    description: Optional[str] = None,
+    chat_attrs: Optional[ChatAttributes] = None
 ) -> Application:
     """
-    Create a new application in ChatBees.
-
-    Args:
-        application_name: The name of the application
-        application_type: Application type
-
-    KwArgs:
-        collection_name: Collection to target (CollectionTarget only)
-        provider: Provider of GPT application (GPT application only)
-        model: Model of GPT application (GPT application only)
-    Returns:
-        The created application
+    Create a new collection application in ChatBees.
 
     """
     url = f'{Config.get_base_url()}/applications/create'
-    application: Optional[Application] = None
-    req: Optional[CreateApplicationRequest] = None
+    application = Application(
+        application_name=application_name,
+        application_desc=description,
+        application_type=ApplicationType.GPT,
+        chat_attrs=chat_attrs,
+        application_target=GPTTarget(
+            provider=provider, model=model).model_dump_json())
+    req = CreateApplicationRequest(application=application)
+    Config.post(url=url, data=req.model_dump_json())
+    return application
 
-    match application_type:
-        case ApplicationType.COLLECTION:
-            assert set(kwargs.keys()) == {'collection_name'}, f"Invalid keyword args"
-            params = {**kwargs, "namespace_name": Config.namespace}
-            application = Application(
-                application_name=application_name,
-                application_type=application_type,
-                application_target=CollectionTarget(**params).model_dump_json())
-            req = CreateApplicationRequest(application=application)
-        case ApplicationType.GPT:
-            assert set(kwargs.keys()) == {'provider', 'model'}, f"Invalid keyword args"
-            application = Application(
-                application_name=application_name,
-                application_type=application_type,
-                application_target=GPTTarget(**kwargs).model_dump_json())
-            req = CreateApplicationRequest(application=application)
-        case _:
-            raise ValueError(f"Invalid application type {application_type}")
+def create_collection_application(
+    application_name: str,
+    collection_name: str,
+    description: Optional[str] = None,
+    chat_attrs: Optional[ChatAttributes] = None
+) -> Application:
+    """
+    Create a new collection application in ChatBees.
+
+    """
+    url = f'{Config.get_base_url()}/applications/create'
+    application = Application(
+        application_name=application_name,
+        application_desc=description,
+        application_type=ApplicationType.COLLECTION,
+        chat_attrs=chat_attrs,
+        application_target=CollectionTarget(
+            namespace_name=Config.namespace, collection_name=collection_name).model_dump_json())
+    req = CreateApplicationRequest(application=application)
     Config.post(url=url, data=req.model_dump_json())
     return application
 

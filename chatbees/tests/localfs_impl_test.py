@@ -7,6 +7,7 @@ from typing import List
 import chatbees as cb
 from chatbees import Chat
 from chatbees.server_models.application import ApplicationType
+from chatbees.server_models.collection_api import ChatAttributes
 from chatbees.server_models.doc_api import AnswerReference, ExtractType, ExtractedTable
 from chatbees.utils.ask import ask_application
 
@@ -40,10 +41,35 @@ class LocalfsImplTest(unittest.TestCase):
         try:
             col = cb.Collection(name=clname)
             cb.create_collection(col)
-            cb.create_application(application_name='test', application_type=ApplicationType.COLLECTION, collection_name=clname)
-            cb.create_application(application_name='test2', application_type=ApplicationType.GPT, provider='openai', model='4o')
+            cb.create_collection_application(
+                application_name='test',
+                description='testdesc',
+                collection_name=clname,
+                chat_attrs=ChatAttributes(welcome_msg='TEST welcome!',
+                                          negative_response='TEST negative'))
+            cb.create_gpt_application(application_name='test2', provider='openai', model='4o')
             applications = cb.list_applications()
             assert set([app.application_name for app in applications]) == {'test', 'test2'}
+
+            app = applications[0] if applications[0].application_name == 'test' else applications[1]
+
+            # Application info is persisted
+            assert app.application_desc == 'testdesc'
+            assert app.chat_attrs.welcome_msg == 'TEST welcome!'
+            assert app.chat_attrs.negative_response == 'TEST negative'
+
+            # Upload a test file, then ask an unrelated question. should get configured negative
+            # response back
+            test_file = f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt'
+            col.upload_document(test_file)
+
+            # Asking through APP should respect negative_response.
+            # It is not configured through cl
+            app_answer = Chat(application_name=app.application_name).ask('what is openai?').answer
+            cl_answer = col.chat().ask('what is openai?').answer
+            assert app_answer == 'TEST negative', f'App answer {app_answer}'
+            assert cl_answer != 'TEST negative', f"Cl answer {cl_answer}"
+
             cb.delete_application('test')
             cb.delete_application('test2')
         except Exception:
@@ -57,7 +83,7 @@ class LocalfsImplTest(unittest.TestCase):
         col = cb.Collection(name=clname)
         cb.create_collection(col)
 
-        app = cb.create_application('testapp', ApplicationType.COLLECTION, collection_name=clname)
+        app = cb.create_collection_application('testapp', collection_name=clname)
 
         files = [
             f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt',
@@ -115,6 +141,8 @@ class LocalfsImplTest(unittest.TestCase):
             resp = app_chat2.ask("q2")
             self.assertRefsAreFromDoc(resp.refs, "text_file.txt")
 
+            print(f"Convo {resp.conversation_id}")
+
             # ensure we can configure chat attrs
             col.configure_chat('a pirate from 1600s', 'the word snowday and nothing else')
             resp = col.ask('what is the color of my hair?')
@@ -122,6 +150,7 @@ class LocalfsImplTest(unittest.TestCase):
 
             resp = app_chat1.ask('what is the color of my hair?')
             print("[app] persona answer", resp.answer)
+
         finally:
             cb.delete_application(app.application_name)
             cb.delete_collection(col.name)

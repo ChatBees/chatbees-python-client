@@ -1,3 +1,4 @@
+import logging
 from typing import List, Tuple
 
 from chatbees.server_models.doc_api import (
@@ -47,24 +48,17 @@ def ask_application(
 ) -> AskResponse:
     url = f'{Config.get_base_url()}/applications/ask'
 
-    app_request = AskRequest(
-        namespace_name="",
-        collection_name="",
+    req = AskRequest(
+        application_name=application_name,
         question=question,
         top_k=top_k,
         doc_name=doc_name,
         history_messages=history_messages,
         conversation_id=conversation_id,
-    ).model_dump_json(exclude={'namespace_name', 'collection_name'})
-
-    req = AskApplicationRequest(
-        application_name=application_name,
-        app_request=app_request,
     )
-
     resp = Config.post(
         url=url,
         data=req.model_dump_json(),
         enforce_api_key=False
     )
-    return AskResponse.model_validate_json(resp.json())
+    return AskResponse.model_validate(resp.json())

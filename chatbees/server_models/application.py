@@ -1,6 +1,9 @@
 import enum
+from typing import Optional
 
 from pydantic import BaseModel
+
+from chatbees.server_models.collection_api import ChatAttributes
 
 
 class ApplicationType(str, enum.Enum):
@@ -20,8 +23,14 @@ class GPTTarget(BaseModel):
 class Application(BaseModel):
     application_name: str
 
+    application_desc: Optional[str] = ''
+
     application_type: ApplicationType
 
-    # Application target could be one of the supported targets.
-    # json string, for example, { "namespace_name": "public", "collection_name": "test_col" }
+    enabled: bool = True
+
     application_target: str
+
+    chat_attrs: Optional[ChatAttributes] = None
+
+
