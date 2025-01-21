@@ -209,3 +209,10 @@ class GetCrawlResponse(BaseModel):
 
 class IndexCrawlRequest(CollectionBaseRequest):
     crawl_id: str
+
+class AskApplicationRequest(BaseModel):
+    application_name: str
+    app_request: str
+
+class AskApplicationResponse(BaseModel):
+    app_response: str

@@ -5,8 +5,10 @@ import unittest
 from typing import List
 
 import chatbees as cb
+from chatbees import Chat
 from chatbees.server_models.application import ApplicationType
 from chatbees.server_models.doc_api import AnswerReference, ExtractType, ExtractedTable
+from chatbees.utils.ask import ask_application
 
 TEST_AID = os.environ.get('ENV_TEST_AID')
 TEST_APIKEY = os.environ.get('ENV_TEST_APIKEY')
@@ -23,6 +25,12 @@ class LocalfsImplTest(unittest.TestCase):
         col = cb.Collection(name=clname)
         resp = col.ask(q, top_k)
         logging.info(f"{clname} q={q} a={resp.answer}")
+        doc_names = [ref.doc_name for ref in resp.refs]
+        logging.info(f"refs={doc_names}")
+
+    def ask_app(self, app_name: str, q: str, top_k: int = 5):
+        resp = ask_application(application_name=app_name, question=q, top_k=top_k)
+        logging.info(f"{app_name} q={q} a={resp.answer}")
         doc_names = [ref.doc_name for ref in resp.refs]
         logging.info(f"refs={doc_names}")
 
@@ -44,8 +52,12 @@ class LocalfsImplTest(unittest.TestCase):
     def test_doc_apis(self):
         cb.init(api_key=self.apikey, account_id=self.aid)
         clname = 'test_doc_apis'
+
+        # Create a collection and an application
         col = cb.Collection(name=clname)
         cb.create_collection(col)
+
+        app = cb.create_application('testapp', ApplicationType.COLLECTION, collection_name=clname)
 
         files = [
             f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt',
@@ -84,21 +96,34 @@ class LocalfsImplTest(unittest.TestCase):
 
             # chat
             chat1 = col.chat()
+            app_chat1 = Chat(application_name=app.application_name)
             chat2 = col.chat(doc_name="text_file.txt")
+            app_chat2 = Chat(application_name=app.application_name, doc_name='text_file.txt')
 
             chat1.ask("q1")
             chat1.ask("q2")
+            app_chat1.ask("q1")
+            app_chat1.ask("q2")
 
             resp = chat2.ask("q1")
             self.assertRefsAreFromDoc(resp.refs, "text_file.txt")
             resp = chat2.ask("q2")
             self.assertRefsAreFromDoc(resp.refs, "text_file.txt")
 
+            resp = app_chat2.ask("q1")
+            self.assertRefsAreFromDoc(resp.refs, "text_file.txt")
+            resp = app_chat2.ask("q2")
+            self.assertRefsAreFromDoc(resp.refs, "text_file.txt")
+
             # ensure we can configure chat attrs
             col.configure_chat('a pirate from 1600s', 'the word snowday and nothing else')
             resp = col.ask('what is the color of my hair?')
             print("persona answer", resp.answer)
+
+            resp = app_chat1.ask('what is the color of my hair?')
+            print("[app] persona answer", resp.answer)
         finally:
+            cb.delete_application(app.application_name)
             cb.delete_collection(col.name)
 
     def assertRefsAreFromDoc(self, refs: List[AnswerReference], doc: str):
