@@ -21,6 +21,7 @@ class LocalfsImplTest(unittest.TestCase):
     def setUp(self):
         self.aid = TEST_AID
         self.apikey = TEST_APIKEY
+        cb.init(api_key=self.apikey, account_id=self.aid)
 
     def ask(self, clname: str, q: str, top_k: int = 5):
         col = cb.Collection(name=clname)
@@ -36,7 +37,6 @@ class LocalfsImplTest(unittest.TestCase):
         logging.info(f"refs={doc_names}")
 
     def test_applications(self):
-        cb.init(api_key=self.apikey, account_id=self.aid)
         clname = 'test_applications'
         try:
             col = cb.Collection(name=clname)
@@ -76,7 +76,6 @@ class LocalfsImplTest(unittest.TestCase):
             cb.delete_collection(clname)
 
     def test_doc_apis(self):
-        cb.init(api_key=self.apikey, account_id=self.aid)
         clname = 'test_doc_apis'
 
         # Create a collection and an application

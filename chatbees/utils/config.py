@@ -6,8 +6,8 @@ from .exceptions import raise_for_error
 ENV_TEST_BASE_URL = os.environ.get("ENV_TEST_BASE_URL", "")
 
 class Config:
-    api_key: str
-    account_id: str
+    api_key: str = ''
+    account_id: str = ''
     PUBLIC_NAMESPACE: str = "public"
     namespace: str = PUBLIC_NAMESPACE
 
