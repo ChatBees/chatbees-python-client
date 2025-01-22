@@ -36,6 +36,51 @@ class LocalfsImplTest(unittest.TestCase):
         doc_names = [ref.doc_name for ref in resp.refs]
         logging.info(f"refs={doc_names}")
 
+    def test_conversations(self):
+        clname = 'test_conversations'
+        appname = 'test_app'
+        try:
+            col = cb.Collection(name=clname)
+            cb.create_collection(col)
+            app = cb.create_collection_application(
+                application_name=appname,
+                description='testdesc',
+                collection_name=clname,
+                chat_attrs=ChatAttributes(welcome_msg='TEST welcome!',
+                                          negative_response='TEST negative'))
+
+            # Upload a test file.
+            test_file = f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt'
+            col.upload_document(test_file)
+
+            col.chat().ask('first_cl_question')
+            Chat(application_name=appname).ask('first_app_question')
+
+            # Test collection conversation
+            col_chat = col.chat()
+            cl_foo_answer = col_chat.ask('cl_foo').answer
+            cl_bar_answer = col_chat.ask('cl_bar').answer
+
+            app_chat = Chat(application_name=appname)
+            app_foo_answer = app_chat.ask('app_foo').answer
+            app_bar_answer = app_chat.ask('app_bar').answer
+
+            cl_convos = Chat.list_conversations(collection_name=clname)
+            app_convos = Chat.list_conversations(application_name=appname)
+            assert len(cl_convos) == 2, f"Found cl convos {cl_convos}"
+            assert len(app_convos) == 2, f"Found app convos {app_convos}"
+
+            cl_convo = Chat.from_conversation(col_chat.conversation_id, collection_name=clname)
+            app_convo = Chat.from_conversation(app_chat.conversation_id, application_name=appname)
+
+            assert cl_convo.history_messages == [('cl_foo', cl_foo_answer), ('cl_bar', cl_bar_answer)], f"Actual convo {cl_convo}"
+            assert app_convo.history_messages == [('app_foo', app_foo_answer), ('app_bar', app_bar_answer)], f"Actual convo {app_convo}"
+
+
+        except Exception:
+            cb.delete_application(appname)
+            cb.delete_collection(clname)
+
     def test_applications(self):
         clname = 'test_applications'
         try:
