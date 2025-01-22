@@ -76,8 +76,8 @@ class LocalfsImplTest(unittest.TestCase):
             assert cl_convo.history_messages == [('cl_foo', cl_foo_answer), ('cl_bar', cl_bar_answer)], f"Actual convo {cl_convo}"
             assert app_convo.history_messages == [('app_foo', app_foo_answer), ('app_bar', app_bar_answer)], f"Actual convo {app_convo}"
 
-            print(cl_convo.history_messages)
-            print(app_convo.history_messages)
+            print(f"convo: {cl_convo.history_messages}")
+            print(f"convo: {app_convo.history_messages}")
         finally:
             cb.delete_application(appname)
             cb.delete_collection(clname)
