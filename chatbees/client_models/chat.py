@@ -35,8 +35,9 @@ class Chat(BaseModel):
     @classmethod
     def list_conversations(cls, collection_name=None, application_name=None) -> List[ConversationMeta]:
         url = f'{Config.get_base_url()}/conversations/list'
+        namespace = Config.namespace if collection_name is not None else None
         req = ListConversationsRequest(
-            namespace_name=Config.namespace,
+            namespace_name=namespace,
             collection_name=collection_name,
             application_name=application_name
         )
