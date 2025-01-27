@@ -5,8 +5,10 @@ from chatbees.server_models.ingestion_type import IngestionType, IngestionStatus
 
 
 class CollectionBaseRequest(BaseModel):
-    namespace_name: str
-    collection_name: str
+    namespace_name: Optional[str] = None
+    collection_name: Optional[str] = None
+    application_name: Optional[str] = None
+
 
 
 class CreateCollectionRequest(CollectionBaseRequest):
@@ -35,17 +37,37 @@ class ListCollectionsResponse(BaseModel):
 
 
 class ChatAttributes(BaseModel):
-    # Configure chatbot role, personality and style. For example:
+    """
+    Chat config
+    """
+    # Configure chatbot personality and style. For example:
     #
-    # - You are an AI assistant. You will talk like a 1600s pirate.
-    # - You are an AI assistant.
-    # - You are an AI customer support agent.
+    # - a 1600s pirate, your name is 'Capital Morgan'.
+    # - a helpful AI assistant
     persona: Optional[str] = None
 
     # Configure chatbot response when no relevant result is found. For example:
     #
     # - I do not have that information.
     negative_response: Optional[str] = None
+
+    # Welcome message a user sees when starting a conversation.
+    welcome_msg: Optional[str] = None
+
+    """
+    Model config
+    """
+    # Configures whether the chatbot gives conservative or creative answers.
+    # Must be between 0 and 1, inclusive of both ends.
+    temperature: Optional[float] = None
+
+    # TODO: Implement these model configs
+    top_p: Optional[float] = None
+    # [-2.0, 2.0]
+    presence_penalty: Optional[float] = None
+    # [-2.0, 2.0]
+    frequency_penalty: Optional[float] = None
+    max_completion_tokens: Optional[int] = None
 
 
 class PeriodicIngest(BaseModel):

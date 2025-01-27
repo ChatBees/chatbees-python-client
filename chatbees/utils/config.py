@@ -6,8 +6,8 @@ from .exceptions import raise_for_error
 ENV_TEST_BASE_URL = os.environ.get("ENV_TEST_BASE_URL", "")
 
 class Config:
-    api_key: str
-    account_id: str
+    api_key: str = ''
+    account_id: str = ''
     PUBLIC_NAMESPACE: str = "public"
     namespace: str = PUBLIC_NAMESPACE
 
@@ -18,11 +18,12 @@ class Config:
 
     @classmethod
     def get_base_url(cls):
+        # Default - prod
+        if ENV_TEST_BASE_URL == '':
+            return f"https://{cls.account_id}.us-west-2.aws.chatbees.ai"
         if ENV_TEST_BASE_URL == 'preprod':
             return f"https://{cls.account_id}.preprod.aws.chatbees.ai"
-        if ENV_TEST_BASE_URL.find("localhost") >= 0:
-            return ENV_TEST_BASE_URL
-        return f"https://{cls.account_id}.us-west-2.aws.chatbees.ai"
+        return ENV_TEST_BASE_URL
 
     @classmethod
     def post(cls, url, data=None, files=None, enforce_api_key=True):
@@ -31,6 +32,7 @@ class Config:
         # Encode data if it is a string
         if data is not None and isinstance(data, str):
             data = data.encode('utf-8')
+        print(f'Sending to URL: {url}, data={data}, header={cls._construct_header()}')
         resp = requests.post(
             url, data=data, files=files, headers=cls._construct_header())
         raise_for_error(resp)
@@ -47,4 +49,4 @@ class Config:
 
     @classmethod
     def _construct_header(cls):
-        return None if cls.api_key is None else {'api-key': cls.api_key}
+        return None if cls.api_key is None else {'api-key': cls.api_key, 'x-org-url': cls.account_id}
