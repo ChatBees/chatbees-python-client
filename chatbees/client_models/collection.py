@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import List, Dict, Tuple, Any, Union, Optional
 from urllib import request
@@ -8,7 +9,7 @@ from chatbees.client_models.chat import Chat
 from chatbees.server_models.doc_api import (
     CrawlStatus,
     AskResponse,
-    SearchReference, GetDocRequest,
+    SearchReference, GetDocRequest, AsyncAddDocResponse, PendingDocumentMetadata,
 )
 from chatbees.server_models.chat import ConfigureChatRequest
 from chatbees.server_models.ingestion_type import (
@@ -142,6 +143,41 @@ class Collection(BaseModel):
                     url=url, files={'file': (fname, f)},
                     data={'request': req.model_dump_json()})
 
+    def upload_documents_async(self, path_or_urls: List[str]) -> List[str]:
+        """
+        Uploads a local or web document into this collection.
+
+        :param path_or_urls: Local file path or the URL of a document. URL must
+                             contain scheme (http or https) prefix.
+        :return:
+        """
+        url = f'{Config.get_base_url()}/docs/add_async'
+        req = AddDocRequest(namespace_name=Config.namespace,
+                            collection_name=self.name)
+        #files = [('files', open(f"{current_dir}/{fname}", "rb")) for fname in fnames]
+        files = []
+
+        for path_or_url in path_or_urls:
+            if is_url(path_or_url):
+                validate_url_file(path_or_url)
+                files.append(('files', request.urlopen(path_or_url) ))
+            else:
+                # Handle tilde "~/blah"
+                path_or_url = os.path.expanduser(path_or_url)
+                validate_file(path_or_url)
+                files.append(('files', open(path_or_url, 'rb')))
+        resp = Config.post(
+            url=url, files=files,
+            data={'request': req.model_dump_json()})
+        for _, file in files:
+            try:
+                file.close()
+                logging.info(f"Closed file")
+            except Exception:
+                pass
+        add_resp = AsyncAddDocResponse.model_validate(resp.json())
+        return add_resp.task_ids
+
     def delete_document(self, doc_name: str):
         """
         Deletes the document.
@@ -170,6 +206,21 @@ class Collection(BaseModel):
         resp = Config.post(url=url, data=req.model_dump_json())
         list_resp = ListDocsResponse.model_validate(resp.json())
         return list_resp.doc_names
+
+    def list_pending_documents(self) -> List[PendingDocumentMetadata]:
+        """
+        List the documents.
+
+        :return: A list of the documents
+        """
+        url = f'{Config.get_base_url()}/docs/list'
+        req = ListDocsRequest(
+            namespace_name=Config.namespace,
+            collection_name=self.name,
+        )
+        resp = Config.post(url=url, data=req.model_dump_json())
+        list_resp = ListDocsResponse.model_validate(resp.json())
+        return list_resp.pending_documents
 
     def summarize_document(self, doc_name: str) -> str:
         """

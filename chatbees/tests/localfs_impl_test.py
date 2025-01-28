@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import os
+import time
 import unittest
 from typing import List
 
@@ -120,6 +121,37 @@ class LocalfsImplTest(unittest.TestCase):
             cb.delete_application('test2')
         finally:
             cb.delete_collection(clname)
+
+
+    def test_async_upload(self):
+        clname = 'test_async_doc_apis'
+
+        # Create a collection and an application
+        col = cb.Collection(name=clname)
+        cb.create_collection(col)
+
+        files = [
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/text_file.txt',
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/española.txt',
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/française.txt',
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/中文.txt',
+        ]
+        doc_names = {'text_file.txt', 'española.txt', 'française.txt', '中文.txt'}
+
+        try:
+            tasks = col.upload_documents_async(files)
+            print(f"Uploaded docs for async processing, tasks {tasks}")
+            while True:
+                docs = col.list_pending_documents()
+                if len(docs) == 0:
+                    break
+                print(f"Async doc upload status {docs}")
+                time.sleep(2)
+            all_docs = col.list_documents()
+            print(f"Got {all_docs}")
+            assert sorted(all_docs) == sorted(doc_names)
+        finally:
+            cb.delete_collection(col.name)
 
     def test_doc_apis(self):
         clname = 'test_doc_apis'
