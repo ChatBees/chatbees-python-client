@@ -53,6 +53,7 @@ def email_login(
     resp = Config.post(
         url=url,
         data=req.model_dump_json(),
+        enforce_api_key=False,
     )
     resp = AccountLoginResponse.model_validate(resp.json())
 
