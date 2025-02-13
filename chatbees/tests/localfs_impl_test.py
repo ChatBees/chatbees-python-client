@@ -11,18 +11,14 @@ from chatbees.server_models.application import ApplicationType
 from chatbees.server_models.collection_api import ChatAttributes
 from chatbees.server_models.doc_api import AnswerReference, ExtractType, ExtractedTable
 from chatbees.utils.ask import ask_application
+from chatbees.utils.config import Config
 
-TEST_AID = os.environ.get('ENV_TEST_AID')
-TEST_APIKEY = os.environ.get('ENV_TEST_APIKEY')
+TEST_ACCOUNT = os.environ.get('ENV_TEST_ACCOUNT')
+TEST_PASSWORD = os.environ.get('ENV_TEST_PASSWORD')
 
 class LocalfsImplTest(unittest.TestCase):
-    aid: str
-    apikey: str
-
     def setUp(self):
-        self.aid = TEST_AID
-        self.apikey = TEST_APIKEY
-        cb.init(api_key=self.apikey, account_id=self.aid)
+        cb.email_login(TEST_ACCOUNT, TEST_PASSWORD)
 
     def ask(self, clname: str, q: str, top_k: int = 5):
         col = cb.Collection(name=clname)
