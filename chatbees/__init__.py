@@ -1,5 +1,6 @@
 from .client.collection_management import *
 from .client.admin_management import *
+from .client.application_management import *
 from .client_models.collection import *
 from .client_models.chat import *
 from .server_models.doc_api import *
