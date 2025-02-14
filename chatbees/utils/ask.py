@@ -49,6 +49,7 @@ def ask_application(
     url = f'{Config.get_base_url()}/applications/ask'
 
     req = AskRequest(
+        namespace_name=Config.namespace,
         application_name=application_name,
         question=question,
         top_k=top_k,

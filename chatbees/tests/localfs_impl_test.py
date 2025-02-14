@@ -7,11 +7,9 @@ from typing import List
 
 import chatbees as cb
 from chatbees import Chat
-from chatbees.server_models.application import ApplicationType
 from chatbees.server_models.collection_api import ChatAttributes
-from chatbees.server_models.doc_api import AnswerReference, ExtractType, ExtractedTable
+from chatbees.server_models.doc_api import AnswerReference
 from chatbees.utils.ask import ask_application
-from chatbees.utils.config import Config
 
 TEST_ACCOUNT = os.environ.get('ENV_TEST_ACCOUNT')
 TEST_PASSWORD = os.environ.get('ENV_TEST_PASSWORD')
@@ -125,7 +123,6 @@ class LocalfsImplTest(unittest.TestCase):
             cb.delete_application('test2')
         finally:
             cb.delete_collection(clname)
-
 
     def test_async_upload(self):
         clname = 'test_async_doc_apis'
