@@ -153,7 +153,7 @@ class LocalfsImplTest(unittest.TestCase):
             assert sorted(all_docs) == sorted(doc_names)
         finally:
             cb.delete_collection(col.name)
-    def test_doc_apis(self):
+    def test_realistic(self):
         clname = 'test_realistic'
 
         # create a collection and an application
