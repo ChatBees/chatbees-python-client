@@ -20,6 +20,14 @@ class LocalfsImplTest(unittest.TestCase):
     def setUp(self):
         cb.email_login(TEST_ACCOUNT, TEST_PASSWORD)
 
+    def tearDown(self):
+        cls = cb.list_collections()
+        apps = cb.list_applications()
+        for app in apps:
+            cb.delete_collection(app.application_name)
+        for cl in cls:
+            cb.delete_collection(cl)
+
     def ask(self, clname: str, q: str, top_k: int = 5):
         col = cb.Collection(name=clname)
         resp = col.ask(q, top_k)
