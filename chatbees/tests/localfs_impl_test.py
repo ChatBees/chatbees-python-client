@@ -153,12 +153,36 @@ class LocalfsImplTest(unittest.TestCase):
             assert sorted(all_docs) == sorted(doc_names)
         finally:
             cb.delete_collection(col.name)
+    def test_doc_apis(self):
+        clname = 'test_realistic'
+
+        # create a collection and an application
+        col = cb.collection(name=clname)
+        cb.create_collection(col)
+
+        app = cb.create_collection_application('testapp', collection_name=clname)
+
+        files = [
+            f'{os.path.dirname(os.path.abspath(__file__))}/data/realistic.txt',
+        ]
+        doc_names = {'realistic.txt'}
+
+        # add and summarize
+        for file in files:
+            col.upload_document(file)
+            fname = os.path.basename(file)
+            col.summarize_document(fname)
+
+        # ask
+        print("ask")
+        resp = col.ask('question?')
+        assert len(resp.refs) > 0
 
     def test_doc_apis(self):
         clname = 'test_doc_apis'
 
-        # Create a collection and an application
-        col = cb.Collection(name=clname)
+        # create a collection and an application
+        col = cb.collection(name=clname)
         cb.create_collection(col)
 
         app = cb.create_collection_application('testapp', collection_name=clname)
