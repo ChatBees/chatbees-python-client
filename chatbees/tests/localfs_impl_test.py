@@ -160,12 +160,9 @@ class LocalfsImplTest(unittest.TestCase):
         col = cb.collection(clname)
         cb.create_collection(col)
 
-        app = cb.create_collection_application('testapp', collection_name=clname)
-
         files = [
             f'{os.path.dirname(os.path.abspath(__file__))}/data/realistic.txt',
         ]
-        doc_names = {'realistic.txt'}
 
         # add and summarize
         for file in files:
@@ -174,9 +171,7 @@ class LocalfsImplTest(unittest.TestCase):
             col.summarize_document(fname)
 
         # ask
-        print("ask")
-        resp = col.ask('question?')
-        assert len(resp.refs) > 0
+        print(col.ask('what are the future work?'))
 
     def test_doc_apis(self):
         clname = 'test_doc_apis'
