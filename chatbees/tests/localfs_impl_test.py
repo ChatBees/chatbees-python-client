@@ -157,7 +157,7 @@ class LocalfsImplTest(unittest.TestCase):
         clname = 'test_realistic'
 
         # create a collection and an application
-        col = cb.collection(name=clname)
+        col = cb.collection(clname)
         cb.create_collection(col)
 
         app = cb.create_collection_application('testapp', collection_name=clname)
@@ -182,7 +182,7 @@ class LocalfsImplTest(unittest.TestCase):
         clname = 'test_doc_apis'
 
         # create a collection and an application
-        col = cb.collection(name=clname)
+        col = cb.collection(clname)
         cb.create_collection(col)
 
         app = cb.create_collection_application('testapp', collection_name=clname)
