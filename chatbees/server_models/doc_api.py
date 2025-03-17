@@ -1,3 +1,4 @@
+import enum
 import json
 from enum import Enum
 from typing import Any, List, Optional, Tuple, Dict
@@ -17,6 +18,19 @@ __all__ = [
     "DocumentType",
 ]
 
+class GetDocRequest(CollectionBaseRequest):
+    doc_name: str
+
+    # fastapi server expects "property name enclosed in double quotes" when
+    # using with UploadFile. pydantic.model_dump_json() uses single quote.
+    # explicitly uses json.loads() and dumps().
+    @classmethod
+    def validate_to_json(cls, value):
+        return cls(**json.loads(value)) if isinstance(value, str) else value
+
+    def to_json_string(self) -> str:
+        return json.dumps(self.__dict__)
+
 class AddDocRequest(CollectionBaseRequest):
     # fastapi server expects "property name enclosed in double quotes" when
     # using with UploadFile. pydantic.model_dump_json() uses single quote.
@@ -27,6 +41,9 @@ class AddDocRequest(CollectionBaseRequest):
 
     def to_json_string(self) -> str:
         return json.dumps(self.__dict__)
+
+class AsyncAddDocResponse(BaseModel):
+    task_ids: List[str]
 
 
 class DeleteDocRequest(CollectionBaseRequest):
@@ -53,12 +70,25 @@ class DocumentMetadata(BaseModel):
     url: Optional[str] = None
     type: DocumentType
 
+class UploadStatus(str, enum.Enum):
+    IN_QUEUE = 'IN_QUEUE' # In queue
+    VECTORIZING = 'VECTORIZING' # Processing file -> vectors
+    INDEXING = 'INDEXING' # Processing file -> vectors
+    SUCCEEDED = 'SUCCEEDED' # Processing file -> vectors
+    FAILED = 'FAILED' # Processing file -> vectors
+
+class PendingDocumentMetadata(DocumentMetadata):
+    task_id: str
+    status: UploadStatus
+    error: str
 
 class ListDocsResponse(BaseModel):
     documents: List[DocumentMetadata] = []
 
     # To be deprecated
     doc_names: List[str]
+
+    pending_documents: List[PendingDocumentMetadata] = []
 
 
 class AskRequest(CollectionBaseRequest):
@@ -200,3 +230,10 @@ class GetCrawlResponse(BaseModel):
 
 class IndexCrawlRequest(CollectionBaseRequest):
     crawl_id: str
+
+class AskApplicationRequest(BaseModel):
+    application_name: str
+    app_request: str
+
+class AskApplicationResponse(BaseModel):
+    app_response: str
